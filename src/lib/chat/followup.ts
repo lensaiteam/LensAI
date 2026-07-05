@@ -1,5 +1,5 @@
 import "server-only";
-import { anthropic } from "../ai/anthropic";
+import { getProvider } from "../ai/provider";
 import { SHORT_DISCLAIMER } from "../ai/disclaimer";
 import { env } from "../env";
 import type { CachedToken } from "../types";
@@ -33,35 +33,27 @@ export async function streamFollowup(
       )}`
     : `The user previously asked about ${ticker}, but the stored analysis has expired.`;
 
-  const client = anthropic();
-  const stream = client.messages.stream({
-    model,
-    max_tokens: 1000,
-    system: [{ type: "text", text: CHAT_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: context, cache_control: { type: "ephemeral" } },
-        ],
-      },
-      { role: "assistant", content: "Understood — I have the analysis context. What's your question?" },
-      ...history.map((h) => ({ role: h.role, content: h.content })),
-      { role: "user" as const, content: message },
-    ],
-  });
-
-  stream.on("text", (d) => onText(d));
-  const final = await stream.finalMessage();
-  const text = final.content
-    .filter((b): b is Extract<typeof b, { type: "text" }> => b.type === "text")
-    .map((b) => b.text)
-    .join("");
+  const provider = getProvider();
+  const result = await provider.streamMessage(
+    {
+      model,
+      system: CHAT_SYSTEM_PROMPT,
+      messages: [
+        { role: "user", content: context },
+        { role: "assistant", content: "Understood — I have the analysis context. What's your question?" },
+        ...history,
+        { role: "user", content: message },
+      ],
+      maxTokens: 1000,
+      webSearch: false, // §5.4 — re-use already-gathered context, no new search
+    },
+    onText,
+  );
 
   return {
-    text,
-    model,
-    inputTokens: final.usage.input_tokens ?? 0,
-    outputTokens: final.usage.output_tokens ?? 0,
+    text: result.text,
+    model: `${provider.name}/${model}`,
+    inputTokens: result.inputTokens,
+    outputTokens: result.outputTokens,
   };
 }

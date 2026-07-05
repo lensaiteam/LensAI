@@ -40,6 +40,7 @@ export default function Landing() {
 
 function Inner() {
   const [stuck, setStuck] = useState(false);
+  const [light, setLight] = useState(false);
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (v) => setStuck(v > 40));
 
@@ -50,7 +51,7 @@ function Inner() {
   });
 
   return (
-    <div className="lp">
+    <div className={`lp${light ? " light" : ""}`}>
       {/* Nav */}
       <nav className={`lp-nav${stuck ? " stuck" : ""}`}>
         <Link className="brand" href="/"><span className="glyph" />LensAI</Link>
@@ -58,6 +59,7 @@ function Inner() {
           <a className="navlink" href="#read">The read</a>
           <a className="navlink" href="#method">Method</a>
           <a className="navlink" href="#stance">Stance</a>
+          <button className="tgl" onClick={() => setLight(!light)}>{light ? "Dark" : "Light"}</button>
           <Link className="tlink" href="/app"><span>Open the desk</span><span className="a">→</span></Link>
         </div>
       </nav>

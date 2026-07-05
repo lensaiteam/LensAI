@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>LensAI — Brand & Motion Foundation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+/* ============================================================
+   LensAI — Brand & Motion Foundation
+   Dark-committed identity: a private intelligence terminal.
+   Self-contained (no external fonts/scripts) for the sandbox.
+   ============================================================ */
+
+:root{
+  /* ── Ground & neutrals (blue-black, chosen — not default grey) ── */
+  --void:#07070f;  --ink-1:#0b0b16;  --ink-2:#11111d;  --ink-3:#181828;
+  --line:#232338;  --line-2:#32324c;
+  --mut:#63637f;   --sec:#9a9ac2;    --txt:#edefff;
+  /* ── Gold: the single hero ── */
+  --gold-d:#8f6f2a; --gold:#c8a84b;  --gold-l:#e8c96a;  --gold-h:#f6dc84;
+  /* ── Counterpoints & signals ── */
+  --aqua:#33e0c4;  --aqua-d:#0f9e8a;
+  --iris:#9b8cff;
+  --pos:#3ecf8e;   --neg:#f4636e;    --warn:#e8a13c;
+  /* ── Atmosphere ── */
+  --glow-gold:rgba(200,168,75,.45);
+  --glow-aqua:rgba(51,224,196,.32);
+  --glow-iris:rgba(155,140,255,.30);
+
+  --serif:"Fraunces","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+  font-optical-sizing:auto;
+
+  --ease:cubic-bezier(.16,1,.3,1);       /* expo-out: entrances */
+  --ease-snap:cubic-bezier(.22,1,.36,1);
+  --mx:50%; --my:50%;                    /* pointer, set by JS */
+}
+
+/* Light toggle: keep the dark world but lift it a touch — a deliberate,
+   dark-committed identity that still answers the viewer's toggle. */
+:root[data-theme="light"]{
+  --void:#0e0e1a; --ink-1:#141422; --ink-2:#1b1b2c; --ink-3:#232336;
+  --line:#2e2e46; --sec:#b4b4d6; --txt:#f6f7ff;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--void);color:var(--txt);font-family:var(--sans);
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  font-size:16px;
+}
+::selection{background:rgba(200,168,75,.28);color:#fff}
+a{color:inherit;text-decoration:none}
+
+/* ── Ambient background: grid + drifting orbs ── */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-grid{position:absolute;inset:-2px;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+                  linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 90% 70% at 50% 30%,#000 40%,transparent 100%);
+}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;will-change:transform}
+.orb.a{width:44vw;height:44vw;left:-10vw;top:-8vw;background:radial-gradient(circle,var(--glow-gold),transparent 68%)}
+.orb.b{width:38vw;height:38vw;right:-8vw;top:24vh;background:radial-gradient(circle,var(--glow-aqua),transparent 68%)}
+.orb.c{width:34vw;height:34vw;left:18vw;top:150vh;background:radial-gradient(circle,var(--glow-iris),transparent 68%)}
+.scan{position:absolute;inset:0;opacity:.5;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.14) 3px 4px);
+  mix-blend-mode:overlay}
+
+/* ── Scroll progress (top hairline) ── */
+.progress{position:fixed;top:0;left:0;height:2px;z-index:200;transform-origin:left;
+  transform:scaleX(0);width:100%;
+  background:linear-gradient(90deg,var(--gold-d),var(--gold-l),var(--aqua))}
+
+/* ── Shell ── */
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 28px}
+section{position:relative;z-index:1;padding:120px 0}
+
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:66px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 28px;transition:background .4s,border-color .4s,backdrop-filter .4s;
+  border-bottom:1px solid transparent}
+.nav.stuck{background:rgba(7,7,15,.72);backdrop-filter:blur(20px) saturate(1.3);border-color:var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:-.02em}
+.mark{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;
+  background:linear-gradient(145deg,var(--gold-l),var(--gold-d));color:#0a0a12;font-weight:800;font-size:15px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 8px 24px -8px var(--glow-gold);position:relative;overflow:hidden}
+.mark::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 40%,rgba(255,255,255,.6) 50%,transparent 60%);
+  transform:translateX(-120%);animation:sheen 5s var(--ease) infinite 2s}
+@keyframes sheen{0%{transform:translateX(-120%)}18%,100%{transform:translateX(120%)}}
+.nav-tag{font-family:var(--mono);font-size:10.5px;color:var(--mut);letter-spacing:.06em;
+  border:1px solid var(--line);padding:5px 10px;border-radius:100px}
+
+/* ── Type primitives ── */
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);
+  display:inline-flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:22px;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.02;letter-spacing:-.02em;text-wrap:balance}
+h2{font-size:clamp(30px,4.6vw,54px);margin:20px 0 18px}
+h2 em{font-style:italic;color:var(--gold-l)}
+.lead{font-size:clamp(16px,1.7vw,19px);color:var(--sec);max-width:60ch}
+.mono{font-family:var(--mono)}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line-2) 12%,var(--line-2) 88%,transparent);
+  transform:scaleX(0);transform-origin:center}
+.rule.in{transform:scaleX(1);transition:transform 1.1s var(--ease)}
+
+/* ── Reveal system (base for scroll combos) ── */
+.reveal{opacity:0;will-change:transform,opacity,filter}
+.reveal.rise{transform:translateY(34px)}
+.reveal.blur{transform:translateY(24px) scale(1.03);filter:blur(10px)}
+.reveal.skew{transform:translateY(30px) skewY(3deg)}
+.reveal.wipe{clip-path:inset(0 100% 0 0)}
+.reveal.in{opacity:1;transform:none;filter:none;clip-path:inset(0 0 0 0);
+  transition:opacity .8s var(--ease),transform .9s var(--ease),filter .9s var(--ease),clip-path 1s var(--ease)}
+.stag>*{opacity:0;transform:translateY(22px)}
+.stag.in>*{opacity:1;transform:none;transition:opacity .7s var(--ease),transform .8s var(--ease)}
+
+/* ═══════════════════ HERO ═══════════════════ */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:66px}
+.boot{font-family:var(--mono);font-size:12px;color:var(--mut);letter-spacing:.04em;margin-bottom:26px;
+  display:flex;align-items:center;gap:10px;opacity:0;animation:fadeUp .8s var(--ease) .2s forwards}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--pos);box-shadow:0 0 12px var(--pos);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(62,207,142,.5)}50%{opacity:.6;box-shadow:0 0 0 6px rgba(62,207,142,0)}}
+.hero h1{font-size:clamp(46px,9vw,124px);letter-spacing:-.035em;margin:0 0 26px}
+.hero h1 .word{display:inline-block;overflow:hidden;vertical-align:top}
+.hero h1 .word i{display:inline-block;font-style:normal;transform:translateY(110%);
+  animation:wordUp 1s var(--ease) forwards}
+.hero h1 .word.it i{font-style:italic;color:var(--gold-l)}
+@keyframes wordUp{to{transform:translateY(0)}}
+.hero-sub{max-width:56ch;font-size:clamp(16px,1.8vw,20px);color:var(--sec);
+  opacity:0;animation:fadeUp .9s var(--ease) 1.05s forwards}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:38px;opacity:0;animation:fadeUp .9s var(--ease) 1.25s forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+/* Buttons: magnetic + pointer glow + sheen */
+.btn{position:relative;font-weight:600;font-size:14px;padding:14px 26px;border-radius:12px;cursor:pointer;
+  border:1px solid transparent;overflow:hidden;transition:transform .25s var(--ease-snap),box-shadow .3s;
+  will-change:transform;display:inline-flex;align-items:center;gap:9px}
+.btn.solid{color:#0a0a12;background:linear-gradient(140deg,var(--gold-h),var(--gold),var(--gold-d));
+  box-shadow:0 12px 32px -12px var(--glow-gold)}
+.btn.solid::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .3s;
+  background:radial-gradient(160px circle at var(--mx) var(--my),rgba(255,255,255,.5),transparent 60%)}
+.btn.solid:hover::before{opacity:1}
+.btn.solid:hover{box-shadow:0 18px 44px -12px var(--glow-gold)}
+.btn.ghost{color:var(--txt);border-color:var(--line-2);background:rgba(255,255,255,.02)}
+.btn.ghost::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .3s;
+  background:radial-gradient(180px circle at var(--mx) var(--my),var(--glow-aqua),transparent 62%)}
+.btn.ghost:hover{border-color:transparent;color:#fff}
+.btn.ghost:hover::before{opacity:1}
+.btn span{position:relative;z-index:1}
+.btn .arw{transition:transform .3s var(--ease-snap)}
+.btn:hover .arw{transform:translateX(4px)}
+
+.scrollcue{position:absolute;bottom:34px;left:28px;font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;
+  color:var(--mut);text-transform:uppercase;display:flex;align-items:center;gap:10px;
+  opacity:0;animation:fadeUp 1s var(--ease) 1.6s forwards}
+.scrollcue .ln{width:1px;height:34px;background:linear-gradient(var(--gold),transparent);position:relative;overflow:hidden}
+.scrollcue .ln::after{content:"";position:absolute;top:-34px;left:0;width:1px;height:34px;
+  background:var(--gold-l);animation:drop 2s var(--ease) infinite}
+@keyframes drop{to{top:34px}}
+
+/* Live ticker strip */
+.ticker{margin-top:56px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  overflow:hidden;white-space:nowrap;opacity:0;animation:fadeUp 1s var(--ease) 1.5s forwards;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.ticker-row{display:inline-flex;gap:44px;padding:14px 22px;animation:marq 32s linear infinite;font-family:var(--mono);font-size:13px}
+.ticker:hover .ticker-row{animation-play-state:paused}
+.tk{display:inline-flex;gap:9px;align-items:center;color:var(--sec)}
+.tk b{color:var(--txt);font-weight:600}
+.tk .up{color:var(--pos)} .tk .dn{color:var(--neg)}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* ═══════════════════ THESIS ═══════════════════ */
+.thesis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:44px}
+.cell{background:var(--ink-1);padding:32px 28px;transition:background .4s}
+.cell:hover{background:var(--ink-2)}
+.cell .k{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.16em;text-transform:uppercase}
+.cell h3{font-size:22px;margin:14px 0 10px}
+.cell p{font-size:14.5px;color:var(--sec)}
+
+/* ═══════════════════ COLOR ═══════════════════ */
+.pal{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-top:44px}
+@media(max-width:760px){.pal{grid-template-columns:1fr}}
+.sw{border-radius:16px;border:1px solid var(--line);padding:22px;position:relative;overflow:hidden;
+  min-height:150px;display:flex;flex-direction:column;justify-content:flex-end;cursor:default;transition:transform .3s var(--ease)}
+.sw:hover{transform:translateY(-3px)}
+.sw .nm{font-family:var(--mono);font-size:12px;letter-spacing:.05em}
+.sw .hx{font-family:var(--mono);font-size:12px;opacity:.7;margin-top:3px}
+.sw .role{font-size:12.5px;color:inherit;opacity:.85;margin-top:10px}
+.sw.hero-sw{grid-row:span 2;background:
+  radial-gradient(120% 90% at 20% 0%,rgba(246,220,132,.16),transparent 60%),
+  linear-gradient(150deg,var(--gold-d),#1a1408);color:var(--gold-h);border-color:var(--gold-d)}
+.sw.hero-sw .big{font-family:var(--serif);font-size:46px;color:var(--gold-h);line-height:1;margin-bottom:auto}
+.sw.void-sw{background:var(--void);color:var(--sec)}
+.sw.aqua-sw{background:linear-gradient(150deg,#062a26,#031714);color:var(--aqua);border-color:var(--aqua-d)}
+.sw.iris-sw{background:linear-gradient(150deg,#191436,#0c0a1c);color:var(--iris)}
+.ramp{display:flex;gap:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-top:16px;height:52px}
+.ramp span{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;
+  font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.5)}
+.sig-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:12px;padding:8px 14px;border-radius:100px;display:inline-flex;gap:8px;align-items:center;
+  border:1px solid currentColor}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor}
+.chip.pos{color:var(--pos)} .chip.neg{color:var(--neg)} .chip.warn{color:var(--warn)} .chip.aq{color:var(--aqua)} .chip.ir{color:var(--iris)}
+.grad-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px}
+@media(max-width:640px){.grad-row{grid-template-columns:1fr}}
+.grad{height:64px;border-radius:12px;position:relative;border:1px solid var(--line);overflow:hidden}
+.grad span{position:absolute;bottom:8px;left:12px;font-family:var(--mono);font-size:10px;color:rgba(0,0,0,.55);font-weight:700}
+.g1{background:linear-gradient(120deg,var(--gold-h),var(--gold),var(--gold-d))}
+.g2{background:linear-gradient(120deg,var(--aqua),var(--iris))}
+.g3{background:linear-gradient(120deg,var(--gold-l),var(--warn) 60%,#7a3d12)}
+
+/* ═══════════════════ TYPE ═══════════════════ */
+.type-hero{font-family:var(--serif);font-size:clamp(60px,13vw,150px);line-height:.92;letter-spacing:-.03em;margin-top:30px}
+.type-hero em{font-style:italic;color:var(--gold-l)}
+.specimen{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);
+  border-radius:16px;overflow:hidden;margin-top:40px}
+@media(max-width:760px){.specimen{grid-template-columns:1fr}}
+.spec{background:var(--ink-1);padding:30px}
+.spec .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);
+  display:flex;justify-content:space-between;margin-bottom:20px}
+.spec .lbl b{color:var(--gold)}
+.scale>div{display:flex;align-items:baseline;gap:14px;padding:9px 0;border-bottom:1px solid var(--ink-3)}
+.scale>div:last-child{border:0}
+.scale .sz{font-family:var(--mono);font-size:10px;color:var(--mut);width:44px;flex-shrink:0}
+.scale .t{font-family:var(--serif)}
+.datarow{font-family:var(--mono);display:flex;justify-content:space-between;align-items:center;padding:11px 0;
+  border-bottom:1px solid var(--ink-3);font-size:14px;font-variant-numeric:tabular-nums}
+.datarow:last-child{border:0}
+.datarow .u{color:var(--pos)} .datarow .d{color:var(--neg)}
+.fonts-note{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.font-tag{border:1px solid var(--line);border-radius:12px;padding:14px 18px;flex:1;min-width:180px;background:var(--ink-1)}
+.font-tag .fn{font-size:17px;font-weight:600}
+.font-tag .fr{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.1em;margin:4px 0 8px}
+.font-tag p{font-size:12.5px;color:var(--sec)}
+
+/* ═══════════════════ MOTION ═══════════════════ */
+.motion-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:44px}
+.demo{border:1px solid var(--line);border-radius:16px;background:var(--ink-1);padding:24px;overflow:hidden;position:relative;
+  min-height:180px;display:flex;flex-direction:column;cursor:pointer}
+.demo .cap{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.demo .cap2{font-size:13px;color:var(--sec);margin-bottom:auto}
+.demo .stage{flex:1;display:grid;place-items:center;min-height:80px}
+.replay{position:absolute;top:16px;right:18px;font-family:var(--mono);font-size:9.5px;color:var(--mut);
+  border:1px solid var(--line);border-radius:100px;padding:4px 9px}
+/* demo objects */
+.d-box{width:60px;height:60px;border-radius:14px;background:linear-gradient(140deg,var(--gold-l),var(--gold-d))}
+.d-line{width:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--aqua))}
+.demo.play .d-mask i{animation:wordUp .8s var(--ease) forwards}
+.d-mask{overflow:hidden}.d-mask i{display:inline-block;font-family:var(--serif);font-size:34px;font-style:italic;color:var(--gold-l);transform:translateY(110%)}
+.demo.play .d-blur{animation:blurin 1s var(--ease) forwards}
+.d-blur{font-family:var(--serif);font-size:30px;opacity:0;filter:blur(12px);transform:scale(1.1)}
+@keyframes blurin{to{opacity:1;filter:blur(0);transform:none}}
+.demo.play .d-line{animation:draw 1s var(--ease) forwards}
+@keyframes draw{to{width:80%}}
+.demo.play .d-box.spin{animation:skewset .9s var(--ease) forwards}
+@keyframes skewset{0%{transform:translateY(30px) skewY(10deg) scale(.9);opacity:0}100%{transform:none;opacity:1}}
+.d-count{font-family:var(--mono);font-size:38px;font-weight:700;color:var(--gold-l);font-variant-numeric:tabular-nums}
+.d-sheen{width:150px;height:44px;border-radius:100px;border:1px solid var(--pos);color:var(--pos);
+  font-family:var(--mono);font-size:12px;display:grid;place-items:center;position:relative;overflow:hidden}
+.demo.play .d-sheen::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(110deg,transparent 30%,rgba(62,207,142,.5) 50%,transparent 70%);
+  transform:translateX(-130%);animation:sw2 1.1s var(--ease) forwards}
+@keyframes sw2{to{transform:translateX(130%)}}
+.d-stag i{display:block;width:38px;height:8px;border-radius:4px;background:var(--line-2);margin:5px 0;opacity:0;transform:translateX(-20px)}
+.demo.play .d-stag i{animation:stagIn .5s var(--ease) forwards}
+.demo.play .d-stag i:nth-child(2){animation-delay:.08s}
+.demo.play .d-stag i:nth-child(3){animation-delay:.16s}
+.demo.play .d-stag i:nth-child(4){animation-delay:.24s}
+@keyframes stagIn{to{opacity:1;transform:none;background:var(--gold)}}
+
+/* Spotlight tilt card */
+.tilt{border:1px solid var(--line);border-radius:18px;background:
+  radial-gradient(220px circle at var(--mx) var(--my),rgba(200,168,75,.14),transparent 60%),var(--ink-1);
+  padding:30px;transition:transform .2s var(--ease),border-color .3s;transform-style:preserve-3d;will-change:transform}
+.tilt:hover{border-color:var(--line-2)}
+
+/* Scroll-linked demo band */
+.scrub{margin-top:52px;border:1px solid var(--line);border-radius:20px;background:var(--ink-1);
+  padding:40px 32px;overflow:hidden;position:relative}
+.scrub .track{height:3px;background:var(--ink-3);border-radius:2px;overflow:hidden;margin:26px 0 30px}
+.scrub .fill{height:100%;width:var(--p,0%);background:linear-gradient(90deg,var(--neg),var(--warn),var(--pos));transition:width .1s linear}
+.scrub .verdict{font-family:var(--serif);font-size:clamp(30px,6vw,64px);line-height:1;transition:color .3s}
+.scrub .pdisp{font-family:var(--mono);font-size:12px;color:var(--mut);letter-spacing:.1em}
+.parax{will-change:transform}
+
+/* ═══════════════════ APPLIED ═══════════════════ */
+.applied{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:44px;align-items:center}
+@media(max-width:860px){.applied{grid-template-columns:1fr}}
+.mock-hero h3{font-family:var(--serif);font-size:clamp(30px,4.4vw,50px);line-height:1.02}
+.mock-hero h3 em{font-style:italic;color:var(--gold-l)}
+.mock-hero p{color:var(--sec);margin:16px 0 22px;font-size:15px}
+.acard{border:1px solid var(--line);border-radius:20px;background:
+  radial-gradient(300px circle at var(--mx) var(--my),rgba(200,168,75,.10),transparent 60%),
+  linear-gradient(160deg,var(--ink-2),var(--ink-1));padding:26px;position:relative;overflow:hidden}
+.acard .top{display:flex;justify-content:space-between;align-items:flex-start}
+.acard .sym{width:44px;height:44px;border-radius:12px;background:linear-gradient(140deg,var(--gold-l),var(--gold-d));
+  color:#0a0a12;font-weight:800;display:grid;place-items:center;font-size:15px}
+.acard .price{font-family:var(--mono);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+.acard .nm{font-size:13px;color:var(--sec)}
+.acard .spark{width:100%;height:56px;margin:18px 0}
+.acard .verdict-chip{font-family:var(--mono);font-size:12px;padding:7px 13px;border-radius:100px;color:var(--pos);
+  border:1px solid var(--pos);display:inline-flex;gap:8px;align-items:center;position:relative;overflow:hidden}
+.acard .verdict-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--pos);box-shadow:0 0 10px var(--pos)}
+.acard .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;margin-top:20px}
+.acard .kv{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12.5px;
+  padding:8px 0;border-bottom:1px solid var(--ink-3);font-variant-numeric:tabular-nums}
+.acard .kv span:first-child{color:var(--mut)}
+.acard .flags{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.fl{font-family:var(--mono);font-size:10.5px;padding:5px 10px;border-radius:8px;border:1px solid var(--line)}
+.fl.g{color:var(--pos);border-color:rgba(62,207,142,.3)} .fl.y{color:var(--warn);border-color:rgba(232,161,60,.3)}
+.disc{margin-top:18px;font-size:11px;color:var(--mut);font-style:italic}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--line);padding:70px 0 60px;position:relative;z-index:1;text-align:center}
+footer .big{font-family:var(--serif);font-size:clamp(26px,4vw,42px);line-height:1.15;max-width:20ch;margin:0 auto 24px}
+footer .big em{font-style:italic;color:var(--gold-l)}
+footer .meta{font-family:var(--mono);font-size:11px;color:var(--mut);letter-spacing:.06em}
+
+.foot-note{max-width:1180px;margin:26px auto 0;padding:0 28px;font-size:12px;color:var(--mut);text-align:center}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal,.stag>*{opacity:1!important;transform:none!important;filter:none!important;clip-path:none!important}
+  .rule{transform:scaleX(1)!important}
+  .hero h1 .word i{transform:none!important}
+}
+</style>
+
+<div class="bg">
+  <div class="bg-grid"></div>
+  <div class="orb a parax" data-speed="0.10"></div>
+  <div class="orb b parax" data-speed="-0.14"></div>
+  <div class="orb c parax" data-speed="0.08"></div>
+  <div class="scan"></div>
+</div>
+<div class="progress" id="prog"></div>
+
+<nav class="nav" id="nav">
+  <a class="brand" href="#top"><span class="mark">L</span>LensAI</a>
+  <span class="nav-tag">BRAND&nbsp;·&nbsp;MOTION&nbsp;FOUNDATION&nbsp;v1</span>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header class="hero wrap" id="top">
+  <div class="boot mono"><span class="dot"></span>system online · signal engine calibrated · <span style="color:var(--aqua)">non-advisory</span></div>
+  <h1 id="heroH1">
+    <span class="word"><i>Decision</i></span> <span class="word"><i>grade</i></span><br>
+    <span class="word it"><i>intelligence,</i></span><br>
+    <span class="word"><i>never</i></span> <span class="word"><i>advice.</i></span>
+  </h1>
+  <p class="hero-sub">A private research terminal for crypto. LensAI reads live markets and current news, then tells you whether the signals look <b style="color:var(--pos)">positive</b>, <b style="color:var(--warn)">mixed</b>, or <b style="color:var(--neg)">negative</b> — with the reasoning, both sides, and no one telling you to buy.</p>
+  <div class="hero-cta">
+    <button class="btn solid mag"><span>Analyze a token</span><span class="arw">→</span></button>
+    <button class="btn ghost mag"><span>See the system</span></button>
+  </div>
+
+  <div class="ticker">
+    <div class="ticker-row" id="trow"></div>
+  </div>
+
+  <div class="scrollcue"><span class="ln"></span>Scroll</div>
+</header>
+
+<!-- ═══════════ THESIS ═══════════ -->
+<section class="wrap">
+  <span class="eyebrow reveal rise">The differentiation thesis</span>
+  <h2 class="reveal rise">How the top 1% of sites <em>stand apart</em> — and what LensAI borrows.</h2>
+  <p class="lead reveal rise">Linear, Stripe, Phantom, Arbitrum, Framer. None of them win with more. They win with restraint, one confident idea, and motion that feels authored. Crypto is a grotesk-and-mono monoculture — so LensAI refuses to look like it.</p>
+  <div class="rule" style="margin-top:36px"></div>
+
+  <div class="thesis-grid stag">
+    <div class="cell">
+      <div class="k">Restraint</div>
+      <h3>One hero, held.</h3>
+      <p>A single accent — gold — carries the brand. Everything else stays quiet neutrals. Boldness spent in one place reads as confidence, not noise.</p>
+    </div>
+    <div class="cell">
+      <div class="k">Voice</div>
+      <h3>Editorial, not techy.</h3>
+      <p>A high-contrast serif for headlines and a data mono for numbers. It reads like a research house, not another wallet landing page.</p>
+    </div>
+    <div class="cell">
+      <div class="k">Motion</div>
+      <h3>Authored, not sprinkled.</h3>
+      <p>Choreographed load sequences, scroll-scrubbed reveals, magnetic hovers. Motion that means something beats a hundred fade-ups.</p>
+    </div>
+    <div class="cell">
+      <div class="k">Depth</div>
+      <h3>Alive, quietly.</h3>
+      <p>Ambient gold and aqua light, a faint terminal grid, hairline rules that draw themselves. Atmosphere you feel before you notice.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ COLOR ═══════════ -->
+<section class="wrap">
+  <span class="eyebrow reveal rise">Identity · Color</span>
+  <h2 class="reveal rise">The palette: <em>gold on the void</em>, one cool counterpoint.</h2>
+  <p class="lead reveal rise">Your originals stay locked — the blue-black void and antique gold. Around them, a disciplined system: an electric aqua for anything live or interactive, a violet for AI moments, and three signal colors that are never the accent.</p>
+
+  <div class="pal reveal blur">
+    <div class="sw hero-sw">
+      <div class="big">Aa</div>
+      <div class="nm">Gold — the hero</div>
+      <div class="hx">#c8a84b</div>
+      <div class="role">Brand, value, insight. Used for one thing at a time.</div>
+    </div>
+    <div class="sw void-sw">
+      <div class="nm">Void — the ground</div>
+      <div class="hx">#07070f</div>
+      <div class="role">Blue-black. Chosen, not default. Makes gold sing.</div>
+    </div>
+    <div class="sw aqua-sw">
+      <div class="nm">Aqua — live</div>
+      <div class="hx">#33e0c4</div>
+      <div class="role">Interactive states, links, "data is fresh".</div>
+    </div>
+  </div>
+
+  <div class="ramp reveal rise" id="goldramp"></div>
+
+  <div class="sig-row reveal rise">
+    <span class="chip pos">POSITIVE&nbsp;·&nbsp;#3ecf8e</span>
+    <span class="chip warn">MIXED&nbsp;·&nbsp;#e8a13c</span>
+    <span class="chip neg">NEGATIVE&nbsp;·&nbsp;#f4636e</span>
+    <span class="chip aq">LIVE&nbsp;·&nbsp;#33e0c4</span>
+    <span class="chip ir">AI&nbsp;·&nbsp;#9b8cff</span>
+  </div>
+
+  <div class="grad-row reveal rise">
+    <div class="grad g1"><span>AURUM · CTA & chrome</span></div>
+    <div class="grad g2"><span>SIGNAL · aqua→iris (AI)</span></div>
+    <div class="grad g3"><span>EMBER · risk & heat</span></div>
+  </div>
+</section>
+
+<!-- ═══════════ TYPE ═══════════ -->
+<section class="wrap">
+  <span class="eyebrow reveal rise">Identity · Typography</span>
+  <h2 class="reveal rise">A serif with <em>authority</em>, a mono with precision.</h2>
+  <div class="type-hero reveal blur">Signal<em>&nbsp;over noise.</em></div>
+
+  <div class="specimen reveal rise">
+    <div class="spec">
+      <div class="lbl"><span>Display — serif</span><b>Fraunces</b></div>
+      <div class="scale">
+        <div><span class="sz">64</span><span class="t" style="font-size:44px">Bitcoin</span></div>
+        <div><span class="sz">40</span><span class="t" style="font-size:30px;font-style:italic;color:var(--gold-l)">decision-grade</span></div>
+        <div><span class="sz">24</span><span class="t" style="font-size:20px">Overall read</span></div>
+      </div>
+    </div>
+    <div class="spec">
+      <div class="lbl"><span>Data — mono</span><b>JetBrains Mono</b></div>
+      <div class="datarow"><span>BTC / USD</span><span>$62,578.74</span></div>
+      <div class="datarow"><span>24H</span><span class="d">−0.46%</span></div>
+      <div class="datarow"><span>7D</span><span class="u">+5.22%</span></div>
+      <div class="datarow"><span>MKT CAP</span><span>$1.25T</span></div>
+      <div class="datarow"><span>SIGNAL</span><span style="color:var(--pos)">POSITIVE</span></div>
+    </div>
+  </div>
+
+  <div class="fonts-note reveal rise">
+    <div class="font-tag"><div class="fn">Fraunces</div><div class="fr">DISPLAY / SERIF</div><p>High-contrast, optical-size serif. Editorial gravitas; the stroke contrast catches the gold. Set tight and large.</p></div>
+    <div class="font-tag"><div class="fn">Inter</div><div class="fr">UI / BODY</div><p>The neutral workhorse for a data-dense product. Legible at every size; the distinctiveness budget is spent elsewhere.</p></div>
+    <div class="font-tag"><div class="fn">JetBrains Mono</div><div class="fr">DATA / LABELS</div><p>Tickers, prices, timestamps, eyebrows. Tabular figures reinforce the "intelligence terminal" identity.</p></div>
+  </div>
+</section>
+
+<!-- ═══════════ MOTION ═══════════ -->
+<section class="wrap">
+  <span class="eyebrow reveal rise">The motion language</span>
+  <h2 class="reveal rise">Not fades — <em>combos</em> that make it breathe.</h2>
+  <p class="lead reveal rise">Every reveal is choreographed from more than one property. Hover any tile to replay it; scroll to feel the linked ones.</p>
+
+  <div class="motion-grid stag">
+    <div class="demo" data-demo><span class="replay">HOVER ↻</span><div class="cap">Mask reveal</div><div class="cap2">clip + rise + settle</div><div class="stage"><div class="d-mask"><i>reveal</i></div></div></div>
+    <div class="demo" data-demo><span class="replay">HOVER ↻</span><div class="cap">Blur to focus</div><div class="cap2">de-blur + scale-down</div><div class="stage"><div class="d-blur">in focus</div></div></div>
+    <div class="demo" data-demo><span class="replay">HOVER ↻</span><div class="cap">Hairline draw</div><div class="cap2">scaleX from origin</div><div class="stage"><div class="d-line"></div></div></div>
+    <div class="demo" data-demo><span class="replay">HOVER ↻</span><div class="cap">Skew settle</div><div class="cap2">kinetic entrance</div><div class="stage"><div class="d-box spin"></div></div></div>
+    <div class="demo" data-demo><span class="replay">HOVER ↻</span><div class="cap">Number tick</div><div class="cap2">count + pulse</div><div class="stage"><div class="d-count" data-count="94">0</div></div></div>
+    <div class="demo" data-demo><span class="replay">HOVER ↻</span><div class="cap">Sheen sweep</div><div class="cap2">gradient wipe on reveal</div><div class="stage"><div class="d-sheen">POSITIVE</div></div></div>
+    <div class="demo" data-demo><span class="replay">HOVER ↻</span><div class="cap">Stagger cascade</div><div class="cap2">per-item spring</div><div class="stage"><div class="d-stag"><i></i><i></i><i></i><i></i></div></div></div>
+    <div class="tilt mag" style="min-height:180px;display:flex;flex-direction:column">
+      <div class="cap mono" style="font-size:11px;color:var(--gold);letter-spacing:.1em">SPOTLIGHT TILT</div>
+      <div style="font-family:var(--serif);font-size:24px;margin-top:auto">Move your cursor.</div>
+      <div style="font-size:12.5px;color:var(--sec);margin-top:6px">Pointer-tracked 3D tilt + a gold light that follows.</div>
+    </div>
+  </div>
+
+  <!-- scroll-linked -->
+  <div class="scrub reveal rise">
+    <div class="eyebrow" style="color:var(--aqua)"><span style="background:linear-gradient(90deg,var(--aqua),transparent);width:22px;height:1px"></span>Scroll-linked</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-top:14px">
+      <div class="verdict" id="verdict">MIXED</div>
+      <div class="pdisp"><span id="ppct">50</span>% · scroll to read the signal</div>
+    </div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <p style="color:var(--sec);font-size:14px;max-width:60ch">As you scroll this section, the verdict is driven by scroll position — the same scrubbing that will animate the hero and section transitions in the live product.</p>
+  </div>
+</section>
+
+<!-- ═══════════ APPLIED ═══════════ -->
+<section class="wrap">
+  <span class="eyebrow reveal rise">Applied</span>
+  <h2 class="reveal rise">The whole system, <em>alive together.</em></h2>
+
+  <div class="applied">
+    <div class="mock-hero reveal rise">
+      <h3>Read any token before you <em>decide.</em></h3>
+      <p>Gold hero, editorial serif, mono data, one aqua counterpoint, motion that leads the eye. This is a fragment of the revamped LensAI — foundation applied.</p>
+      <button class="btn solid mag"><span>Analyze BTC</span><span class="arw">→</span></button>
+    </div>
+
+    <div class="acard tilt mag reveal blur">
+      <div class="top">
+        <div>
+          <div class="price">$62,578.74</div>
+          <div class="nm">Bitcoin · BTC</div>
+        </div>
+        <div class="sym">₿</div>
+      </div>
+      <svg class="spark" viewBox="0 0 300 56" preserveAspectRatio="none">
+        <defs><linearGradient id="sg" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stop-color="var(--pos)" stop-opacity=".35"/><stop offset="1" stop-color="var(--pos)" stop-opacity="0"/>
+        </linearGradient></defs>
+        <path id="sparkfill" d="" fill="url(#sg)"/>
+        <path id="sparkline" d="" fill="none" stroke="var(--pos)" stroke-width="2" stroke-linecap="round"/>
+        <circle id="sparkdot" r="3.2" fill="var(--pos)"/>
+      </svg>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="verdict-chip">SIGNAL · POSITIVE</span>
+        <span class="mono" style="font-size:12px;color:var(--mut)">as of 22:19</span>
+      </div>
+      <div class="grid2">
+        <div class="kv"><span>24H</span><span style="color:var(--neg)">−0.46%</span></div>
+        <div class="kv"><span>7D</span><span style="color:var(--pos)">+5.22%</span></div>
+        <div class="kv"><span>MKT CAP</span><span>$1.25T</span></div>
+        <div class="kv"><span>RANK</span><span>#1</span></div>
+      </div>
+      <div class="flags">
+        <span class="fl g">◆ Deepest liquidity</span>
+        <span class="fl g">◆ Halving supply</span>
+        <span class="fl y">◆ Macro-sensitive</span>
+      </div>
+      <div class="disc">LensAI provides information and analysis, not financial advice.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="big reveal rise">Built to feel like <em>a decision worth making</em> — not another crypto landing page.</div>
+    <div class="meta reveal rise">LENSAI · BRAND &amp; MOTION FOUNDATION · v1 · gold #c8a84b on void #07070f</div>
+  </div>
+</footer>
+<div class="foot-note">Fonts: Fraunces (display), Inter (UI), JetBrains Mono (data), loaded from Google Fonts. In the app these load via next/font. If a face looks wrong, you're offline — it falls back to Palatino/Georgia + system mono.</div>
+
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── Ticker content ── */
+  var toks=[['BTC','$62,578','+5.2%',1],['ETH','$1,770','+12.8%',1],['SOL','$80.98','+13.6%',1],
+    ['ARB','$0.078','-2.5%',0],['JUP','$0.24','+14.1%',1],['PEPE','$0.0000027','-3.2%',0],
+    ['LINK','$11.42','+4.1%',1],['DOGE','$0.061','-1.8%',0],['AVAX','$18.7','+6.9%',1]];
+  function tkHtml(){return toks.map(function(t){
+    return '<span class="tk"><b>'+t[0]+'</b> '+t[1]+' <span class="'+(t[3]?'up':'dn')+'">'+t[2]+'</span></span>';
+  }).join('');}
+  document.getElementById('trow').innerHTML = tkHtml()+tkHtml();
+
+  /* ── Gold ramp ── */
+  var ramp=['#3a2c0f','#6b521f','#8f6f2a','#c8a84b','#e8c96a','#f6dc84'];
+  document.getElementById('goldramp').innerHTML = ramp.map(function(c){
+    return '<span style="background:'+c+'">'+c+'</span>';
+  }).join('');
+
+  /* ── Reveal on scroll ── */
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:.18, rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.reveal,.rule,.stag').forEach(function(el){ io.observe(el); });
+
+  /* ── Motion demo tiles: replay on hover + play once in view ── */
+  document.querySelectorAll('[data-demo]').forEach(function(d){
+    function play(){ d.classList.remove('play'); void d.offsetWidth; d.classList.add('play');
+      var c=d.querySelector('[data-count]'); if(c) count(c); }
+    d.addEventListener('mouseenter',play);
+    var once=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){play();once.unobserve(e.target);}});},{threshold:.5});
+    once.observe(d);
+  });
+  function count(el){ var to=+el.dataset.count,t0=null,dur=900;
+    function step(t){ if(!t0)t0=t; var p=Math.min((t-t0)/dur,1); var e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(to*e); if(p<1)requestAnimationFrame(step);} requestAnimationFrame(step); }
+
+  /* ── Sparkline (applied card) ── */
+  (function(){
+    var pts=[42,40,44,38,36,45,41,48,44,52,49,56,53,60,58,63], W=300,H=56,max=Math.max.apply(0,pts),min=Math.min.apply(0,pts);
+    var d=pts.map(function(v,i){var x=i/(pts.length-1)*W,y=H-6-((v-min)/(max-min))*(H-14);return (i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);}).join(' ');
+    document.getElementById('sparkline').setAttribute('d',d);
+    document.getElementById('sparkfill').setAttribute('d',d+' L300 56 L0 56 Z');
+    var lx=W, ly=H-6-((pts[pts.length-1]-min)/(max-min))*(H-14);
+    var dot=document.getElementById('sparkdot'); dot.setAttribute('cx',lx-1); dot.setAttribute('cy',ly);
+  })();
+
+  /* ── Pointer glow / magnetic / tilt ── */
+  document.querySelectorAll('.mag').forEach(function(el){
+    el.addEventListener('pointermove',function(ev){
+      var r=el.getBoundingClientRect(), x=ev.clientX-r.left, y=ev.clientY-r.top;
+      el.style.setProperty('--mx',x+'px'); el.style.setProperty('--my',y+'px');
+      if(reduce) return;
+      var dx=(x/r.width-.5), dy=(y/r.height-.5);
+      if(el.classList.contains('tilt')){
+        el.style.transform='perspective(700px) rotateY('+(dx*7)+'deg) rotateX('+(-dy*7)+'deg)';
+      } else if(el.classList.contains('btn')){
+        el.style.transform='translate('+(dx*7)+'px,'+(dy*7)+'px)';
+      }
+    });
+    el.addEventListener('pointerleave',function(){ el.style.transform=''; });
+  });
+
+  /* ── Scroll-linked: progress bar, parallax, verdict scrub, nav ── */
+  var prog=document.getElementById('prog'), nav=document.getElementById('nav'),
+      parax=[].slice.call(document.querySelectorAll('.parax')),
+      scrub=document.querySelector('.scrub'), fill=document.getElementById('fill'),
+      verdict=document.getElementById('verdict'), ppct=document.getElementById('ppct'),
+      states=[['NEGATIVE','#f4636e'],['MIXED','#e8a13c'],['POSITIVE','#3ecf8e']],
+      ticking=false;
+  function onScroll(){
+    var y=window.scrollY, h=document.documentElement.scrollHeight-innerHeight;
+    prog.style.transform='scaleX('+(h>0?y/h:0)+')';
+    nav.classList.toggle('stuck', y>40);
+    if(!reduce) parax.forEach(function(p){ p.style.transform='translateY('+(y*(+p.dataset.speed))+'px)'; });
+    if(scrub){
+      var r=scrub.getBoundingClientRect(), vh=innerHeight;
+      var p=Math.max(0,Math.min(1,(vh-r.top)/(vh+r.height)));
+      fill.style.setProperty('--p',(p*100).toFixed(0)+'%');
+      ppct.textContent=(p*100).toFixed(0);
+      var s=states[Math.min(2,Math.floor(p*3))];
+      verdict.textContent=s[0]; verdict.style.color=s[1];
+    }
+    ticking=false;
+  }
+  addEventListener('scroll',function(){ if(!ticking){requestAnimationFrame(onScroll);ticking=true;} },{passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>

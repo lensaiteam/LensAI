@@ -2,39 +2,129 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design tokens ported from the prototype (design-reference/app.html). */
+/* ============================================================
+   LensAI brand tokens — "private intelligence terminal"
+   Source of truth: brand/foundation.html · memory: brand-identity
+   ============================================================ */
 :root {
-  --bg: #07070f;
-  --bg2: #0b0b18;
-  --bg3: #0f0f20;
-  --panel: #13131f;
-  --card: #181828;
-  --card2: #1d1d30;
-  --border: rgba(255, 255, 255, 0.07);
-  --border2: rgba(255, 255, 255, 0.13);
+  /* Ground & neutrals (blue-black, chosen) */
+  --void: #07070f;
+  --ink-1: #0b0b16;
+  --ink-2: #11111d;
+  --ink-3: #181828;
+  --line: #232338;
+  --line-2: #32324c;
+  --mut: #63637f;
+  --sec: #9a9ac2;
+  --txt: #edefff;
+
+  /* Gold — the single hero */
+  --gold-d: #8f6f2a;
   --gold: #c8a84b;
-  --gold2: #e8c96a;
-  --green: #22c55e;
-  --red: #ef4444;
-  --orange: #f59e0b;
-  --purple: #a78bfa;
-  --w: #eef0ff;
-  --w2: #9999b5;
-  --m: #555570;
+  --gold-l: #e8c96a;
+  --gold-h: #f6dc84;
+
+  /* Counterpoints & signals */
+  --aqua: #33e0c4;
+  --aqua-d: #0f9e8a;
+  --iris: #9b8cff;
+  --pos: #3ecf8e;
+  --neg: #f4636e;
+  --warn: #e8a13c;
+
+  /* Atmosphere */
+  --glow-gold: rgba(200, 168, 75, 0.45);
+  --glow-aqua: rgba(51, 224, 196, 0.32);
+  --glow-iris: rgba(155, 140, 255, 0.3);
+
+  /* Type (next/font injects the *-font vars) */
+  --font-serif-stack: var(--font-serif), "Iowan Old Style", Palatino, Georgia, serif;
+  --font-sans-stack: var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono-stack: var(--font-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Back-compat aliases (current functional pages still use these; R2/R3
+     migrate them to the names above, then these get removed). ── */
+  --bg: var(--void);
+  --bg2: var(--ink-1);
+  --bg3: var(--ink-2);
+  --panel: var(--ink-2);
+  --card: var(--ink-3);
+  --card2: #1d1d30;
+  --border: var(--line);
+  --border2: var(--line-2);
+  --gold2: var(--gold-l);
+  --gold3: rgba(200, 168, 75, 0.12);
+  --green: var(--pos);
+  --red: var(--neg);
+  --orange: var(--warn);
+  --purple: var(--iris);
+  --w: var(--txt);
+  --w2: var(--sec);
+  --m: var(--mut);
   --dim: #252538;
 }
 
+/* Dark-committed identity; the toggle lifts rather than inverts. */
+:root[data-theme="light"] {
+  --void: #0e0e1a;
+  --ink-1: #141422;
+  --ink-2: #1b1b2c;
+  --ink-3: #232336;
+  --line: #2e2e46;
+  --sec: #b4b4d6;
+  --txt: #f6f7ff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
 html,
 body {
   height: 100%;
 }
 body {
-  background: var(--bg);
-  color: var(--w);
+  background: var(--void);
+  color: var(--txt);
+  font-family: var(--font-sans-stack);
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
 }
+::selection {
+  background: rgba(200, 168, 75, 0.28);
+  color: #fff;
+}
 
-/* Thin gold-ish scrollbars to match the terminal aesthetic. */
+/* Type helpers */
+.font-serif {
+  font-family: var(--font-serif-stack);
+}
+.font-mono {
+  font-family: var(--font-mono-stack);
+}
+
+/* Lenis smooth scroll (applied on marketing routes only) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Thin scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -47,25 +137,26 @@ body {
   background: transparent;
 }
 
-/* Rendered markdown inside analysis/chat bubbles. */
+/* Rendered markdown (analysis / chat) — brand-aligned */
 .md h2 {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--gold);
-  margin: 20px 0 8px;
-  letter-spacing: -0.2px;
+  font-family: var(--font-serif-stack);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--gold-l);
+  letter-spacing: -0.01em;
+  margin: 22px 0 8px;
 }
 .md h2:first-child {
   margin-top: 0;
 }
 .md p {
-  color: var(--w2);
-  line-height: 1.65;
+  color: var(--sec);
+  line-height: 1.7;
   margin: 8px 0;
   font-size: 14px;
 }
 .md strong {
-  color: var(--w);
+  color: var(--txt);
   font-weight: 600;
 }
 .md ul {
@@ -73,18 +164,20 @@ body {
   padding-left: 18px;
 }
 .md li {
-  color: var(--w2);
-  line-height: 1.6;
+  color: var(--sec);
+  line-height: 1.65;
   font-size: 14px;
   margin: 4px 0;
 }
 .md a {
-  color: var(--gold2);
+  color: var(--aqua);
   text-decoration: underline;
+  text-underline-offset: 2px;
   word-break: break-all;
 }
 .md code {
-  background: var(--card);
+  font-family: var(--font-mono-stack);
+  background: var(--ink-3);
   padding: 1px 5px;
   border-radius: 4px;
   font-size: 12px;

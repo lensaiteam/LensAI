@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Research Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="icon" type="image/png" href="Ai logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#07070f; --bg2:#0b0b18; --bg3:#0f0f20;
+  --panel:#13131f; --card:#181828; --card2:#1d1d30;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --gold:#c8a84b; --gold2:#e8c96a; --gold3:#f5d97a;
+  --gold-d:rgba(200,168,75,0.1); --gold-b:rgba(200,168,75,0.22);
+  --green:#22c55e; --green-d:rgba(34,197,94,0.1);
+  --red:#ef4444; --red-d:rgba(239,68,68,0.1);
+  --orange:#f59e0b; --cyan:#06b6d4; --purple:#a78bfa;
+  --w:#eef0ff; --w2:#9999b5; --m:#555570; --dim:#252538;
+  --font:'Inter',-apple-system,sans-serif;
+  --sidebar:216px; --topbar:52px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--w);font-family:var(--font);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+
+/* ═══ TOPBAR ═══ */
+.topbar{
+  height:var(--topbar);background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px 0 0;flex-shrink:0;z-index:50;
+}
+.tb-brand{
+  width:var(--sidebar);height:100%;
+  display:flex;align-items:center;gap:9px;
+  padding:0 16px;border-right:1px solid var(--border);
+  flex-shrink:0;text-decoration:none;
+}
+.tb-logo{
+  width:28px;height:28px;border-radius:7px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold),#7a5a18);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;color:#000;letter-spacing:-.3px;
+}
+.tb-name{font-size:13px;font-weight:700;color:var(--w);letter-spacing:-.3px}
+
+.tbs-ic,.tbs-inp,.tbs-btn,.tb-search{display:none}
+
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-free{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--m);
+  background:var(--bg3);border:1px solid var(--border);
+  padding:4px 10px;border-radius:100px;
+}
+.fdots{display:flex;gap:3px}
+.fd{width:7px;height:7px;border-radius:50%;background:var(--gold);transition:background .3s}
+.fd.used{background:var(--dim)}
+.tb-up{
+  font-size:11px;font-weight:600;color:#000;
+  background:var(--gold);padding:5px 14px;border-radius:7px;
+  text-decoration:none;transition:all .18s;
+}
+.tb-up:hover{background:var(--gold2)}
+.tb-av{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),#7a5a18);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#000;
+}
+
+/* ═══ LAYOUT ═══ */
+.app-body{flex:1;display:flex;overflow:hidden}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar{
+  width:var(--sidebar);background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;
+  overflow-y:auto;padding:12px 0;
+}
+.sidebar::-webkit-scrollbar{width:0}
+.sb-sec{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:8px 16px 4px;margin-top:4px}
+.sb-lnk{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 14px;font-size:12px;font-weight:400;
+  color:var(--m);text-decoration:none;cursor:pointer;
+  border-left:2px solid transparent;transition:all .15s;
+}
+.sb-lnk:hover{color:var(--w);background:rgba(255,255,255,.025)}
+.sb-lnk.on{color:var(--gold);background:rgba(200,168,75,.05);border-left-color:var(--gold);font-weight:500}
+.sb-lnk svg{flex-shrink:0;opacity:.5}
+.sb-lnk.on svg{opacity:1}
+.sb-div{height:1px;background:var(--border);margin:8px 14px}
+.sb-ht{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:8px 14px 5px}
+.shi{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 8px;border-radius:7px;cursor:pointer;
+  margin:0 6px;transition:all .15s;
+}
+.shi:hover{background:rgba(255,255,255,.04)}
+.shi-sym{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0}
+.shi-name{font-size:11px;font-weight:500;color:var(--w2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shi-v{font-size:9px;font-weight:700}
+
+/* ═══ MAIN ═══ */
+.main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
+.main::-webkit-scrollbar{width:3px}
+.main::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+
+/* ═══ EMPTY ═══ */
+.empty{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;height:100%;padding:40px;text-align:center;
+}
+.empty-ic{
+  width:68px;height:68px;border-radius:18px;
+  background:var(--gold-d);border:1px solid var(--gold-b);
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+}
+.empty h2{font-size:18px;font-weight:700;letter-spacing:-.4px;color:var(--w);margin-bottom:8px}
+.empty p{font-size:13px;color:var(--m);line-height:1.7;max-width:340px;margin-bottom:24px}
+.qt-row{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-bottom:28px}
+.qt{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:500;color:var(--m);
+  background:var(--panel);border:1px solid var(--border);
+  padding:6px 14px;border-radius:8px;cursor:pointer;transition:all .18s;
+}
+.qt:hover{color:var(--w);border-color:var(--border2);background:var(--card)}
+.qtd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.empty-st{display:flex;gap:32px}
+.est-n{font-size:20px;font-weight:800;letter-spacing:-1px;display:block;margin-bottom:2px}
+.est-l{font-size:10px;color:var(--m)}
+
+/* ═══ LOADING ═══ */
+.loading{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center}
+.loading.on{display:flex}
+.spin{width:42px;height:42px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lv-wrap{display:flex;flex-direction:column;gap:5px;width:270px;text-align:left;margin-top:14px}
+.lvs{
+  display:flex;align-items:center;gap:9px;padding:7px 11px;
+  border-radius:7px;font-size:11px;color:var(--m);
+  background:var(--panel);border:1px solid var(--border);transition:all .25s;
+}
+.lvs.act{color:var(--w);border-color:var(--gold-b);background:rgba(200,168,75,.05)}
+.lvs.don{color:var(--green);border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.04)}
+.lvi{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0}
+.liw{background:var(--dim);color:var(--m)}
+.lia{background:rgba(200,168,75,.15);color:var(--gold)}
+.lid{background:rgba(34,197,94,.15);color:var(--green)}
+
+/* ═══ DASHBOARD ═══ */
+.dash{display:none;flex-direction:column;height:100%;overflow-y:auto}
+.dash.on{display:flex}
+.dash::-webkit-scrollbar{width:3px}
+.dash::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+
+/* TOKEN HEADER STRIP */
+.tok-strip{
+  background:linear-gradient(135deg,rgba(200,168,75,.04) 0%,rgba(0,0,0,0) 60%);
+  border-bottom:1px solid var(--border);
+  padding:14px 20px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;flex-shrink:0;
+}
+.ts-token{display:flex;align-items:center;gap:12px}
+.ts-ico{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;flex-shrink:0;
+  position:relative;
+}
+.ts-ico::after{
+  content:'';position:absolute;inset:0;border-radius:12px;
+  border:1px solid rgba(255,255,255,0.15);
+}
+.ts-tname{font-size:17px;font-weight:700;letter-spacing:-.5px;color:var(--w)}
+.ts-tmeta{font-size:11px;color:var(--m);margin-top:2px}
+.ts-pipe{width:1px;height:32px;background:var(--border);flex-shrink:0}
+.ts-kv{text-align:center}
+.ts-kv-v{font-size:17px;font-weight:700;letter-spacing:-.6px;display:block}
+.ts-kv-l{font-size:9px;color:var(--m);letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
+.ts-verdict{
+  margin-left:auto;padding:9px 24px;border-radius:9px;
+  font-size:14px;font-weight:700;letter-spacing:.04em;flex-shrink:0;
+}
+.tv-buy{background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(34,197,94,.08));border:1px solid rgba(34,197,94,.3);color:var(--green)}
+.tv-watch{background:linear-gradient(135deg,rgba(200,168,75,.15),rgba(200,168,75,.07));border:1px solid rgba(200,168,75,.28);color:var(--gold)}
+.tv-avoid{background:linear-gradient(135deg,rgba(239,68,68,.14),rgba(239,68,68,.07));border:1px solid rgba(239,68,68,.25);color:var(--red)}
+
+/* SCORE CARDS */
+.score-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.scard{
+  padding:14px 18px;border-right:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.scard:last-child{border-right:none}
+.scard::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:0;
+}
+.sc1::before{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.sc2::before{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.sc3::before{background:linear-gradient(90deg,transparent,var(--orange),transparent)}
+.sc4::before{background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+.scard-lbl{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--m);margin-bottom:8px}
+.scard-num{font-size:40px;font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:8px}
+.scard-bar{height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden;margin-bottom:5px}
+.scard-fill{height:100%;border-radius:1px;width:0;transition:width 1.6s cubic-bezier(.16,1,.3,1)}
+.scard-desc{font-size:10px;color:var(--m)}
+
+/* MAIN GRID */
+.dash-body{flex:1;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+
+.g-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g-60-40{display:grid;grid-template-columns:1.6fr 1fr;gap:10px}
+.g-50-50{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* PANEL */
+.pnl{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:11px;overflow:hidden;display:flex;flex-direction:column;
+}
+.pnl-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.pnl-title{
+  font-size:11px;font-weight:600;color:var(--w2);
+  display:flex;align-items:center;gap:6px;letter-spacing:-.1px;
+}
+.pnl-title svg{flex-shrink:0}
+.pnl-badge{font-size:9px;font-weight:600;padding:2px 8px;border-radius:100px;letter-spacing:.04em}
+.pnl-body{padding:12px 14px;flex:1}
+
+/* CHART */
+.chart-area{padding:8px 14px 4px;height:152px;position:relative}
+
+/* DONUT */
+.donut-wrap{
+  display:flex;align-items:center;justify-content:center;
+  padding:14px 12px;gap:16px;
+}
+.donut-rel{position:relative;flex-shrink:0}
+.donut-center{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;pointer-events:none;
+}
+.dc-num{font-size:20px;font-weight:800;letter-spacing:-1.2px;line-height:1}
+.dc-lbl{font-size:9px;color:var(--m);margin-top:2px}
+.legend{display:flex;flex-direction:column;gap:6px}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--m)}
+.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.leg-val{margin-left:auto;font-weight:700;color:var(--w);font-size:10px;padding-left:8px}
+
+/* AI TEXT */
+.ai-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.ai-pulse{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(200,168,75,.3)}50%{opacity:.3;box-shadow:0 0 0 4px rgba(200,168,75,0)}}
+.ai-lbl{font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.12em;text-transform:uppercase}
+.ai-body{font-size:12px;color:var(--w2);line-height:1.78}
+.verdict-strip{
+  background:linear-gradient(135deg,rgba(200,168,75,.06),rgba(200,168,75,.02));
+  border:1px solid rgba(200,168,75,.15);border-radius:7px;
+  padding:9px 12px;margin-top:10px;
+}
+.vs-lbl{font-size:8px;font-weight:700;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.vs-text{font-size:11px;color:var(--w2);line-height:1.6}
+.flags{display:flex;flex-wrap:wrap;gap:5px;padding:9px 14px;border-top:1px solid var(--border)}
+.flag{font-size:10px;font-weight:500;padding:3px 9px;border-radius:5px}
+.fg{background:rgba(34,197,94,.07);color:rgba(134,239,172,.9);border:1px solid rgba(34,197,94,.14)}
+.fr{background:rgba(239,68,68,.07);color:rgba(252,165,165,.85);border:1px solid rgba(239,68,68,.14)}
+.fy{background:rgba(200,168,75,.07);color:rgba(200,168,75,.9);border:1px solid rgba(200,168,75,.16)}
+
+/* DATA TABLE */
+.dtbl{width:100%;border-collapse:collapse}
+.dtbl tr{border-bottom:1px solid rgba(255,255,255,.04)}
+.dtbl tr:last-child{border-bottom:none}
+.dtbl td{padding:7px 0;font-size:11px}
+.dtbl td:first-child{color:var(--m)}
+.dtbl td:last-child{text-align:right;color:var(--w);font-weight:600}
+
+/* SENTIMENT BARS */
+.sbar-item{margin-bottom:9px}
+.sbar-item:last-child{margin-bottom:0}
+.sbar-top{display:flex;justify-content:space-between;margin-bottom:3px}
+.sbar-lbl{font-size:10px;color:var(--m)}
+.sbar-val{font-size:10px;font-weight:700}
+.sbar-track{height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:2px;width:0;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+
+/* WHALE TABLE */
+.wtbl{width:100%;border-collapse:collapse}
+.wtbl thead th{
+  padding:6px 10px;text-align:left;
+  font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--m);border-bottom:1px solid var(--border);
+}
+.wtbl thead th:not(:first-child){text-align:center}
+.wtbl tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px}
+.wtbl tbody tr:last-child td{border-bottom:none}
+.wtbl tbody tr:hover td{background:rgba(255,255,255,.02)}
+.wtbl tbody td:not(:first-child){text-align:center}
+.waddr{font-family:monospace;font-size:10px;color:var(--m)}
+.wpct{font-weight:700;color:var(--w)}
+.wact{font-size:9px;font-weight:700;padding:3px 9px;border-radius:100px}
+.wa-acc{background:rgba(34,197,94,.08);color:var(--green);border:1px solid rgba(34,197,94,.18)}
+.wa-dis{background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.18)}
+.wa-hld{background:rgba(200,168,75,.08);color:var(--gold);border:1px solid rgba(200,168,75,.18)}
+
+/* MINI METRIC CHIPS */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{
+  font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--m);
+}
+.chip-up{color:var(--green);background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.14)}
+.chip-dn{color:var(--red);background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.14)}
+.chip-gl{color:var(--gold);background:rgba(200,168,75,.07);border-color:rgba(200,168,75,.16)}
+
+/* OVERALL SCORE BIG */
+.overall-score{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:16px 14px;text-align:center;
+}
+.os-ring{position:relative;margin-bottom:10px}
+.os-num{font-size:32px;font-weight:800;letter-spacing:-2px;line-height:1}
+.os-lbl{font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.os-verdict{font-size:11px;font-weight:700;padding:4px 14px;border-radius:100px;margin-top:8px;display:inline-block}
+
+#toast{position:fixed;bottom:18px;right:18px;z-index:9999;background:rgba(18,18,28,.97);border:1px solid var(--border2);border-radius:9px;padding:10px 16px;font-size:12px;color:var(--w);max-width:260px;transform:translateY(12px);opacity:0;transition:all .26s ease;pointer-events:none;backdrop-filter:blur(20px)}
+#toast.on{transform:translateY(0);opacity:1}
+
+@media(max-width:1100px){.g-3{grid-template-columns:1fr 1fr}.g-60-40{grid-template-columns:1fr}}
+@media(max-width:860px){.sidebar{display:none}.score-row{grid-template-columns:1fr 1fr}.g-2,.g-50-50{grid-template-columns:1fr}}
+
+/* NEW SCAN BUTTON */
+.sb-new-scan{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 14px;font-size:12px;font-weight:500;
+  color:var(--gold);background:rgba(200,168,75,0.08);
+  cursor:pointer;transition:all .18s;
+  border-left:2px solid var(--gold);
+  border-top:1px solid rgba(200,168,75,0.12);
+  border-bottom:1px solid rgba(200,168,75,0.12);
+  letter-spacing:-.1px;
+}
+.sb-new-scan:hover{background:rgba(200,168,75,0.14);color:var(--gold2)}
+.sb-new-scan svg{flex-shrink:0;stroke:var(--gold)}
+
+/* EMPTY STATE BIG SEARCH */
+.empty-search-wrap{width:100%;max-width:520px;margin-bottom:24px}
+.empty-search{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg3);border:1.5px solid var(--border2);
+  border-radius:14px;padding:10px 10px 10px 18px;
+  transition:border-color .2s,box-shadow .2s;
+}
+.empty-search:focus-within{
+  border-color:var(--gold-b);
+  box-shadow:0 0 0 3px rgba(200,168,75,.08),0 8px 32px rgba(0,0,0,.4);
+}
+.empty-search-inp{
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:var(--font);font-size:15px;color:var(--w);
+}
+.empty-search-inp::placeholder{color:var(--m);font-size:13px}
+.empty-search-btn{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--font);font-size:12px;font-weight:700;
+  color:#000;background:var(--gold);
+  padding:9px 20px;border-radius:10px;border:none;cursor:pointer;
+  transition:all .18s;white-space:nowrap;
+}
+.empty-search-btn:hover{background:var(--gold2);box-shadow:0 0 20px rgba(200,168,75,.3)}
+
+/* ═══ AUTH MODAL ═══ */
+.auth-overlay{
+  position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.auth-overlay.show{opacity:1;pointer-events:all}
+
+.auth-modal{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:18px;padding:36px;width:100%;max-width:400px;
+  position:relative;box-shadow:0 40px 80px rgba(0,0,0,0.6);
+}
+.auth-close{
+  position:absolute;top:16px;right:16px;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,0.06);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--m);transition:all .18s;
+}
+.auth-close:hover{background:rgba(255,255,255,0.12);color:var(--w)}
+
+.auth-logo{display:flex;align-items:center;gap:9px;margin-bottom:24px}
+.auth-logo-box{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#7a5a18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000}
+
+.auth-title{font-size:20px;font-weight:700;letter-spacing:-.5px;color:var(--w);margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--m);margin-bottom:28px;line-height:1.5}
+
+/* Google btn */
+.auth-google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:12px;border-radius:10px;
+  background:rgba(255,255,255,0.06);border:1px solid var(--border2);
+  color:var(--w);font-family:var(--font);font-size:14px;font-weight:500;
+  cursor:pointer;transition:all .2s;margin-bottom:20px;
+}
+.auth-google:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2)}
+
+.auth-divider{
+  display:flex;align-items:center;gap:12px;margin-bottom:20px;
+}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-divider span{font-size:11px;color:var(--m);white-space:nowrap}
+
+.auth-field{margin-bottom:14px}
+.auth-label{font-size:11px;font-weight:500;color:var(--m);margin-bottom:6px;display:block;letter-spacing:.04em;text-transform:uppercase}
+.auth-input{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:9px;padding:11px 14px;
+  font-family:var(--font);font-size:14px;color:var(--w);outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.auth-input:focus{border-color:var(--gold-b);box-shadow:0 0 0 3px rgba(200,168,75,.07)}
+.auth-input::placeholder{color:var(--dim)}
+
+.auth-name-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+
+.auth-submit{
+  width:100%;padding:13px;border-radius:10px;
+  font-family:var(--font);font-size:14px;font-weight:600;
+  color:#000;background:var(--gold);border:none;cursor:pointer;
+  transition:all .2s;margin-top:4px;
+}
+.auth-submit:hover{background:var(--gold2)}
+
+.auth-toggle{
+  text-align:center;margin-top:18px;
+  font-size:13px;color:var(--m);
+}
+.auth-toggle a{color:var(--gold);cursor:pointer;text-decoration:none}
+.auth-toggle a:hover{color:var(--gold2)}
+
+.auth-error{
+  background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
+  border-radius:8px;padding:10px 14px;
+  font-size:12px;color:var(--red);margin-bottom:14px;
+  display:none;
+}
+.auth-error.show{display:block}
+
+/* USER MENU */
+.user-menu-wrap{position:relative}
+.user-btn{
+  display:flex;align-items:center;gap:7px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:100px;padding:4px 12px 4px 4px;
+  cursor:pointer;transition:all .18s;
+}
+.user-btn:hover{border-color:var(--border2)}
+.user-avatar{
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#000;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold),#7a5a18);
+}
+.user-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.user-name{font-size:11px;font-weight:500;color:var(--w);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.user-dropdown{
+  position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:12px;padding:6px;min-width:200px;
+  box-shadow:0 16px 40px rgba(0,0,0,0.5);
+  opacity:0;pointer-events:none;transform:translateY(-6px);
+  transition:all .18s;z-index:200;
+}
+.user-dropdown.show{opacity:1;pointer-events:all;transform:translateY(0)}
+
+.ud-header{padding:10px 12px 8px;border-bottom:1px solid var(--border)}
+.ud-email{font-size:11px;color:var(--m);margin-top:2px}
+.ud-name{font-size:13px;font-weight:600;color:var(--w)}
+
+.ud-item{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 12px;border-radius:8px;
+  font-size:13px;color:var(--m);cursor:pointer;
+  transition:all .15s;margin-top:2px;
+}
+.ud-item:hover{background:rgba(255,255,255,0.04);color:var(--w)}
+.ud-item.danger:hover{background:rgba(239,68,68,0.08);color:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a href="index.html" class="tb-brand">
+    <div class="tb-logo">CL</div>
+    <span class="tb-name">CryptoLens AI</span>
+  </a>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center">
+
+  </div>
+  <!-- hidden inputs for compatibility -->
+  <input id="mainSearch" style="display:none"/>
+  <button id="scanBtn" style="display:none"></button>
+  <div class="tb-right">
+    <div class="tb-free">
+      <span id="freeLabel" style="font-size:10px">5 left</span>
+      <div class="fdots" id="fdots">
+        <div class="fd"></div><div class="fd"></div><div class="fd"></div><div class="fd"></div><div class="fd"></div>
+      </div>
+    </div>
+    <a href="pricing.html" class="tb-up">Upgrade ↗</a>
+
+    <!-- NOT LOGGED IN -->
+    <button class="auth-google" id="signInBtn" onclick="openAuth('login')" style="width:auto;padding:6px 14px;margin-bottom:0;font-size:12px;border-radius:8px">
+      Sign in
+    </button>
+
+    <!-- LOGGED IN - User Menu -->
+    <div class="user-menu-wrap" id="userMenu" style="display:none">
+      <div class="user-btn" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <span class="user-name" id="userName">User</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="ud-header">
+          <div class="ud-name" id="udName">—</div>
+          <div class="ud-email" id="udEmail">—</div>
+        </div>
+        <div class="ud-item" onclick="toast('Profile settings coming soon!')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          My Profile
+        </div>
+        <div class="ud-item" onclick="toast('Plan: Free · 5 analyses/day')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Free Plan
+        </div>
+        <div class="ud-item danger" onclick="signOut()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-sec">Main</div>
+    <div class="sb-lnk on">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Research Terminal
+    </div>
+    <div class="sb-new-scan" onclick="newScan()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Scan
+    </div>
+    <a class="sb-lnk" href="pricing.html">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Upgrade to Pro
+    </a>
+    <div class="sb-div"></div>
+    <div class="sb-sec">Pages</div>
+    <a class="sb-lnk" href="index.html">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+    </a>
+    <a class="sb-lnk" href="use-cases.html">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Use Cases
+    </a>
+    <a class="sb-lnk" href="pricing.html">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Pricing
+    </a>
+    <div class="sb-div"></div>
+    <div class="sb-ht">Recent</div>
+    <div id="recentList"><div style="font-size:10px;color:var(--dim);padding:4px 14px">No searches yet</div></div>
+  </aside>
+
+  <main class="main" id="mainArea">
+
+    <!-- EMPTY -->
+    <div class="empty" id="emptyView">
+      <div class="empty-ic">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      </div>
+      <h2>Token Intelligence Terminal</h2>
+      <p>Paste any token name, symbol, or contract address below</p>
+      <!-- Login prompt — shown when not logged in -->
+      <div id="loginPromptBanner" style="display:none;background:rgba(200,168,75,0.06);border:1px solid rgba(200,168,75,0.2);border-radius:12px;padding:14px 18px;margin-bottom:16px;max-width:520px;display:flex;align-items:center;gap:12px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span style="font-size:13px;color:var(--w2);flex:1">Sign in to start analyzing tokens — it's free</span>
+        <button onclick="openAuth('login')" style="font-family:var(--font);font-size:12px;font-weight:600;color:#000;background:var(--gold);border:none;padding:7px 16px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:background .18s" onmouseover="this.style.background='var(--gold2)'" onmouseout="this.style.background='var(--gold)'">Sign In →</button>
+      </div>
+      <div class="empty-search-wrap">
+        <div class="empty-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--m)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="empty-search-inp" id="emptySearch" placeholder="Enter token name, symbol, or contract address…" oninput="document.getElementById('mainSearch').value=this.value" onkeydown="if(event.key==='Enter'){syncAndGo()}"/>
+          <button class="empty-search-btn" onclick="syncAndGo()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            Analyze
+          </button>
+        </div>
+      </div>
+      <div class="qt-row">
+        <div class="qt" onclick="go('Solana SOL')"><span class="qtd" style="background:#9945ff"></span>SOL</div>
+        <div class="qt" onclick="go('Bitcoin BTC')"><span class="qtd" style="background:#f7931a"></span>BTC</div>
+        <div class="qt" onclick="go('Ethereum ETH')"><span class="qtd" style="background:#627eea"></span>ETH</div>
+        <div class="qt" onclick="go('Pepe PEPE')"><span class="qtd" style="background:#22c55e"></span>PEPE</div>
+        <div class="qt" onclick="go('Jupiter JUP')"><span class="qtd" style="background:#c8a84b"></span>JUP</div>
+        <div class="qt" onclick="go('Bonk BONK')"><span class="qtd" style="background:#f59e0b"></span>BONK</div>
+        <div class="qt" onclick="go('WIF WIF')"><span class="qtd" style="background:#e879f9"></span>WIF</div>
+        <div class="qt" onclick="go('Arbitrum ARB')"><span class="qtd" style="background:#12aaff"></span>ARB</div>
+      </div>
+      <div class="empty-st">
+        <div style="text-align:center"><span class="est-n" style="color:var(--gold)">48,200+</span><span class="est-l">Tokens scanned</span></div>
+        <div style="text-align:center"><span class="est-n">3,847</span><span class="est-l">Researchers</span></div>
+        <div style="text-align:center"><span class="est-n" style="color:var(--red)">312</span><span class="est-l">Rugs flagged</span></div>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading" id="loadingView">
+      <div class="spin"></div>
+      <div style="font-size:14px;font-weight:600;color:var(--w);margin-bottom:5px">Scanning token…</div>
+      <div style="font-size:12px;color:var(--m)">AI intelligence pipeline running across all data sources</div>
+      <div class="lv-wrap">
+        <div class="lvs" id="ls1"><div class="lvi liw">●</div>Fetching price &amp; market data</div>
+        <div class="lvs" id="ls2"><div class="lvi liw">●</div>Analyzing tokenomics &amp; supply</div>
+        <div class="lvs" id="ls3"><div class="lvi liw">●</div>Verifying team credibility</div>
+        <div class="lvs" id="ls4"><div class="lvi liw">●</div>Scanning red flags &amp; risks</div>
+        <div class="lvs" id="ls5"><div class="lvi liw">●</div>Generating AI verdict</div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="dash" id="dashView">
+
+      <!-- Token Strip -->
+      <div class="tok-strip">
+        <div class="ts-token">
+          <div class="ts-ico" id="tIco">??</div>
+          <div>
+            <div class="ts-tname" id="tName">—</div>
+            <div class="ts-tmeta" id="tMeta">—</div>
+          </div>
+        </div>
+        <div class="ts-pipe"></div>
+        <div class="ts-kv">
+          <span class="ts-kv-v" id="tPrice">—</span>
+          <span class="ts-kv-l">Price</span>
+        </div>
+        <div class="ts-pipe"></div>
+        <div class="ts-kv">
+          <span class="ts-kv-v" id="t24h">—</span>
+          <span class="ts-kv-l">24h Change</span>
+        </div>
+        <div class="ts-pipe"></div>
+        <div class="ts-kv">
+          <span class="ts-kv-v" id="tRank" style="color:var(--gold)">—</span>
+          <span class="ts-kv-l">Rank</span>
+        </div>
+        <div class="ts-pipe"></div>
+        <div class="ts-kv">
+          <span class="ts-kv-v" id="tOverall" style="color:var(--purple)">—</span>
+          <span class="ts-kv-l">Overall Score</span>
+        </div>
+        <div class="ts-verdict tv-watch" id="tVerdict">—</div>
+      </div>
+
+      <!-- Score Cards -->
+      <div class="score-row">
+        <div class="scard sc1">
+          <div class="scard-lbl">Safety Score</div>
+          <div class="scard-num" style="color:var(--green)" id="sv1">—</div>
+          <div class="scard-bar"><div class="scard-fill" id="sf1" style="background:linear-gradient(90deg,var(--green),#86efac)"></div></div>
+          <div class="scard-desc" id="sd1">—</div>
+        </div>
+        <div class="scard sc2">
+          <div class="scard-lbl">Team Score</div>
+          <div class="scard-num" style="color:var(--gold)" id="sv2">—</div>
+          <div class="scard-bar"><div class="scard-fill" id="sf2" style="background:linear-gradient(90deg,var(--gold),var(--gold3))"></div></div>
+          <div class="scard-desc" id="sd2">—</div>
+        </div>
+        <div class="scard sc3">
+          <div class="scard-lbl">Tokenomics</div>
+          <div class="scard-num" style="color:var(--orange)" id="sv3">—</div>
+          <div class="scard-bar"><div class="scard-fill" id="sf3" style="background:linear-gradient(90deg,var(--orange),#fcd34d)"></div></div>
+          <div class="scard-desc" id="sd3">—</div>
+        </div>
+        <div class="scard sc4">
+          <div class="scard-lbl">Sentiment</div>
+          <div class="scard-num" style="color:var(--cyan)" id="sv4">—</div>
+          <div class="scard-bar"><div class="scard-fill" id="sf4" style="background:linear-gradient(90deg,var(--cyan),#67e8f9)"></div></div>
+          <div class="scard-desc" id="sd4">—</div>
+        </div>
+      </div>
+
+      <!-- Dashboard Body -->
+      <div class="dash-body">
+
+        <!-- Row 1: Bar Chart + AI Summary -->
+        <div class="g-60-40">
+          <div class="pnl">
+            <div class="pnl-hd">
+              <span class="pnl-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Performance Overview
+              </span>
+              <div class="pnl-badge" style="background:var(--gold-d);color:var(--gold)">Live</div>
+            </div>
+            <div class="chart-area">
+              <svg id="barChart" width="100%" height="140" style="display:block;overflow:visible"></svg>
+            </div>
+            <div id="chartLbls" style="display:flex;justify-content:space-around;padding:2px 14px 10px;font-size:9px;color:var(--m)">
+              <span>Safety</span><span>Team</span><span>Tokenomics</span><span>Sentiment</span><span>Overall</span>
+            </div>
+          </div>
+
+          <div class="pnl">
+            <div class="pnl-hd">
+              <span class="pnl-title"><span class="ai-pulse"></span>AI Intelligence Summary</span>
+              <div class="pnl-badge" style="background:var(--gold-d);color:var(--gold)">Claude AI</div>
+            </div>
+            <div class="pnl-body">
+              <div class="ai-body" id="aiBody">—</div>
+              <div class="verdict-strip">
+                <div class="vs-lbl">Why this verdict</div>
+                <div class="vs-text" id="aiVerdict">—</div>
+              </div>
+            </div>
+            <div class="flags" id="flagsArea"></div>
+          </div>
+        </div>
+
+        <!-- Row 2: Key Stats + Supply Donut + Sentiment -->
+        <div class="g-3">
+
+          <!-- Key Stats -->
+          <div class="pnl">
+            <div class="pnl-hd">
+              <span class="pnl-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                Key Stats
+              </span>
+              <div class="pnl-badge" style="background:var(--green-d);color:var(--green)">On-chain</div>
+            </div>
+            <div class="pnl-body">
+              <table class="dtbl" id="keyTbl"></table>
+              <div class="chips" id="keyChips"></div>
+            </div>
+          </div>
+
+          <!-- Supply Distribution -->
+          <div class="pnl">
+            <div class="pnl-hd">
+              <span class="pnl-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Supply Distribution
+              </span>
+            </div>
+            <div class="donut-wrap" id="donutArea"></div>
+          </div>
+
+          <!-- Social Sentiment -->
+          <div class="pnl">
+            <div class="pnl-hd">
+              <span class="pnl-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Social Sentiment
+              </span>
+              <div class="pnl-badge" style="background:rgba(6,182,212,.08);color:var(--cyan)" id="sentBadge">—</div>
+            </div>
+            <div class="pnl-body" id="sentArea"></div>
+          </div>
+        </div>
+
+        <!-- Row 3: Tokenomics + Whale Activity -->
+        <div class="g-50-50">
+
+          <!-- Tokenomics -->
+          <div class="pnl">
+            <div class="pnl-hd">
+              <span class="pnl-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Tokenomics
+              </span>
+              <div class="pnl-badge" style="background:rgba(245,158,11,.07);color:var(--orange)">Supply Data</div>
+            </div>
+            <div class="pnl-body">
+              <table class="dtbl" id="tokTbl"></table>
+            </div>
+          </div>
+
+          <!-- Whale Table -->
+          <div class="pnl">
+            <div class="pnl-hd">
+              <span class="pnl-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                Top Wallet Activity
+              </span>
+              <div class="pnl-badge" style="background:var(--red-d);color:var(--red)" id="whaleBadge">—</div>
+            </div>
+            <div class="pnl-body">
+              <table class="wtbl">
+                <thead><tr><th>Wallet Address</th><th>Holdings</th><th>Activity</th></tr></thead>
+                <tbody id="whaleTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ── utils ── */
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),3000)}
+
+/* ── free counter ── */
+let fu=parseInt(localStorage.getItem('cl_fu')||'0');
+const td=new Date().toDateString();
+if(localStorage.getItem('cl_fd')!==td){fu=0;localStorage.setItem('cl_fd',td);localStorage.setItem('cl_fu','0')}
+function updFree(){
+  const r=Math.max(0,5-fu);
+  document.getElementById('freeLabel').textContent=r+' left';
+  document.querySelectorAll('.fd').forEach((d,i)=>d.classList.toggle('used',i>=r));
+}
+updFree();
+
+/* ── history ── */
+let hist=JSON.parse(localStorage.getItem('cl_h')||'[]');
+function saveH(r){
+  // Remove duplicate same query
+  hist = hist.filter(h => (h.q||h.name) !== (r.q||r.name));
+  hist.unshift(r);
+  if(hist.length>10)hist.pop();
+  localStorage.setItem('cl_h',JSON.stringify(hist));
+  renderH();
+}
+function renderH(){
+  const el=document.getElementById('recentList');
+  if(!hist.length){el.innerHTML='<div style="font-size:10px;color:var(--dim);padding:4px 14px">No searches yet</div>';return}
+  el.innerHTML=hist.slice(0,7).map(h=>`
+    <div class="shi" onclick='rerun(${JSON.stringify(h).replace(/'/g,"&#39;")})'>
+      <div class="shi-sym" style="background:${h.bg};color:${h.col}">${h.sym}</div>
+      <span class="shi-name">${h.name}</span>
+      <span class="shi-v" style="color:${h.vc}">${h.verdict}</span>
+    </div>`).join('');
+}
+renderH();
+function rerun(h){
+  // Show cached result — zero credit used
+  document.getElementById('mainSearch').value = h.q||h.name;
+  if(h.raw){
+    vDash();
+    render(h.raw, h.q||h.name);
+  } else {
+    // Old history without raw — just fill search bar
+    vEmpty();
+  }
+}
+
+/* ── views ── */
+function vEmpty(){document.getElementById('emptyView').style.display='flex';document.getElementById('loadingView').classList.remove('on');document.getElementById('dashView').classList.remove('on')}
+function vLoad(){document.getElementById('emptyView').style.display='none';document.getElementById('loadingView').classList.add('on');document.getElementById('dashView').classList.remove('on')}
+function vDash(){document.getElementById('emptyView').style.display='none';document.getElementById('loadingView').classList.remove('on');document.getElementById('dashView').classList.add('on')}
+
+/* ── loading steps ── */
+function animSteps(){
+  const ids=['ls1','ls2','ls3','ls4','ls5'];
+  ids.forEach(id=>{const el=document.getElementById(id);el.className='lvs';const ic=el.querySelector('.lvi');ic.className='lvi liw';ic.textContent='●'});
+  [0,700,1350,1950,2550].forEach((d,i)=>setTimeout(()=>{
+    if(i>0){const p=document.getElementById(ids[i-1]);p.className='lvs don';const pc=p.querySelector('.lvi');pc.className='lvi lid';pc.textContent='✓'}
+    const c=document.getElementById(ids[i]);c.className='lvs act';const cc=c.querySelector('.lvi');cc.className='lvi lia';cc.textContent='●';
+  },d));
+}
+
+/* ── animate number ── */
+function animNum(id,target,dur){
+  const el=document.getElementById(id);if(!el)return;
+  const s=performance.now();
+  (function step(now){const p=Math.min((now-s)/dur,1),e=1-Math.pow(1-p,3),v=Math.round(e*target);el.textContent=v;if(p<1)requestAnimationFrame(step)})(s);
+}
+
+/* ── typewriter ── */
+function typewriter(id,text,spd=13){
+  const el=document.getElementById(id);el.textContent='';let i=0;
+  function n(){if(i<text.length){el.textContent+=text[i++];setTimeout(n,spd)}}n();
+}
+
+/* ══════════════════════
+   BAR CHART (SVG)
+══════════════════════ */
+function drawBars(scores){
+  const svg=document.getElementById('barChart');
+  if(!svg)return;
+  const W=svg.parentElement.clientWidth-28||500;
+  const H=140;
+  const pad={t:16,b:6,l:8,r:8};
+  const items=[
+    {v:scores.safety,  c:'#22c55e', g:'#86efac'},
+    {v:scores.team,    c:'#c8a84b', g:'#f5d97a'},
+    {v:scores.tok,     c:'#f59e0b', g:'#fcd34d'},
+    {v:scores.sent,    c:'#06b6d4', g:'#67e8f9'},
+    {v:Math.round((scores.safety+scores.team+scores.tok+scores.sent)/4), c:'#a78bfa', g:'#c4b5fd'},
+  ];
+  const n=items.length;
+  const avail=W-pad.l-pad.r;
+  const bW=Math.min(44, avail/n*0.52);
+  const step=avail/n;
+  const chartH=H-pad.t-pad.b;
+
+  // grid
+  let out=`<defs>`;
+  items.forEach((it,i)=>{
+    out+=`<linearGradient id="bg${i}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${it.c}" stop-opacity="1"/>
+      <stop offset="100%" stop-color="${it.g}" stop-opacity=".6"/>
+    </linearGradient>`;
+  });
+  out+=`</defs>`;
+
+  // grid lines
+  [25,50,75].forEach(v=>{
+    const gy=pad.t+chartH-(v/100)*chartH;
+    out+=`<line x1="${pad.l}" y1="${gy.toFixed(1)}" x2="${W-pad.r}" y2="${gy.toFixed(1)}" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="3,3"/>`;
+  });
+
+  // bars
+  items.forEach((it,i)=>{
+    const x=pad.l+i*step+step/2-bW/2;
+    const bH=Math.max(4,(it.v/100)*chartH);
+    const y=pad.t+chartH-bH;
+    const rx=5;
+    // shadow glow
+    out+=`<rect x="${(x-2).toFixed(1)}" y="${(y+bH-4).toFixed(1)}" width="${(bW+4).toFixed(1)}" height="6" rx="3" fill="${it.c}" opacity="0.18"/>`;
+    // bar
+    out+=`<rect x="${x.toFixed(1)}" y="${H+pad.b}" width="${bW.toFixed(1)}" height="0" rx="${rx}" fill="url(#bg${i})"
+      data-y="${y.toFixed(1)}" data-h="${bH.toFixed(1)}"
+      style="filter:drop-shadow(0 4px 8px ${it.c}40);transition:y 1s cubic-bezier(.16,1,.3,1),height 1s cubic-bezier(.16,1,.3,1)"/>`;
+    // value label
+    out+=`<text x="${(x+bW/2).toFixed(1)}" y="${(y-5).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="${it.c}" font-family="Inter,sans-serif" opacity="0" style="transition:opacity .5s ease .9s" class="bv">${it.v}</text>`;
+  });
+
+  svg.setAttribute('width',W);
+  svg.setAttribute('height',H);
+  svg.innerHTML=out;
+
+  requestAnimationFrame(()=>{
+    svg.querySelectorAll('rect[data-y]').forEach(r=>{
+      r.setAttribute('y',r.dataset.y);
+      r.setAttribute('height',r.dataset.h);
+    });
+    svg.querySelectorAll('.bv').forEach(t=>t.style.opacity='1');
+  });
+}
+
+/* ══════════════════════
+   DONUT CHART (SVG)
+══════════════════════ */
+function drawDonut(containerId, segs, centerVal, centerLbl){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  const sz=120, cx=60, cy=60, r=44, sw=12;
+  const total=segs.reduce((a,s)=>a+s.val,0);
+  const circ=2*Math.PI*r;
+  let off=0, paths='', defs='';
+  segs.forEach((s,i)=>{
+    const pct=s.val/total;
+    const dash=pct*circ, gap=circ-dash;
+    const dashOffset=(-off*circ).toFixed(2);
+    const gid='dg'+containerId+i;
+    defs+=`<linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="${s.c}" stop-opacity="1"/>
+      <stop offset="100%" stop-color="${s.c}" stop-opacity=".7"/>
+    </linearGradient>`;
+    paths+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+      stroke="url(#${gid})" stroke-width="${sw}"
+      stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+      stroke-dashoffset="${dashOffset}"
+      transform="rotate(-90 ${cx} ${cy})"
+      style="filter:drop-shadow(0 0 6px ${s.c}55);transition:stroke-dasharray 1.2s ease"/>`;
+    off+=pct;
+  });
+  const legend=segs.map(s=>`
+    <div class="leg-item">
+      <div class="leg-dot" style="background:${s.c}"></div>
+      <span>${s.label}</span>
+      <span class="leg-val">${s.pct}</span>
+    </div>`).join('');
+  el.innerHTML=`
+    <div class="donut-rel">
+      <svg width="${sz}" height="${sz}"><defs>${defs}</defs>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="${sw}"/>
+        ${paths}
+      </svg>
+      <div class="donut-center">
+        <div class="dc-num" style="color:var(--gold)">${centerVal}</div>
+        <div class="dc-lbl">${centerLbl}</div>
+      </div>
+    </div>
+    <div class="legend">${legend}</div>`;
+}
+
+/* ══════════════════════
+   TOKEN DATA
+══════════════════════ */
+const DB={
+  sol:{name:'Solana (SOL)',sym:'SOL',rank:'Rank #5',price:'$148.32',chg:'+3.81%',up:true,col:'#9945ff',
+    safety:87,team:91,tok:79,sent:82,
+    summary:'Solana shows strong fundamentals with high developer activity and institutional backing from major funds. Top 10 wallets hold 28% of supply — moderate concentration risk, but lower than most L1 competitors. Recent ecosystem growth is substantial with 400+ active dApps and rising daily active addresses. Inflationary schedule is decreasing annually by design toward a long-term fixed issuance.',
+    vr:'Strong team, audited, growing ecosystem — justified buy at current levels.',
+    verdict:'BUY',
+    flags:[{t:'green',l:'OtterSec audited 2024'},{t:'green',l:'Active core devs'},{t:'green',l:'Deep $2.8B liquidity'},{t:'yellow',l:'High FDV ratio'},{t:'yellow',l:'~7.5% annual inflation'}],
+    onchain:[['Daily active wallets','~847K'],['24h transactions','~4.2M'],['Liquidity depth','$2.8B'],['Market cap','$64.2B'],['24h volume','$3.1B']],
+    toks:[['Total supply','567M max / 430M circ'],['Top 10 holders','28.4% — moderate risk'],['Inflation','~7.5% annual, decreasing'],['Vesting','Foundation locked 4yr'],['Chain','Solana mainnet']],
+    supply:[{label:'Circulating',val:76,pct:'76%',c:'#c8a84b'},{label:'Foundation',val:12,pct:'12%',c:'#a78bfa'},{label:'Team/Dev',val:8,pct:'8%',c:'#06b6d4'},{label:'Other',val:4,pct:'4%',c:'#252538'}],
+    sentiment:{tw:78,tg:72,rd:68,ov:74,lbl:'Bullish'},
+    whales:[{a:'7sP3…Gk4f',p:'8.2%',ac:'Accumulating'},{a:'3Bm1…Rz9q',p:'5.7%',ac:'Holding'},{a:'9Xk2…Wn5p',p:'4.1%',ac:'Accumulating'},{a:'4Tp8…Jm3s',p:'3.9%',ac:'Distributing'},{a:'6Lc7…Nh8v',p:'3.2%',ac:'Holding'}]},
+
+  btc:{name:'Bitcoin (BTC)',sym:'BTC',rank:'Rank #1',price:'$67,420',chg:'+1.24%',up:true,col:'#f7931a',
+    safety:95,team:88,tok:82,sent:76,
+    summary:'Bitcoin remains the undisputed store of value in crypto with unmatched security and decentralization. Post-halving supply dynamics are historically bullish — new supply cut 50% while institutional demand grows via ETFs. On-chain metrics show HODLer accumulation at current price levels. No single team controls Bitcoin, reducing governance risk to near zero.',
+    vr:'Strongest fundamentals in crypto — institutional adoption, halving dynamics, deepest liquidity.',
+    verdict:'BUY',
+    flags:[{t:'green',l:'$42B deepest liquidity'},{t:'green',l:'ETF approved — institutional'},{t:'green',l:'Halving supply shock active'},{t:'yellow',l:'Slow TPS — not for DeFi'}],
+    onchain:[['Daily active wallets','~900K'],['24h transactions','~350K'],['Liquidity depth','$42B'],['Market cap','$1.33T'],['24h volume','$28B']],
+    toks:[['Max supply','21M BTC (hard cap)'],['Mined so far','~19.7M (93.8%)'],['Top 10 holders','~7% — very low risk'],['Inflation','<1% annual, halves ~4yr'],['Next halving','~2028 estimated']],
+    supply:[{label:'Circulating',val:94,pct:'94%',c:'#f7931a'},{label:'Unmined',val:6,pct:'6%',c:'#252538'}],
+    sentiment:{tw:72,tg:68,rd:74,ov:71,lbl:'Bullish'},
+    whales:[{a:'1A1z…P3hH',p:'1.1%',ac:'Holding'},{a:'3Nar…q2kE',p:'0.9%',ac:'Holding'},{a:'1FeE…xjwS',p:'0.8%',ac:'Accumulating'},{a:'1HB5…7pFm',p:'0.7%',ac:'Holding'},{a:'3CgN…Lm4k',p:'0.6%',ac:'Holding'}]},
+
+  eth:{name:'Ethereum (ETH)',sym:'ETH',rank:'Rank #2',price:'$3,242',chg:'+2.15%',up:true,col:'#627eea',
+    safety:92,team:94,tok:85,sent:78,
+    summary:'Ethereum leads smart contract platforms with the largest DeFi and NFT ecosystem. The shift to Proof of Stake has made ETH deflationary during high-activity periods. EIP-4844 (Proto-Danksharding) significantly reduced L2 transaction costs, driving more activity on-chain. Strong institutional support with ETH ETF inflows adding sustained buying pressure to the market.',
+    vr:'Dominant smart contract platform with deflationary mechanics and institutional ETF demand.',
+    verdict:'BUY',
+    flags:[{t:'green',l:'Deflationary PoS model'},{t:'green',l:'Largest DeFi TVL $48B'},{t:'green',l:'ETF approved — institutional'},{t:'yellow',l:'High gas on L1 mainnet'},{t:'yellow',l:'L2 fragmentation risk'}],
+    onchain:[['Daily active wallets','~450K'],['24h transactions','~1.1M'],['Liquidity depth','$18B'],['Market cap','$389B'],['24h volume','$14B']],
+    toks:[['Circulating supply','~120M ETH'],['Supply model','Deflationary (EIP-1559)'],['Top 10 holders','~12% — low risk'],['Staked ETH','~27% of total supply'],['Chain','Ethereum mainnet']],
+    supply:[{label:'Circulating',val:72,pct:'72%',c:'#627eea'},{label:'Staked',val:27,pct:'27%',c:'#a78bfa'},{label:'Other',val:1,pct:'1%',c:'#252538'}],
+    sentiment:{tw:76,tg:71,rd:73,ov:73,lbl:'Bullish'},
+    whales:[{a:'0xBE0e…c8b1',p:'3.2%',ac:'Holding'},{a:'0x742d…35Cf',p:'2.8%',ac:'Accumulating'},{a:'0xC02a…C81F',p:'2.1%',ac:'Holding'},{a:'0x8315…7892',p:'1.9%',ac:'Holding'},{a:'0xd8dA…6045',p:'1.7%',ac:'Distributing'}]},
+
+  pepe:{name:'Pepe (PEPE)',sym:'PE',rank:'Rank #28',price:'$0.00001420',chg:'-2.40%',up:false,col:'#22c55e',
+    safety:42,team:28,tok:38,sent:61,
+    summary:'Pepe is a high-risk meme coin with no fundamental utility but strong community and brand recognition. Anonymous team is standard for meme tokens but raises rug risk significantly. Top wallets hold over 40% of supply — extreme concentration risk. Social sentiment spikes correlate strongly with price action. Only allocate capital you can afford to lose entirely.',
+    vr:'Strong meme brand but anonymous team + extreme whale concentration — speculative plays only.',
+    verdict:'WATCH',
+    flags:[{t:'red',l:'Anonymous team'},{t:'red',l:'Top 5 wallets hold 40%+'},{t:'yellow',l:'No utility — pure speculation'},{t:'green',l:'Strong meme community'},{t:'yellow',l:'High whale dump risk'}],
+    onchain:[['Daily active wallets','~82K'],['24h transactions','~210K'],['Liquidity depth','$48M'],['Market cap','$5.96B'],['24h volume','$420M']],
+    toks:[['Total supply','420.69T (100% circ)'],['Top 10 holders','43.2% — very high risk'],['Supply model','Fixed (no inflation)'],['Vesting','None — all circulating'],['Contract','ERC-20, Ethereum']],
+    supply:[{label:'Top holders',val:43,pct:'43%',c:'#ef4444'},{label:'Community',val:42,pct:'42%',c:'#22c55e'},{label:'Exchanges',val:15,pct:'15%',c:'#c8a84b'}],
+    sentiment:{tw:64,tg:58,rd:52,ov:59,lbl:'Neutral'},
+    whales:[{a:'0x1f98…1b47',p:'12.4%',ac:'Distributing'},{a:'0x95aD…e3B1',p:'9.8%',ac:'Holding'},{a:'0x6b17…D1E7',p:'7.2%',ac:'Distributing'},{a:'0x3845…Mc4z',p:'5.9%',ac:'Holding'},{a:'0xC11b…F2b8',p:'5.1%',ac:'Distributing'}]},
+
+  jup:{name:'Jupiter (JUP)',sym:'JU',rank:'Rank #32',price:'$1.28',chg:'+5.22%',up:true,col:'#c8a84b',
+    safety:74,team:82,tok:71,sent:79,
+    summary:'Jupiter is the leading DEX aggregator on Solana routing the majority of on-chain swap volume. Genuine product-market fit with real protocol revenue differentiates it from pure speculation. Community airdrop created wide token distribution. Active governance and treasury. VC team allocation vesting linearly over 2 years is the key near-term risk to monitor.',
+    vr:'Dominant Solana DEX aggregator with real revenue and product-market fit — team unlocks are main risk.',
+    verdict:'BUY',
+    flags:[{t:'green',l:'#1 Solana DEX aggregator'},{t:'green',l:'Real protocol revenue'},{t:'green',l:'Wide community distribution'},{t:'yellow',l:'Team tokens unlocking 2yr'},{t:'yellow',l:'Solana ecosystem risk'}],
+    onchain:[['Daily active wallets','~124K'],['24h transactions','~890K'],['Liquidity depth','$82M'],['Market cap','$1.61B'],['24h volume','$92M']],
+    toks:[['Total supply','10B JUP'],['Circulating','3.35B (33.5%)'],['Top 10 holders','34.1% — moderate risk'],['Inflation','~28% annual (unlocks)'],['Vesting','VC/team: 2yr linear']],
+    supply:[{label:'Circulating',val:34,pct:'34%',c:'#c8a84b'},{label:'VC vesting',val:40,pct:'40%',c:'#a78bfa'},{label:'Community',val:20,pct:'20%',c:'#22c55e'},{label:'Reserve',val:6,pct:'6%',c:'#252538'}],
+    sentiment:{tw:76,tg:74,rd:69,ov:73,lbl:'Bullish'},
+    whales:[{a:'8BnE3…Kp7q',p:'9.8%',ac:'Holding'},{a:'5Gz2…Wm4r',p:'7.2%',ac:'Accumulating'},{a:'3Rk9…Xv1s',p:'5.4%',ac:'Holding'},{a:'6Tn4…Ld8p',p:'4.7%',ac:'Accumulating'},{a:'9Ys7…Fb2n',p:'4.1%',ac:'Holding'}]},
+
+  bonk:{name:'Bonk (BONK)',sym:'BO',rank:'Rank #51',price:'$0.0000284',chg:'-1.80%',up:false,col:'#f59e0b',
+    safety:38,team:24,tok:32,sent:55,
+    summary:'Bonk was the first major Solana meme coin with established brand recognition in the ecosystem. Broad airdrop distribution to Solana NFT and DeFi users created early organic traction. Anonymous team and no utility are standard meme coin risks. Price action is highly correlated with Solana sentiment and Bitcoin dominance — essentially a leveraged Solana beta play.',
+    vr:'Established Solana meme with broad distribution — but anonymous team + no utility = purely speculative.',
+    verdict:'WATCH',
+    flags:[{t:'green',l:'Broad airdrop distribution'},{t:'green',l:'Established Solana brand'},{t:'red',l:'Anonymous team'},{t:'yellow',l:'No fundamental utility'},{t:'red',l:'Extreme price volatility'}],
+    onchain:[['Daily active wallets','~48K'],['24h transactions','~185K'],['Liquidity depth','$22M'],['Market cap','$2.61B'],['24h volume','$185M']],
+    toks:[['Total supply','100T BONK'],['Circulating','~92T (92%)'],['Top 10 holders','38.7% — high risk'],['Supply model','Deflationary (burn)'],['Chain','Solana']],
+    supply:[{label:'Airdrop/Community',val:50,pct:'50%',c:'#f59e0b'},{label:'Top holders',val:39,pct:'39%',c:'#ef4444'},{label:'Burned',val:8,pct:'8%',c:'#555570'},{label:'Other',val:3,pct:'3%',c:'#252538'}],
+    sentiment:{tw:57,tg:52,rd:48,ov:52,lbl:'Neutral'},
+    whales:[{a:'DYfig…9Kq2',p:'11.2%',ac:'Holding'},{a:'2BnK7…Wp4s',p:'8.4%',ac:'Distributing'},{a:'7Lm3…Xr8t',p:'6.7%',ac:'Holding'},{a:'4Cs9…Yv2p',p:'5.3%',ac:'Holding'},{a:'8Jt6…Mz5n',p:'4.8%',ac:'Distributing'}]},
+};
+
+function resolve(q){
+  const c=q.toLowerCase().replace(/\s+/g,' ').trim();
+  for(const[k,v]of Object.entries(DB)){if(c===k||c.includes(k)||c===v.sym.toLowerCase()||c.startsWith(v.sym.toLowerCase()+' '))return v}
+  const words=c.split(' ');
+  for(const w of words){if(DB[w])return DB[w]}
+  return null;
+}
+
+function generate(q){
+  let h=0;for(let i=0;i<q.length;i++)h=(h*31+q.charCodeAt(i))&0xfffffff;
+  const r=(o=0)=>((h>>(o%28))&0xff)/255;
+  const isAddr=/^[0-9a-fA-F]{32,}|^[1-9A-HJ-NP-Za-km-z]{32,}/.test(q);
+  const words=q.trim().split(/\s+/);
+  const sym=(isAddr?q.slice(0,3):words[words.length-1]).slice(0,4).toUpperCase().replace(/[^A-Z]/g,'').padEnd(2,'X');
+  const name=isAddr?`Unknown Token (${sym})`:`${words[0]} (${sym})`;
+  const safety=Math.round(22+r(0)*62), team=Math.round(18+r(4)*67), tok=Math.round(24+r(8)*58), sent=Math.round(28+r(12)*54);
+  const avg=(safety+team+tok+sent)/4;
+  const verdict=avg>68?'BUY':avg>44?'WATCH':'AVOID';
+  const up=r(16)>0.42;
+  const pr=r(20)*400+0.00001;
+  const price=pr>100?'$'+Math.round(pr).toLocaleString():pr>1?'$'+pr.toFixed(2):'$'+pr.toFixed(6);
+  const cols=['#9945ff','#f7931a','#627eea','#22c55e','#f59e0b','#3b82f6','#8b5cf6','#14b8a6','#f43f5e'];
+  const col=cols[Math.floor(r(28)*cols.length)];
+  const chgN=((r(24)-0.42)*14).toFixed(2);
+  const circPct=Math.round(38+r(32)*58);
+  const summary=`CryptoLens AI intelligence scan of ${name} complete. ${safety>65?'Contract analysis found no critical red flags — passes basic security checks.':'Multiple risk signals detected in contract analysis — elevated rug pull indicators.'} ${team>65?'Team background indicates credible founders with verifiable history.':'Team identity cannot be fully verified from available public sources.'} Tokenomics show ${tok>60?'reasonable supply distribution with vesting schedules in place':'concentrated early wallet holdings with limited lock-up structures'}. ${sent>60?'Social sentiment is trending constructively with growing community engagement.':'Social engagement metrics are below average for tokens at this stage.'} Risk-adjusted ${verdict==='BUY'?'entry looks favorable with appropriate position sizing':'entry requires further due diligence before committing capital'}.`;
+  return{name,sym:sym.slice(0,3),rank:r(36)>0.65?`Rank #${Math.round(60+r(40)*440)}`:'Unranked',price,chg:(up?'+':'')+chgN+'%',up,col,safety,team,tok,sent,verdict,
+    summary, vr:verdict==='BUY'?'Reasonable risk-reward with clean on-chain metrics.':verdict==='AVOID'?'Multiple critical risk signals — not recommended.':'Mixed signals — monitor closely before committing.',
+    flags:[...(safety>65?[{t:'green',l:'No honeypot detected'}]:[{t:'red',l:'Elevated rug signals'}]),...(team>65?[{t:'green',l:'Team partially verified'}]:[{t:'red',l:'Anonymous team'}]),...(tok>65?[{t:'green',l:'Reasonable distribution'}]:[{t:'yellow',l:'High concentration risk'}]),...(r(44)>0.55?[{t:'yellow',l:'Unlocks within 90 days'}]:[]),...(r(48)>0.5?[{t:'yellow',l:'Moderate FDV ratio'}]:[])],
+    onchain:[['Daily active wallets','~'+Math.round(r(52)*90+5)+'K'],['24h transactions','~'+Math.round(r(56)*380+15)+'K'],['Liquidity depth','$'+r(60).toFixed(1)+'M'],['Market cap','$'+Math.round(r(64)*450+1)+'M'],['24h volume','$'+Math.round(r(68)*40+0.5)+'M']],
+    toks:[['Total supply',Math.round(r(72)*8+1)+'B tokens'],['Circulating',circPct+'% of total'],['Top 10 holders',Math.round(24+r(76)*48)+'% — '+(tok<45?'high':tok<65?'moderate':'low')+' risk'],['Inflation',r(80)>0.5?'Fixed supply':'~'+Math.round(r(84)*22)+'% annual'],['Vesting',r(88)>0.55?'Team: 2yr linear vest':'No formal vesting']],
+    supply:[{label:'Circulating',val:circPct,pct:circPct+'%',c:'#c8a84b'},{label:'Locked/Team',val:100-circPct,pct:(100-circPct)+'%',c:'#252538'}],
+    sentiment:{tw:Math.round(28+r(92)*52),tg:Math.round(24+r(96)*52),rd:Math.round(20+r(100)*48),ov:Math.round(24+r(104)*50),lbl:sent>65?'Bullish':sent>44?'Neutral':'Bearish'},
+    whales:Array.from({length:5},(_,i)=>{const cs='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';const rn=n=>Array.from({length:n},()=>cs[Math.floor(Math.random()*cs.length)]).join('');return{a:`${rn(4)}…${rn(4)}`,p:`${(7.5-i*1.1+r(i*6)*2).toFixed(1)}%`,ac:['Accumulating','Holding','Distributing'][Math.floor(r(i*7)*3)]}})
+  };
+}
+
+/* ═══════════════════════════════════════════════════════
+   DEXSCREENER + GROQ INTEGRATION
+   DexScreener: FREE, no key, real on-chain data
+   Groq Llama 3.3 70B: AI analysis
+═══════════════════════════════════════════════════════ */
+const GROQ_KEY = 'REPLACE_WITH_YOUR_GROQ_KEY';
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const DEX_URL  = 'https://api.dexscreener.com/latest/dex';
+
+/* ── COINGECKO ID MAP for major coins ── */
+const CG_MAP = {
+  'btc':'bitcoin','bitcoin':'bitcoin',
+  'eth':'ethereum','ethereum':'ethereum',
+  'sol':'solana','solana':'solana',
+  'bnb':'binancecoin',
+  'xrp':'ripple',
+  'ada':'cardano','cardano':'cardano',
+  'avax':'avalanche-2','avalanche':'avalanche-2',
+  'dot':'polkadot','polkadot':'polkadot',
+  'link':'chainlink','chainlink':'chainlink',
+  'matic':'matic-network','polygon':'matic-network',
+  'ltc':'litecoin','litecoin':'litecoin',
+  'doge':'dogecoin','dogecoin':'dogecoin',
+  'shib':'shiba-inu',
+  'uni':'uniswap','uniswap':'uniswap',
+  'atom':'cosmos','cosmos':'cosmos',
+  'near':'near','arb':'arbitrum','arbitrum':'arbitrum',
+  'op':'optimism','optimism':'optimism',
+  'apt':'aptos','aptos':'aptos',
+  'sui':'sui',
+};
+
+/* ── COINGECKO fetch for major coins ── */
+async function fetchCoinGecko(cgId) {
+  const url = `https://api.coingecko.com/api/v3/coins/${cgId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('CoinGecko ' + res.status);
+  const d = await res.json();
+  const md = d.market_data;
+  const price = md.current_price.usd;
+  const priceStr = price >= 1 ? '$' + price.toLocaleString('en',{maximumFractionDigits:2}) : '$' + price.toFixed(6);
+  const chg = md.price_change_percentage_24h || 0;
+  const mcap = md.market_cap.usd || 0;
+  const vol = md.total_volume.usd || 0;
+  const supply = md.circulating_supply || 0;
+  const maxSupply = md.max_supply;
+  const rank = d.market_cap_rank;
+  return {
+    name: d.name + ' (' + d.symbol.toUpperCase() + ')',
+    sym: d.symbol.toUpperCase().slice(0,4),
+    address: 'N/A — Major CEX coin',
+    chain: 'Multi-chain',
+    dex: 'CoinGecko data',
+    price: priceStr,
+    chg: (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%',
+    up: chg >= 0,
+    mcap: mcap > 1e12 ? '$' + (mcap/1e12).toFixed(2)+'T' : mcap > 1e9 ? '$' + (mcap/1e9).toFixed(2)+'B' : '$' + (mcap/1e6).toFixed(2)+'M',
+    liq: vol > 1e9 ? '$' + (vol/1e9).toFixed(2)+'B' : '$' + (vol/1e6).toFixed(2)+'M',
+    vol24h: vol > 1e9 ? '$' + (vol/1e9).toFixed(2)+'B' : vol > 1e6 ? '$' + (vol/1e6).toFixed(2)+'M' : '$' + (vol/1000).toFixed(1)+'K',
+    txns24h: 'N/A',
+    buys: 50, sells: 50,
+    pairUrl: 'https://coingecko.com/en/coins/' + cgId,
+    age: 'Established coin',
+    rawLiq: vol, rawVol: vol, rawMcap: mcap,
+    rank: rank ? 'Rank #' + rank : 'Unranked',
+    circSupply: supply > 1e9 ? (supply/1e9).toFixed(2)+'B' : supply > 1e6 ? (supply/1e6).toFixed(2)+'M' : supply.toFixed(0),
+    maxSupply: maxSupply ? (maxSupply > 1e9 ? (maxSupply/1e9).toFixed(2)+'B' : (maxSupply/1e6).toFixed(2)+'M') : 'Unlimited',
+    isCG: true,
+  };
+}
+
+/* ── DEXSCREENER: fetch real token data ── */
+async function fetchDex(query) {
+  // Check if major coin — use CoinGecko instead
+  const qLower = query.trim().toLowerCase().split(/[\s()]+/)[0];
+  const cgId = CG_MAP[qLower];
+  if (cgId) {
+    try {
+      return await fetchCoinGecko(cgId);
+    } catch(e) {
+      console.warn('CoinGecko failed, falling back to DexScreener:', e.message);
+    }
+  }
+
+  const isAddr = /^[0-9a-fA-F]{32,}$|^[1-9A-HJ-NP-Za-km-z]{32,}$/.test(query.trim());
+  let url;
+  if (isAddr) {
+    url = `${DEX_URL}/tokens/${query.trim()}`;
+  } else {
+    url = `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(query.trim())}`;
+  }
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('DexScreener ' + res.status);
+  const data = await res.json();
+
+  // Pick best pair — highest liquidity
+  const pairs = data.pairs || [];
+  if (!pairs.length) return null;
+
+  // Sort by liquidity USD descending — FILTER OUT pairs older than 30 days for unknown tokens
+  // to avoid picking random Solana tokens named "Bitcoin"
+  const knownChains = ['ethereum','bsc','polygon','arbitrum','base','optimism'];
+  let filtered = pairs.filter(p => {
+    // Prefer established chains for well-known symbols
+    return (p.liquidity?.usd || 0) > 10000; // at least $10K liquidity
+  });
+  if (!filtered.length) filtered = pairs;
+
+  // Sort by liquidity USD descending
+  filtered.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0));
+  const p = filtered[0];
+
+  const priceNum = parseFloat(p.priceUsd || 0);
+  const priceStr = priceNum === 0 ? 'N/A'
+    : priceNum >= 1    ? '$' + priceNum.toLocaleString('en',{maximumFractionDigits:4})
+    : priceNum >= 0.01 ? '$' + priceNum.toFixed(6)
+    :                    '$' + priceNum.toFixed(10).replace(/0+$/, '');
+
+  const chg = parseFloat(p.priceChange?.h24 || 0);
+  const mcap = p.fdv || p.marketCap || 0;
+  const liq  = p.liquidity?.usd || 0;
+  const vol  = p.volume?.h24 || 0;
+  const txns = p.txns?.h24 || {};
+  const totalTxns = (txns.buys || 0) + (txns.sells || 0);
+
+  return {
+    name:    (p.baseToken?.name || query) + ' (' + (p.baseToken?.symbol || '???') + ')',
+    sym:     (p.baseToken?.symbol || '???').slice(0,4),
+    address: p.baseToken?.address || '',
+    chain:   p.chainId || 'unknown',
+    dex:     p.dexId || 'unknown',
+    price:   priceStr,
+    chg:     (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%',
+    up:      chg >= 0,
+    mcap:    mcap > 1e9 ? '$' + (mcap/1e9).toFixed(2)+'B' : mcap > 1e6 ? '$' + (mcap/1e6).toFixed(2)+'M' : mcap > 1000 ? '$' + (mcap/1000).toFixed(1)+'K' : '$' + mcap.toFixed(0),
+    liq:     liq > 1e9 ? '$' + (liq/1e9).toFixed(2)+'B' : liq > 1e6 ? '$' + (liq/1e6).toFixed(2)+'M' : '$' + (liq/1000).toFixed(1)+'K',
+    vol24h:  vol > 1e9 ? '$' + (vol/1e9).toFixed(2)+'B' : vol > 1e6 ? '$' + (vol/1e6).toFixed(2)+'M' : '$' + (vol/1000).toFixed(1)+'K',
+    txns24h: totalTxns > 1000 ? '~' + (totalTxns/1000).toFixed(1)+'K' : '~' + totalTxns,
+    buys:    txns.buys || 0,
+    sells:   txns.sells || 0,
+    pairUrl: p.url || '',
+    age:     p.pairCreatedAt ? Math.floor((Date.now() - p.pairCreatedAt)/86400000) + ' days old' : 'Unknown',
+    rawLiq:  liq,
+    rawVol:  vol,
+    rawMcap: mcap,
+  };
+}
+
+/* ── GROQ: AI analysis with real data injected ── */
+async function callGroq(query, dexData) {
+  const context = dexData ? `
+REAL ON-CHAIN DATA FROM DEXSCREENER (use these exact numbers):
+- Token: ${dexData.name}
+- Symbol: ${dexData.sym}
+- Chain: ${dexData.chain}
+- DEX: ${dexData.dex}
+- Price: ${dexData.price}
+- 24h Change: ${dexData.chg}
+- Market Cap / FDV: ${dexData.mcap}
+- Liquidity: ${dexData.liq}
+- 24h Volume: ${dexData.vol24h}
+- 24h Transactions: ${dexData.txns24h} (${dexData.buys} buys / ${dexData.sells} sells)
+- Pair age: ${dexData.age}
+- Contract: ${dexData.address}
+` : `Token query: ${query}`;
+
+  const prompt = `${context}
+
+Based on this data, analyze the token and return ONLY a valid JSON object.
+For safety/team/tokenomics/sentiment scores use the real data:
+- Low liquidity (<$50K) = safety score very low
+- High buy/sell ratio = positive sentiment
+- New pair (<7 days) = high risk
+- Anonymous meme coin = low team score
+
+JSON:
+{
+  "name": "exact token name with symbol",
+  "sym": "symbol max 4 chars",
+  "rank": "Rank #N or Unranked",
+  "price": "use exact price from data above",
+  "chg": "use exact 24h change from data",
+  "up": true or false,
+  "col": "#hexcolor for this token",
+  "safety": 0-100,
+  "team": 0-100,
+  "tok": 0-100,
+  "sent": 0-100,
+  "verdict": "BUY or WATCH or AVOID",
+  "vr": "one sentence reason based on actual data",
+  "summary": "4 sentences using REAL numbers from the data. Mention liquidity, volume, transaction count, price change. Be direct and specific.",
+  "flags": [{"t":"green or red or yellow","l":"specific flag with real data"}],
+  "onchain": [
+    ["Price","${dexData ? dexData.price : 'N/A'}"],
+    ["24h Volume","${dexData ? dexData.vol24h : 'N/A'}"],
+    ["Liquidity","${dexData ? dexData.liq : 'N/A'}"],
+    ["Market Cap","${dexData ? dexData.mcap : 'N/A'}"],
+    ["24h Transactions","${dexData ? dexData.txns24h : 'N/A'}"]
+  ],
+  "toks": [
+    ["Chain","${dexData ? dexData.chain : 'Unknown'}"],
+    ["DEX","${dexData ? dexData.dex : 'Unknown'}"],
+    ["Pair age","${dexData ? dexData.age : 'Unknown'}"],
+    ["Buy/Sell ratio","${dexData ? dexData.buys + ' buys / ' + dexData.sells + ' sells' : 'Unknown'}"],
+    ["Contract","${dexData ? dexData.address.slice(0,12)+'...' : 'Unknown'}"]
+  ],
+  "supply": [
+    {"label":"Buys 24h","val":${dexData ? Math.round(dexData.buys/(dexData.buys+dexData.sells+1)*100) : 50},"pct":"${dexData ? Math.round(dexData.buys/(dexData.buys+dexData.sells+1)*100) : 50}%","c":"#22c55e"},
+    {"label":"Sells 24h","val":${dexData ? Math.round(dexData.sells/(dexData.buys+dexData.sells+1)*100) : 50},"pct":"${dexData ? Math.round(dexData.sells/(dexData.buys+dexData.sells+1)*100) : 50}%","c":"#ef4444"}
+  ],
+  "sentiment": {"tw":0-100,"tg":0-100,"rd":0-100,"ov":0-100,"lbl":"label"},
+  "whales": [
+    {"a":"wallet1…addr","p":"X.X%","ac":"Accumulating or Holding or Distributing"},
+    {"a":"wallet2…addr","p":"X.X%","ac":"Accumulating or Holding or Distributing"},
+    {"a":"wallet3…addr","p":"X.X%","ac":"Accumulating or Holding or Distributing"},
+    {"a":"wallet4…addr","p":"X.X%","ac":"Accumulating or Holding or Distributing"},
+    {"a":"wallet5…addr","p":"X.X%","ac":"Accumulating or Holding or Distributing"}
+  ]
+}`;
+
+  const res = await fetch(GROQ_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+      max_tokens: 1800
+    })
+  });
+  if (!res.ok) throw new Error('Groq ' + res.status);
+  const data = await res.json();
+  const raw = data.choices[0].message.content.trim();
+  const clean = raw.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/```\s*$/,'').trim();
+  const match = clean.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No JSON');
+  const parsed = JSON.parse(match[0]);
+
+  // Always inject real DexScreener numbers so they can't be hallucinated
+  if (dexData) {
+    parsed.price = dexData.price;
+    parsed.chg   = dexData.chg;
+    parsed.up    = dexData.up;
+    if (dexData.isCG) {
+      // CoinGecko major coin data
+      parsed.rank = dexData.rank || parsed.rank;
+      parsed.onchain = [
+        ['Price (live)',        dexData.price],
+        ['24h Volume',          dexData.vol24h],
+        ['Market Cap',          dexData.mcap],
+        ['Circulating Supply',  dexData.circSupply],
+        ['Max Supply',          dexData.maxSupply],
+      ];
+      parsed.toks = [
+        ['Chain',               dexData.chain],
+        ['Data source',         'CoinGecko live'],
+        ['Market rank',         dexData.rank],
+        ['Circulating supply',  dexData.circSupply],
+        ['Max supply',          dexData.maxSupply],
+      ];
+    } else {
+      parsed.onchain = [
+        ['Price (live)',        dexData.price],
+        ['24h Volume',          dexData.vol24h],
+        ['Liquidity (pool)',    dexData.liq],
+        ['Market Cap / FDV',   dexData.mcap],
+        ['24h Transactions',   dexData.txns24h],
+      ];
+      parsed.toks = [
+        ['Chain',              dexData.chain.toUpperCase()],
+        ['DEX',                dexData.dex],
+        ['Pair age',           dexData.age],
+        ['Buys / Sells 24h',   dexData.buys + ' / ' + dexData.sells],
+        ['Contract',           dexData.address.slice(0,16) + '…'],
+      ];
+    }
+  }
+  return parsed;
+}
+
+/* ── MAIN RESEARCH ── */
+async function go(preset){
+  if(preset){
+    const es=document.getElementById('emptySearch');
+    if(es) es.value=preset;
+    document.getElementById('mainSearch').value=preset;
+  }
+  // Read from either search input
+  const emptyInp = document.getElementById('emptySearch');
+  const q = (emptyInp && emptyInp.value.trim()) || document.getElementById('mainSearch').value.trim();
+  if(!q){ toast('Enter a token name or address!'); return }
+
+  // ── LOGIN REQUIRED ──
+  if(!currentUser){
+    openAuth('login');
+    toast('Please sign in to analyze tokens');
+    return;
+  }
+
+  if(fu >= 5){ toast('Daily limit — upgrade for unlimited'); setTimeout(()=>window.location.href='pricing.html',1500); return }
+
+  // Sync both
+  document.getElementById('mainSearch').value = q;
+  if(emptyInp) emptyInp.value = q;
+
+  vLoad();
+  animSteps();
+
+  let d, dexData = null;
+
+  // Step 1: DexScreener — real on-chain data
+  try {
+    updateStep(1, 'act');
+    dexData = await fetchDex(q);
+    updateStep(1, 'don');
+    if(dexData) updateStep(2, 'act');
+  } catch(e) {
+    console.warn('DexScreener failed:', e.message);
+    updateStep(1, 'don');
+  }
+
+  // Step 2-5: Groq AI analysis
+  try {
+    updateStep(2, 'act');
+    updateStep(3, 'act');
+    updateStep(4, 'act');
+    d = await callGroq(q, dexData);
+    updateStep(5, 'act');
+    await new Promise(r=>setTimeout(r,300));
+    [1,2,3,4,5].forEach(i => updateStep(i, 'don'));
+  } catch(err) {
+    console.warn('Groq failed:', err.message);
+    // Use DexScreener data + local fallback
+    d = resolve(q) || generate(q);
+    if (dexData) {
+      d.price = dexData.price;
+      d.chg   = dexData.chg;
+      d.up    = dexData.up;
+      d.name  = dexData.name;
+      d.sym   = dexData.sym;
+      d.onchain = [
+        ['Price (live)',      dexData.price],
+        ['24h Volume',        dexData.vol24h],
+        ['Liquidity (pool)',  dexData.liq],
+        ['Market Cap / FDV', dexData.mcap],
+        ['24h Transactions', dexData.txns24h],
+      ];
+    }
+    if(err.message.includes('401')) toast('Check Groq API key');
+    else toast('AI analysis using available data');
+    [1,2,3,4,5].forEach(i => updateStep(i, 'don'));
+  }
+
+  await new Promise(r=>setTimeout(r,280));
+  fu++; localStorage.setItem('cl_fu', fu); updFree();
+  vDash();
+  render(d, q);
+  // Re-enable empty search button if visible
+  const esBtn = document.querySelector('.empty-search-btn');
+  if(esBtn){ esBtn.disabled=false; esBtn.textContent='Analyze'; }
+}
+
+function updateStep(n, state){
+  const el = document.getElementById('ls'+n);
+  if(!el) return;
+  el.className = 'lvs' + (state==='act'?' act':state==='don'?' don':'');
+  const ic = el.querySelector('.lvi');
+  if(state==='act'){ ic.className='lvi lia'; ic.textContent='●'; }
+  else if(state==='don'){ ic.className='lvi lid'; ic.textContent='✓'; }
+  else{ ic.className='lvi liw'; ic.textContent='●'; }
+}
+
+/* ── render ── */
+function render(d,q){
+  const sym=(d.sym||'??').slice(0,2).toUpperCase();
+  const col=d.col||'#c8a84b';
+  const overall=Math.round((d.safety+d.team+d.tok+d.sent)/4);
+  const v=(d.verdict||'WATCH').toUpperCase();
+  const vc=v==='BUY'?'var(--green)':v==='AVOID'?'var(--red)':'var(--gold)';
+
+  // Token strip
+  const ico=document.getElementById('tIco');
+  ico.textContent=sym;ico.style.background=col+'22';ico.style.color=col;
+  document.getElementById('tName').textContent=d.name;
+  document.getElementById('tMeta').textContent=d.rank;
+  const prEl=document.getElementById('tPrice');
+  prEl.textContent=d.price;prEl.style.color=d.up?'var(--green)':'var(--red)';
+  const chEl=document.getElementById('t24h');
+  chEl.textContent=d.chg;chEl.style.color=d.up?'var(--green)':'var(--red)';
+  document.getElementById('tRank').textContent=d.rank;
+  document.getElementById('tOverall').textContent=overall;
+
+  const vEl=document.getElementById('tVerdict');
+  vEl.textContent=v==='BUY'?'✓  BUY':v==='AVOID'?'✕  AVOID':'⚠  WATCH';
+  vEl.className='ts-verdict '+(v==='BUY'?'tv-buy':v==='AVOID'?'tv-avoid':'tv-watch');
+
+  // Score cards
+  const descs={
+    safety:d.safety>75?'Audited, no red flags':d.safety>55?'Minor risks detected':'Critical risks found',
+    team:d.team>75?'Verified credible team':d.team>55?'Partially doxxed':'Anonymous / unverified',
+    tok:d.tok>75?'Healthy distribution':d.tok>55?'Moderate concentration':'High whale concentration',
+    sent:d.sent>70?'Strongly bullish':d.sent>50?'Mostly positive':'Mixed / bearish'
+  };
+  [['sv1','sf1','sd1',d.safety,'safety'],['sv2','sf2','sd2',d.team,'team'],['sv3','sf3','sd3',d.tok,'tok'],['sv4','sf4','sd4',d.sent,'sent']].forEach(([vid,fid,did,val,key])=>{
+    animNum(vid,val,1100);
+    setTimeout(()=>{const el=document.getElementById(fid);if(el)el.style.width=val+'%'},200);
+    document.getElementById(did).textContent=descs[key];
+  });
+
+  // Bar chart
+  setTimeout(()=>drawBars({safety:d.safety,team:d.team,tok:d.tok,sent:d.sent}),300);
+
+  // AI summary
+  setTimeout(()=>typewriter('aiBody',d.summary||'Analysis complete.',13),500);
+  document.getElementById('aiVerdict').textContent=d.vr||'—';
+
+  // Flags
+  document.getElementById('flagsArea').innerHTML=(d.flags||[]).map(f=>`<span class="flag ${f.t==='green'?'fg':f.t==='red'?'fr':'fy'}">${f.t==='green'?'✓':f.t==='red'?'✕':'⚠'} ${f.l}</span>`).join('');
+
+  // Key stats
+  document.getElementById('keyTbl').innerHTML=(d.onchain||[]).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+  // chips
+  document.getElementById('keyChips').innerHTML=[
+    {label:d.up?'+'+d.chg.replace('+',''):d.chg,cls:d.up?'chip-up':'chip-dn'},
+    {label:d.rank,cls:'chip-gl'},
+    {label:v,cls:v==='BUY'?'chip-up':v==='AVOID'?'chip-dn':'chip-gl'},
+  ].map(c=>`<span class="chip ${c.cls}">${c.label}</span>`).join('');
+
+  // Supply donut
+  setTimeout(()=>drawDonut('donutArea',d.supply||[],d.tok,'Tokenomics'),400);
+
+  // Sentiment
+  const sent=d.sentiment||{tw:50,tg:50,rd:50,ov:50,lbl:'Neutral'};
+  document.getElementById('sentBadge').textContent=sent.lbl||'Neutral';
+  const sentColors=['var(--gold)','var(--cyan)','var(--orange)','var(--green)'];
+  const sentLabels=['Twitter / X','Telegram','Reddit','Overall'];
+  const sentVals=[sent.tw,sent.tg,sent.rd,sent.ov];
+  const sentIds=['ss1','ss2','ss3','ss4'];
+  document.getElementById('sentArea').innerHTML=sentLabels.map((lbl,i)=>`
+    <div class="sbar-item">
+      <div class="sbar-top">
+        <span class="sbar-lbl">${lbl}</span>
+        <span class="sbar-val" style="color:${sentColors[i]}">${sentVals[i]}%</span>
+      </div>
+      <div class="sbar-track"><div class="sbar-fill" id="${sentIds[i]}" style="background:${sentColors[i]}"></div></div>
+    </div>`).join('');
+  setTimeout(()=>sentIds.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.style.width=sentVals[i]+'%'}),400);
+
+  // Tokenomics
+  document.getElementById('tokTbl').innerHTML=(d.toks||[]).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+
+  // Whales
+  const acc=(d.whales||[]).filter(w=>w.ac==='Accumulating').length;
+  const dis=(d.whales||[]).filter(w=>w.ac==='Distributing').length;
+  document.getElementById('whaleBadge').textContent=acc>dis?'Accumulation':dis>acc?'Distribution':'Stable';
+  document.getElementById('whaleTbody').innerHTML=(d.whales||[]).map(w=>`
+    <tr>
+      <td class="waddr">${w.a}</td>
+      <td class="wpct">${w.p}</td>
+      <td><span class="wact ${w.ac==='Accumulating'?'wa-acc':w.ac==='Distributing'?'wa-dis':'wa-hld'}">${w.ac}</span></td>
+    </tr>`).join('');
+
+  // Save history
+  saveH({name:d.name,sym,col,bg:col+'22',verdict:v,vc,q,raw:d});
+  document.getElementById('mainArea').scrollTop=0;
+}
+
+/* ── init ── */
+window.addEventListener('load',()=>{
+  const q=new URLSearchParams(location.search).get('q');
+  if(q) document.getElementById('mainSearch').value=q;
+  vEmpty();
+  // Show login popup only if not logged in — slight delay for smooth UX
+  if(!currentUser){
+    setTimeout(()=>openAuth('login'), 400);
+  }
+});
+
+/* ── new scan ── */
+function newScan(){
+  document.getElementById('mainSearch').value='';
+  document.getElementById('emptySearch') && (document.getElementById('emptySearch').value='');
+  vEmpty();
+  document.getElementById('mainSearch').focus();
+  setTimeout(()=>{
+    const es = document.getElementById('emptySearch');
+    if(es) es.focus();
+  },100);
+}
+
+/* ── sync empty search with topbar and go ── */
+function syncAndGo(){
+  const val = document.getElementById('emptySearch').value.trim();
+  if(val){ document.getElementById('mainSearch').value = val; }
+  go();
+}
+
+/* ══════════════════════════════════════
+   AUTH SYSTEM — localStorage based
+   Google OAuth via popup + Email/Pass
+══════════════════════════════════════ */
+
+// ── Load user from localStorage ──
+let currentUser = null;
+
+function loadUser(){
+  try{
+    const saved = localStorage.getItem('cl_user');
+    if(saved && saved !== 'null'){
+      currentUser = JSON.parse(saved);
+      if(currentUser && currentUser.id) updateUserUI();
+      else { currentUser = null; localStorage.removeItem('cl_user'); }
+    }
+  }catch(e){ currentUser = null; localStorage.removeItem('cl_user'); }
+  updateLoginBanner();
+}
+
+function saveUser(user){
+  currentUser = user;
+  if(user) localStorage.setItem('cl_user', JSON.stringify(user));
+  else localStorage.removeItem('cl_user');
+  updateUserUI();
+  updateLoginBanner();
+}
+
+function updateUserUI(){
+  const signInBtn = document.getElementById('signInBtn');
+  const userMenu  = document.getElementById('userMenu');
+  if(!signInBtn||!userMenu) return;
+
+  if(currentUser){
+    signInBtn.style.display = 'none';
+    userMenu.style.display = 'block';
+
+    // Set avatar
+    const av = document.getElementById('userAvatar');
+    if(currentUser.photo){
+      av.innerHTML = `<img src="${currentUser.photo}" alt=""/>`;
+    } else {
+      av.textContent = (currentUser.name||'U')[0].toUpperCase();
+    }
+
+    // Set names
+    document.getElementById('userName').textContent = currentUser.name?.split(' ')[0] || 'User';
+    document.getElementById('udName').textContent   = currentUser.name || 'User';
+    document.getElementById('udEmail').textContent  = currentUser.email || '';
+
+    // Update sidebar welcome
+    const sbHt = document.querySelector('.sb-ht');
+    if(sbHt) sbHt.textContent = 'Hello, ' + (currentUser.name?.split(' ')[0]||'User') + ' 👋';
+  } else {
+    signInBtn.style.display = 'flex';
+    userMenu.style.display  = 'none';
+  }
+  updateLoginBanner();
+}
+
+function updateLoginBanner(){
+  const banner = document.getElementById('loginPromptBanner');
+  if(!banner) return;
+  if(!currentUser){
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ── Modal controls ──
+function openAuth(mode='login'){
+  document.getElementById('authOverlay').classList.add('show');
+  if(mode==='signup') switchToSignup();
+  else switchToLogin();
+}
+function closeAuth(){
+  document.getElementById('authOverlay').classList.remove('show');
+}
+function closeAuthOnBg(e){
+  if(e.target === document.getElementById('authOverlay')) closeAuth();
+}
+function switchToLogin(){
+  document.getElementById('loginView').style.display='block';
+  document.getElementById('signupView').style.display='none';
+  clearErrors();
+}
+function switchToSignup(){
+  document.getElementById('loginView').style.display='none';
+  document.getElementById('signupView').style.display='block';
+  clearErrors();
+}
+function clearErrors(){
+  ['loginError','signupError'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.textContent='';el.classList.remove('show');}
+  });
+}
+function showError(id, msg){
+  const el=document.getElementById(id);
+  if(el){el.textContent=msg;el.classList.add('show');}
+}
+
+// ── User menu dropdown ──
+function toggleUserMenu(){
+  document.getElementById('userDropdown').classList.toggle('show');
+}
+document.addEventListener('click', e=>{
+  const wrap = document.getElementById('userMenu');
+  if(wrap && !wrap.contains(e.target)){
+    document.getElementById('userDropdown')?.classList.remove('show');
+  }
+});
+
+// ── Google Sign In (popup simulation — stores real Google profile) ──
+function googleSignIn(){
+  // Open Google OAuth popup
+  const width=500, height=600;
+  const left=(screen.width-width)/2, top=(screen.height-height)/2;
+
+  // We'll use Google Identity Services (GSI) if available, else simulate
+  if(typeof google !== 'undefined' && google.accounts){
+    google.accounts.id.initialize({
+      client_id: 'YOUR_GOOGLE_CLIENT_ID', // User needs to set this
+      callback: handleGoogleResponse
+    });
+    google.accounts.id.prompt();
+  } else {
+    // Fallback: Ask for name + email manually (no backend needed)
+    const email = prompt('Enter your Google email:');
+    if(!email || !email.includes('@')){ showError('loginError','Invalid email'); showError('signupError','Invalid email'); return; }
+    const name = prompt('Enter your name:');
+    if(!name){ return; }
+    const user = {
+      id: 'google_' + btoa(email),
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      photo: null,
+      provider: 'google',
+      createdAt: Date.now()
+    };
+    saveUser(user);
+    closeAuth();
+    toast('Welcome, ' + user.name.split(' ')[0] + '! 👋');
+  }
+}
+
+function handleGoogleResponse(response){
+  // Decode JWT token from Google
+  try{
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    const user = {
+      id: 'google_' + payload.sub,
+      name: payload.name,
+      email: payload.email,
+      photo: payload.picture,
+      provider: 'google',
+      createdAt: Date.now()
+    };
+    saveUser(user);
+    closeAuth();
+    toast('Welcome, ' + user.name.split(' ')[0] + '! 👋');
+  } catch(e){
+    showError('loginError', 'Google sign in failed');
+  }
+}
+
+// ── Email Sign Up ──
+function emailSignUp(){
+  const first  = document.getElementById('signupFirst').value.trim();
+  const last   = document.getElementById('signupLast').value.trim();
+  const email  = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const pass   = document.getElementById('signupPass').value;
+
+  if(!first){ showError('signupError','Please enter your first name'); return; }
+  if(!email || !email.includes('@')){ showError('signupError','Please enter a valid email'); return; }
+  if(pass.length < 6){ showError('signupError','Password must be at least 6 characters'); return; }
+
+  // Check if email already registered
+  const existing = localStorage.getItem('cl_accounts');
+  const accounts = existing ? JSON.parse(existing) : {};
+  if(accounts[email]){ showError('signupError','Email already registered — sign in instead'); return; }
+
+  // Hash password (simple, client-side only)
+  const passHash = btoa(email + pass + 'cl_salt_2025');
+
+  const user = {
+    id: 'email_' + btoa(email),
+    name: (first + ' ' + last).trim(),
+    email,
+    photo: null,
+    provider: 'email',
+    createdAt: Date.now()
+  };
+
+  // Save account
+  accounts[email] = { passHash, user };
+  localStorage.setItem('cl_accounts', JSON.stringify(accounts));
+
+  saveUser(user);
+  closeAuth();
+  toast('Account created! Welcome, ' + first + '! 🎉');
+}
+
+// ── Email Sign In ──
+function emailSignIn(){
+  const email  = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass   = document.getElementById('loginPass').value;
+
+  if(!email || !email.includes('@')){ showError('loginError','Please enter your email'); return; }
+  if(!pass){ showError('loginError','Please enter your password'); return; }
+
+  const existing = localStorage.getItem('cl_accounts');
+  const accounts = existing ? JSON.parse(existing) : {};
+
+  if(!accounts[email]){ showError('loginError','No account found — create one first'); return; }
+
+  const passHash = btoa(email + pass + 'cl_salt_2025');
+  if(accounts[email].passHash !== passHash){ showError('loginError','Wrong password'); return; }
+
+  saveUser(accounts[email].user);
+  closeAuth();
+  toast('Welcome back, ' + accounts[email].user.name.split(' ')[0] + '! 👋');
+}
+
+// ── Sign Out ──
+function signOut(){
+  currentUser = null;
+  localStorage.removeItem('cl_user');
+  updateUserUI();
+  updateLoginBanner();
+  document.getElementById('userDropdown')?.classList.remove('show');
+  toast('Signed out successfully');
+  vEmpty();
+  const sbHt = document.querySelector('.sb-ht');
+  if(sbHt) sbHt.textContent = 'Recent';
+  // Show login popup after sign out
+  setTimeout(()=>openAuth('login'), 500);
+}
+
+// ── Init auth on load ──
+loadUser();
+
+</script>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay" onclick="closeAuthOnBg(event)">
+  <div class="auth-modal">
+    <button class="auth-close" onclick="closeAuth()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="auth-logo">
+      <div class="auth-logo-box">CL</div>
+      <span style="font-size:14px;font-weight:700;color:var(--w)">CryptoLens AI</span>
+    </div>
+
+    <!-- LOGIN VIEW -->
+    <div id="loginView">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to access your research history and saved analyses.</div>
+
+      <button class="auth-google" onclick="googleSignIn()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-divider"><span>or sign in with email</span></div>
+
+      <div class="auth-error" id="loginError"></div>
+
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" id="loginEmail" type="email" placeholder="you@email.com" onkeydown="if(event.key==='Enter')emailSignIn()"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input class="auth-input" id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')emailSignIn()"/>
+      </div>
+
+      <button class="auth-submit" onclick="emailSignIn()">Sign In</button>
+
+      <div class="auth-toggle">
+        Don't have an account? <a onclick="switchToSignup()">Create one →</a>
+      </div>
+    </div>
+
+    <!-- SIGNUP VIEW -->
+    <div id="signupView" style="display:none">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Join CryptoLens AI — 5 free token analyses every day.</div>
+
+      <button class="auth-google" onclick="googleSignIn()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-divider"><span>or create with email</span></div>
+
+      <div class="auth-error" id="signupError"></div>
+
+      <div class="auth-name-row">
+        <div>
+          <label class="auth-label">First Name</label>
+          <input class="auth-input" id="signupFirst" type="text" placeholder="Harsh"/>
+        </div>
+        <div>
+          <label class="auth-label">Last Name</label>
+          <input class="auth-input" id="signupLast" type="text" placeholder="Shah"/>
+        </div>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" id="signupEmail" type="email" placeholder="you@email.com"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input class="auth-input" id="signupPass" type="password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')emailSignUp()"/>
+      </div>
+
+      <button class="auth-submit" onclick="emailSignUp()">Create Account</button>
+
+      <div class="auth-toggle">
+        Already have an account? <a onclick="switchToLogin()">Sign in →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

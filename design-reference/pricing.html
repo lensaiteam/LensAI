@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Pricing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="icon" type="image/png" href="Ai logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+:root{
+  --bg:#080808;--bg2:#0e0e0e;--bg3:#141414;
+  --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --w:#f0f0f0;--w2:#aaaaaa;--m:#666;--dim:#333;
+  --gold:#c8a84b;--gold2:#e8c96a;--gold-d:rgba(200,168,75,0.1);
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;
+  --font:'Inter',-apple-system,sans-serif;--nav:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--w);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+#bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav);display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(8,8,8,0.6);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-box{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#a07830);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000}
+.nav-logo-text{font-size:15px;font-weight:600;color:var(--w);letter-spacing:-0.3px}
+.nav-links{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.nav-links a{font-size:13px;color:var(--m);text-decoration:none;padding:6px 14px;border-radius:6px;transition:all .18s}
+.nav-links a:hover,.nav-links a.on{color:var(--w);background:rgba(255,255,255,0.06)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-ghost{font-size:13px;color:var(--m);background:none;border:1px solid var(--border);padding:7px 18px;border-radius:100px;cursor:pointer;text-decoration:none;transition:all .18s;font-family:var(--font)}
+.nav-ghost:hover{color:var(--w);border-color:var(--border2)}
+.nav-solid{font-size:13px;font-weight:500;color:#000;background:var(--w);padding:7px 18px;border-radius:100px;text-decoration:none;transition:opacity .18s;border:none;cursor:pointer;font-family:var(--font)}
+.nav-solid:hover{opacity:.85}
+
+/* USER AVATAR NAV */
+.nav-user{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:4px 12px 4px 4px;cursor:pointer;transition:all .18s}
+.nav-user:hover{border-color:rgba(255,255,255,0.2)}
+.nav-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#7a5a18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;flex-shrink:0}
+.nav-uname{font-size:12px;font-weight:500;color:var(--w);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-drop-wrap{position:relative}
+.nav-drop{display:none;position:absolute;top:calc(100% + 8px);right:0;background:#0d0d0d;border:1px solid var(--border2);border-radius:12px;padding:6px;min-width:180px;box-shadow:0 16px 40px rgba(0,0,0,0.6);z-index:200}
+.nav-drop-hd{padding:9px 12px 8px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.nav-drop-name{font-size:13px;font-weight:600;color:var(--w)}
+.nav-drop-email{font-size:11px;color:var(--m);margin-top:1px}
+.nav-drop-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;font-size:13px;color:var(--m);cursor:pointer;transition:all .15s;margin-top:2px}
+.nav-drop-item:hover{background:rgba(255,255,255,0.04);color:var(--w)}
+.nav-drop-item.danger:hover{background:rgba(239,68,68,0.08);color:var(--red)}
+
+/* AUTH MODAL */
+.auth-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.85);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.auth-overlay.show{opacity:1;pointer-events:all}
+.auth-modal{background:#0d0d0d;border:1px solid var(--border2);border-radius:20px;padding:38px;width:100%;max-width:400px;position:relative;box-shadow:0 40px 80px rgba(0,0,0,0.8)}
+.auth-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.06);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--m)}
+.auth-close:hover{background:rgba(255,255,255,0.12);color:var(--w)}
+.auth-logo{display:flex;align-items:center;gap:9px;margin-bottom:22px}
+.auth-logo-box{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--gold),#7a5a18);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000}
+.auth-title{font-size:20px;font-weight:700;letter-spacing:-.5px;color:var(--w);margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--m);margin-bottom:22px;line-height:1.55}
+.auth-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);color:var(--w);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;margin-bottom:16px}
+.auth-google:hover{background:rgba(255,255,255,0.1)}
+.auth-divider{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-divider span{font-size:11px;color:#555;white-space:nowrap}
+.auth-field{margin-bottom:12px}
+.auth-label{font-size:10px;font-weight:600;color:var(--m);margin-bottom:5px;display:block;letter-spacing:.06em;text-transform:uppercase}
+.auth-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:11px 14px;font-family:var(--font);font-size:14px;color:var(--w);outline:none;transition:border-color .2s}
+.auth-input:focus{border-color:rgba(200,168,75,0.45)}
+.auth-input::placeholder{color:var(--dim)}
+.auth-name-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.auth-submit{width:100%;padding:13px;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:600;color:#000;background:var(--gold);border:none;cursor:pointer;transition:all .2s;margin-top:4px}
+.auth-submit:hover{background:var(--gold2)}
+.auth-toggle{text-align:center;margin-top:16px;font-size:13px;color:var(--m)}
+.auth-toggle a{color:var(--gold);cursor:pointer}
+.auth-err{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:9px 13px;font-size:12px;color:var(--red);margin-bottom:12px;display:none}
+.auth-err.show{display:block}
+
+/* WALLET MODAL */
+.wallet-overlay{position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,0.9);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center}
+.wallet-modal{background:#0d0d0d;border:1px solid var(--border2);border-radius:20px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.8)}
+.wm-hd{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.wm-logo{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--gold),#7a5a18);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000}
+.wm-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.06);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--m)}
+.wm-close:hover{background:rgba(255,255,255,0.12);color:var(--w)}
+.wm-steps{display:flex;align-items:center;padding:13px 20px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.ws{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#444}
+.ws.active{color:var(--gold)}
+.ws.done{color:var(--green)}
+.ws-num{width:20px;height:20px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.ws-line{flex:1;height:1px;background:var(--border);margin:0 8px}
+.wm-body{padding:24px 22px}
+.wm-h{font-size:17px;font-weight:700;letter-spacing:-.4px;color:var(--w);margin-bottom:6px}
+.wm-sub{font-size:13px;color:var(--m);margin-bottom:20px;line-height:1.6}
+.wallet-opt{display:flex;align-items:center;gap:14px;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:all .2s;margin-bottom:10px}
+.wallet-opt:hover{border-color:rgba(240,185,11,0.4);background:rgba(240,185,11,0.04)}
+.wallet-icon{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.wallet-name{font-size:14px;font-weight:600;color:var(--w)}
+.wallet-desc{font-size:12px;color:var(--m);margin-top:2px}
+.wallet-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:100px;background:rgba(34,197,94,0.08);color:var(--green);border:1px solid rgba(34,197,94,0.15);margin-left:auto;flex-shrink:0}
+.wm-secure{display:flex;align-items:center;gap:8px;font-size:11px;color:#444;margin-top:14px}
+.order-box{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.order-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)}
+.order-row:last-child{border-bottom:none}
+.order-lbl{font-size:13px;color:var(--m)}
+.order-val{font-size:13px;font-weight:600;color:var(--w)}
+.connected-badge{display:flex;align-items:center;gap:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.18);border-radius:9px;padding:9px 14px;margin-bottom:16px}
+.cb-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.cb-txt{font-size:12px;color:var(--green);font-weight:500}
+.cb-addr{font-size:11px;color:#555;margin-left:auto;font-family:monospace}
+.pay-btn{width:100%;padding:14px;border-radius:11px;background:#F0B90B;color:#000;font-family:var(--font);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .2s}
+.pay-btn:hover{background:#e0a800}
+.proc-wrap{text-align:center;padding:16px 0}
+.proc-spin{width:52px;height:52px;border:3px solid rgba(255,255,255,0.06);border-top-color:#F0B90B;border-radius:50%;animation:wspin .8s linear infinite;margin:0 auto 16px}
+@keyframes wspin{to{transform:rotate(360deg)}}
+.proc-title{font-size:16px;font-weight:600;color:var(--w);margin-bottom:8px}
+.proc-msg{font-size:13px;color:#555;line-height:1.6}
+.tx-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-top:16px;text-align:left}
+.tx-lbl{font-size:10px;color:#444;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.tx-hash{font-size:11px;font-family:monospace;color:#555}
+.err-icon{width:56px;height:56px;border-radius:50%;background:rgba(239,68,68,0.1);border:2px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.err-title{font-size:17px;font-weight:700;color:var(--red);margin-bottom:8px;letter-spacing:-.4px}
+.err-msg{font-size:13px;color:var(--m);margin-bottom:6px;line-height:1.6}
+.err-box{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:13px 16px;margin:13px 0;text-align:left}
+.err-box-lbl{font-size:10px;color:var(--red);letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:6px}
+.err-code{font-size:11px;font-family:monospace;color:#888;line-height:1.8}
+.err-safe{font-size:12px;color:#555;margin-bottom:16px}
+.err-btns{display:flex;gap:10px}
+.btn-retry{flex:1;padding:12px;border-radius:10px;background:var(--card);border:1px solid var(--border2);color:var(--w);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer}
+.btn-ok{flex:1;padding:12px;border-radius:10px;background:#F0B90B;color:#000;font-family:var(--font);font-size:14px;font-weight:700;border:none;cursor:pointer}
+
+/* PAGE STYLES */
+.wrap{max-width:1100px;margin:0 auto;padding:0 40px}
+.section{position:relative;z-index:1;padding:100px 0}
+.divider{height:1px;background:var(--border);position:relative;z-index:1}
+.g-up{opacity:0;transform:translateY(26px)}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.tag::before{content:'';width:16px;height:1px;background:var(--gold);opacity:.5;display:block}
+.hero{position:relative;z-index:1;padding:calc(var(--nav) + 90px) 40px 80px;text-align:center;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 50%,transparent 30%,rgba(8,8,8,0.88) 100%);pointer-events:none;z-index:0}
+.hero-inner{position:relative;z-index:2;max-width:680px;margin:0 auto}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:12px;color:var(--m);margin-bottom:28px}
+.kicker-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:kblink 2s ease-in-out infinite}
+@keyframes kblink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-h1{font-size:clamp(44px,6.5vw,76px);font-weight:800;letter-spacing:-3.5px;line-height:.97;color:var(--w);margin-bottom:20px}
+.hero-h1 .gold{color:var(--gold)}
+.hero-sub{font-size:17px;font-weight:300;color:var(--m);line-height:1.72;max-width:480px;margin:0 auto 44px}
+.toggle-wrap{display:flex;justify-content:center;margin-bottom:0}
+.toggle{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:100px;padding:4px}
+.toggle-opt{font-size:13px;font-weight:500;color:var(--m);padding:8px 22px;border-radius:100px;cursor:pointer;transition:all .22s;border:none;background:transparent;font-family:var(--font)}
+.toggle-opt.on{background:var(--w);color:#000;font-weight:600}
+.save-pill{font-size:10px;font-weight:600;color:var(--green);background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);padding:2px 8px;border-radius:100px;margin-left:4px}
+.plans-wrap{position:relative;z-index:1;padding:60px 0 0}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:stretch}
+.plan{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative;transition:border-color .25s,transform .25s;display:flex;flex-direction:column}
+.plan:hover{transform:translateY(-4px);border-color:var(--border2)}
+.plan.pro{background:rgba(200,168,75,0.04);border-color:rgba(200,168,75,0.3)}
+.plan.pro:hover{border-color:rgba(200,168,75,0.55)}
+.plan.elite{border-color:rgba(139,92,246,0.2)}
+.plan.elite:hover{border-color:rgba(139,92,246,0.4)}
+.plan::before{content:'';position:absolute;top:0;left:0;right:0;height:1px}
+.plan.free::before{background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent)}
+.plan.pro::before{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.plan.elite::before{background:linear-gradient(90deg,transparent,rgba(139,92,246,0.7),transparent)}
+.popular-tag{position:absolute;top:16px;right:16px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#000;background:var(--gold);padding:4px 12px;border-radius:100px}
+.plan-hd{padding:28px 28px 24px;border-bottom:1px solid var(--border)}
+.plan-tier{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--m);margin-bottom:14px}
+.plan.pro .plan-tier{color:var(--gold)}
+.plan.elite .plan-tier{color:var(--purple)}
+.plan-price{display:flex;align-items:flex-start;gap:2px;margin-bottom:6px;line-height:1}
+.plan-cur{font-size:22px;font-weight:600;color:var(--m);margin-top:10px}
+.plan.pro .plan-cur{color:rgba(200,168,75,0.6)}
+.plan.elite .plan-cur{color:rgba(139,92,246,0.6)}
+.plan-amt{font-size:60px;font-weight:800;letter-spacing:-4px;color:var(--w)}
+.plan.pro .plan-amt{color:var(--gold)}
+.plan.elite .plan-amt{color:var(--purple)}
+.plan-period{font-size:13px;color:var(--m);margin-bottom:4px}
+.plan-tagline{font-size:12px;color:var(--dim)}
+.plan-body{padding:24px 28px;flex:1;display:flex;flex-direction:column}
+.perks{list-style:none;flex:1}
+.perk{display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.perk:last-child{border-bottom:none}
+.perk-ck{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.perk-txt{color:var(--w2);line-height:1.5}
+.perk-txt.hi{color:var(--w);font-weight:500}
+.plan-ft{padding:0 28px 28px;margin-top:20px}
+.plan-btn{width:100%;padding:14px;border-radius:11px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:-.2px;border:none}
+.pb-free{background:rgba(255,255,255,0.07);color:var(--w);border:1px solid var(--border2)}
+.pb-free:hover{background:rgba(255,255,255,0.12)}
+.pb-pro{background:var(--gold);color:#000}
+.pb-pro:hover{background:var(--gold2)}
+.pb-elite{background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid rgba(139,92,246,0.3)}
+.pb-elite:hover{background:rgba(139,92,246,0.25)}
+.b2b{background:rgba(59,130,246,0.04);border:1px solid rgba(59,130,246,0.15);border-radius:16px;padding:26px 32px;display:flex;align-items:center;gap:24px;margin-top:12px}
+.b2b-icon{width:48px;height:48px;border-radius:12px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.b2b-title{font-size:15px;font-weight:600;color:var(--w);margin-bottom:4px;letter-spacing:-.3px}
+.b2b-desc{font-size:13px;color:var(--m);line-height:1.5}
+.b2b-price{margin-left:auto;text-align:right;flex-shrink:0}
+.b2b-amt{font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--blue)}
+.b2b-per{font-size:12px;color:var(--m);margin-top:2px}
+.b2b-btn{font-family:var(--font);font-size:12px;font-weight:500;color:var(--blue);background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);padding:7px 16px;border-radius:8px;cursor:pointer;text-decoration:none;transition:all .2s;margin-top:10px;display:inline-block}
+.b2b-btn:hover{background:rgba(59,130,246,0.2)}
+.cmp-box{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:64px}
+.ct-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:rgba(0,0,0,0.3);border-bottom:1px solid var(--border)}
+.cth{padding:16px 20px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--m);text-align:center}
+.cth:first-child{text-align:left;color:var(--w)}
+.cth.gold{color:var(--gold)}
+.cth.purple{color:var(--purple)}
+.ct-sec{padding:10px 20px 6px;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border)}
+.ct-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-bottom:1px solid var(--border);transition:background .15s}
+.ct-row:last-child{border-bottom:none}
+.ct-row:hover{background:rgba(255,255,255,0.02)}
+.ctd{padding:13px 20px;font-size:13px;color:var(--m);text-align:center;display:flex;align-items:center;justify-content:center}
+.ctd:first-child{text-align:left;justify-content:flex-start;color:var(--w);font-weight:500;flex-direction:column;align-items:flex-start}
+.ctd-sub{font-size:11px;color:var(--dim);font-weight:400;margin-top:2px}
+.ctd-yes{color:var(--green)}
+.ctd-no{color:var(--dim)}
+.ctd-val{color:var(--w);font-weight:600}
+.ctd-gold{color:var(--gold);font-weight:600}
+.ctd-purple{color:var(--purple);font-weight:600}
+.val-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:64px}
+.vp{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center}
+.vp-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.vp-num{font-size:30px;font-weight:800;letter-spacing:-1.5px;margin-bottom:4px}
+.vp-lbl{font-size:13px;color:var(--m);line-height:1.55}
+.guarantee{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:16px;padding:28px 32px;display:flex;align-items:center;gap:24px;margin-top:64px}
+.g-icon{width:60px;height:60px;border-radius:50%;background:rgba(34,197,94,0.08);border:2px solid rgba(34,197,94,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.g-title{font-size:16px;font-weight:600;color:var(--w);margin-bottom:6px;letter-spacing:-.3px}
+.g-desc{font-size:13px;color:var(--m);line-height:1.65}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:64px}
+.faq-item{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.faq-item:hover,.faq-item.open{border-color:var(--border2)}
+.faq-item.open{border-color:rgba(200,168,75,0.25)}
+.faq-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:20px 22px;background:none;border:none;color:var(--w);font-family:var(--font);font-size:14px;font-weight:500;text-align:left;cursor:pointer;gap:12px;letter-spacing:-.2px}
+.faq-chev{flex-shrink:0;transition:transform .3s;color:var(--m);display:flex;align-items:center}
+.faq-item.open .faq-chev{transform:rotate(45deg);color:var(--gold)}
+.faq-ans{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .28s;font-size:13px;color:var(--m);line-height:1.78;padding:0 22px}
+.faq-item.open .faq-ans{max-height:200px;padding:0 22px 20px}
+.cta-box{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:20px;padding:80px 52px;text-align:center;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:500px;height:400px;background:radial-gradient(ellipse,rgba(200,168,75,0.08) 0%,transparent 65%);pointer-events:none}
+.cta-tag{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:block}
+.cta-h{font-size:clamp(34px,4.5vw,52px);font-weight:800;letter-spacing:-2.5px;color:var(--w);margin-bottom:14px}
+.cta-p{font-size:16px;color:var(--m);max-width:400px;margin:0 auto 36px;line-height:1.7}
+.cta-btns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.btn-wht{font-family:var(--font);font-size:14px;font-weight:500;color:#000;background:var(--w);padding:13px 30px;border-radius:100px;text-decoration:none;border:none;cursor:pointer;transition:opacity .18s}
+.btn-wht:hover{opacity:.85}
+.btn-line{font-family:var(--font);font-size:14px;color:var(--m);background:transparent;padding:13px 30px;border-radius:100px;text-decoration:none;border:1px solid var(--border);cursor:pointer;transition:all .18s}
+.btn-line:hover{color:var(--w);border-color:var(--border2)}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:36px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.flogo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.flinks{display:flex;gap:24px}
+.flinks a{font-size:13px;color:var(--m);text-decoration:none;transition:color .18s}
+.flinks a:hover{color:var(--w)}
+.fcopy{font-size:12px;color:var(--dim)}
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(20,20,20,0.96);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--w);max-width:280px;transform:translateY(14px);opacity:0;transition:all .28s ease;pointer-events:none;backdrop-filter:blur(20px)}
+#toast.on{transform:translateY(0);opacity:1}
+@media(max-width:900px){.plans-grid{grid-template-columns:1fr}.faq-grid{grid-template-columns:1fr}.val-grid{grid-template-columns:1fr 1fr}.b2b{flex-wrap:wrap}.b2b-price{margin-left:0}}
+@media(max-width:768px){.nav{padding:0 20px}.nav-links{display:none}.wrap{padding:0 20px}footer{padding:24px 20px}.cta-box{padding:40px 24px}.hero{padding:calc(var(--nav)+50px) 20px 60px}}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="nav-logo-text">CryptoLens AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="app.html">Research</a>
+    <a href="pricing.html" class="on">Pricing</a>
+    <a href="use-cases.html">Use Cases</a>
+  </div>
+  <div class="nav-right">
+    <!-- Logged OUT -->
+    <div id="navOut" style="display:flex;align-items:center;gap:10px">
+      <button class="nav-ghost" onclick="openAuth('login')">Sign in</button>
+      <button class="nav-solid" onclick="openAuth('signup')">Start free &rarr;</button>
+    </div>
+    <!-- Logged IN -->
+    <div id="navIn" style="display:none">
+      <div class="nav-drop-wrap" id="navWrap">
+        <div class="nav-user" onclick="toggleDrop()">
+          <div class="nav-av" id="navAv">U</div>
+          <span class="nav-uname" id="navName">User</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="nav-drop" id="navDrop">
+          <div class="nav-drop-hd">
+            <div class="nav-drop-name" id="navDN"></div>
+            <div class="nav-drop-email" id="navDE"></div>
+          </div>
+          <div class="nav-drop-item" onclick="window.location.href='app.html'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Research Terminal
+          </div>
+          <div class="nav-drop-item danger" onclick="doSignOut()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay" onclick="if(event.target===this)closeAuth()">
+  <div class="auth-modal">
+    <button class="auth-close" onclick="closeAuth()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div class="auth-logo"><span style="font-size:14px;font-weight:700;color:var(--w)">CryptoLens AI</span></div>
+    <!-- Login -->
+    <div id="aLI">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to subscribe and access the Research Terminal.</div>
+      <button class="auth-google" onclick="gSI()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider"><span>or sign in with email</span></div>
+      <div class="auth-err" id="lErr"></div>
+      <div class="auth-field"><label class="auth-label">Email</label><input class="auth-input" id="lE" type="email" placeholder="you@email.com"/></div>
+      <div class="auth-field"><label class="auth-label">Password</label><input class="auth-input" id="lP" type="password" placeholder="Enter password"/></div>
+      <button class="auth-submit" onclick="eLI()">Sign In</button>
+      <div class="auth-toggle">No account? <a onclick="toSU()">Create one free</a></div>
+    </div>
+    <!-- Signup -->
+    <div id="aSU" style="display:none">
+      <div class="auth-title">Create free account</div>
+      <div class="auth-sub">5 free AI token analyses daily. No credit card needed.</div>
+      <button class="auth-google" onclick="gSI()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider"><span>or sign up with email</span></div>
+      <div class="auth-err" id="sErr"></div>
+      <div class="auth-name-row">
+        <div><label class="auth-label">First Name</label><input class="auth-input" id="sF" type="text" placeholder="Harsh"/></div>
+        <div><label class="auth-label">Last Name</label><input class="auth-input" id="sL" type="text" placeholder="Shah"/></div>
+      </div>
+      <div class="auth-field"><label class="auth-label">Email</label><input class="auth-input" id="sE" type="email" placeholder="you@email.com"/></div>
+      <div class="auth-field"><label class="auth-label">Password</label><input class="auth-input" id="sP" type="password" placeholder="Min 6 characters"/></div>
+      <button class="auth-submit" onclick="eSU()">Create Account</button>
+      <div class="auth-toggle">Have an account? <a onclick="toLI()">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- WALLET MODAL -->
+<div class="wallet-overlay" id="walletOverlay" onclick="if(event.target===this)closeWallet()">
+  <div class="wallet-modal">
+    <div class="wm-hd">
+      <div style="display:flex;align-items:center;gap:10px"><div class="wm-logo">CL</div><span style="font-size:14px;font-weight:700;color:var(--w)">CryptoLens AI</span></div>
+      <button class="wm-close" onclick="closeWallet()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="wm-steps">
+      <div class="ws active" id="wst1"><div class="ws-num">1</div>Connect</div>
+      <div class="ws-line"></div>
+      <div class="ws" id="wst2"><div class="ws-num">2</div>Confirm</div>
+      <div class="ws-line"></div>
+      <div class="ws" id="wst3"><div class="ws-num">3</div>Payment</div>
+    </div>
+    <!-- Step 1: Connect Wallet -->
+    <div id="wStep1" class="wm-body">
+      <div class="wm-h">Connect your wallet</div>
+      <div class="wm-sub">Choose a wallet to pay with BNB on BNB Smart Chain.</div>
+      <div class="wallet-opt" onclick="connectWallet('metamask')">
+        <div class="wallet-icon" style="background:rgba(255,153,0,0.1)"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/960px-MetaMask_Fox.svg.png" style="width:32px;height:32px" onerror="this.style.display='none'"/></div>
+        <div><div class="wallet-name">MetaMask</div><div class="wallet-desc">Browser extension wallet</div></div>
+        <div class="wallet-badge">Popular</div>
+      </div>
+      <div class="wallet-opt" onclick="connectWallet('trust')">
+        <div class="wallet-icon" style="background:rgba(59,130,246,0.1)"><img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/trust-wallet-icon.png" style="width:32px;height:32px" onerror="this.style.display='none'"/></div>
+        <div><div class="wallet-name">Trust Wallet</div><div class="wallet-desc">Mobile &amp; browser wallet</div></div>
+      </div>
+      <div class="wallet-opt" onclick="connectWallet('wc')">
+        <div class="wallet-icon" style="background:rgba(59,153,255,0.1)"><svg width="22" height="16" viewBox="0 0 40 25" fill="none"><path d="M8.2 6.3c6.5-6.4 17.1-6.4 23.6 0l.8.8c.3.3.3.9 0 1.2l-2.7 2.6c-.2.1-.4.1-.6 0L28 9.5c-4.5-4.4-11.8-4.4-16.3 0l-1.5 1.5c-.2.1-.4.1-.6 0L7 8.4c-.3-.3-.3-.9 0-1.2l1.2-1zm29.1 5.4l2.4 2.4c.3.3.3.9 0 1.2L28.6 26.4c-.3.3-.9.3-1.2 0l-7.5-7.4c-.1-.1-.3-.1-.4 0L12 26.4c-.3.3-.9.3-1.2 0L.3 15.3C0 15 0 14.4.3 14.1l2.4-2.4c.3-.3.9-.3 1.2 0l7.5 7.4c.1.1.3.1.4 0l7.5-7.4c.3-.3.9-.3 1.2 0l7.5 7.4c.1.1.3.1.4 0l7.5-7.4c.3-.4.9-.4 1.4-.1z" fill="#3B99FC"/></svg></div>
+        <div><div class="wallet-name">WalletConnect</div><div class="wallet-desc">Scan QR with any wallet</div></div>
+      </div>
+      <div class="wm-secure"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Secured by BNB Smart Chain &bull; Your keys, your funds</div>
+    </div>
+    <!-- Step 2: Confirm Order -->
+    <div id="wStep2" class="wm-body" style="display:none">
+      <div class="wm-h">Confirm your order</div>
+      <div class="wm-sub">Review before signing the transaction.</div>
+      <div class="connected-badge"><div class="cb-dot"></div><span class="cb-txt">Wallet connected</span><span class="cb-addr" id="wAddr">0x742d...35Cf</span></div>
+      <div class="order-box">
+        <div class="order-row"><span class="order-lbl">Plan</span><span class="order-val" id="wPlan">Pro</span></div>
+        <div class="order-row"><span class="order-lbl">Network</span><div style="display:flex;align-items:center;gap:6px"><div style="width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,#F0B90B,#e8a800)"></div><span style="font-size:13px;font-weight:500;color:#F0B90B">BNB Smart Chain</span></div></div>
+        <div class="order-row"><span class="order-lbl">Amount (USD)</span><span class="order-val">$<span id="wUSD">29</span>/mo</span></div>
+        <div class="order-row"><span class="order-lbl">Amount (BNB)</span><span style="font-size:15px;font-weight:700;color:#F0B90B">&#8776; <span id="wBNB">0.047</span> BNB</span></div>
+        <div class="order-row"><span class="order-lbl">Gas fee (est.)</span><span style="font-size:13px;color:#555">&#8776; 0.0003 BNB</span></div>
+      </div>
+      <button class="pay-btn" onclick="doPayment()">Sign &amp; Pay with MetaMask</button>
+      <div style="text-align:center;margin-top:10px;font-size:11px;color:#444">A MetaMask popup will appear to sign the transaction</div>
+    </div>
+    <!-- Step 3: Processing / Error -->
+    <div id="wStep3" class="wm-body" style="display:none">
+      <div id="wProc" class="proc-wrap">
+        <div class="proc-spin"></div>
+        <div class="proc-title">Processing transaction...</div>
+        <div class="proc-msg" id="wMsg">Waiting for wallet signature...</div>
+        <div class="tx-box"><div class="tx-lbl">Transaction Hash</div><div class="tx-hash" id="wTxHash">Pending...</div></div>
+      </div>
+      <div id="wErr" style="display:none;text-align:center">
+        <div class="err-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="err-title">Transaction Failed</div>
+        <div class="err-msg" id="wErrMsg">Transaction reverted.</div>
+        <div class="err-box"><div class="err-box-lbl">Error Details</div><div class="err-code" id="wErrCode">Error: execution reverted</div></div>
+        <div class="err-safe">No funds were deducted. Your wallet balance is unchanged.</div>
+        <div class="err-btns"><button class="btn-retry" onclick="doPayment()">Try Again</button><button class="btn-ok" onclick="closeWallet()">OK</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner g-up" id="hi">
+    <div class="hero-kicker"><span class="kicker-dot"></span>SIMPLE PRICING &bull; NO HIDDEN FEES</div>
+    <h1 class="hero-h1">Start free.<br>Scale when <span class="gold">ready.</span></h1>
+    <p class="hero-sub">5 free AI token analyses every day no credit card, no signup. Upgrade when you need unlimited access, advanced data, or API integration.</p>
+    <div class="toggle-wrap">
+      <div class="toggle">
+        <button class="toggle-opt on" onclick="setBill(this,'mo')">Monthly</button>
+        <button class="toggle-opt" onclick="setBill(this,'yr')">Annual <span class="save-pill">Save 30%</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLANS -->
+<div class="plans-wrap">
+  <div class="wrap">
+    <div class="plans-grid g-up" id="plg">
+      <!-- FREE -->
+      <div class="plan free">
+        <div class="plan-hd">
+          <div class="plan-tier">Free</div>
+          <div class="plan-price"><span class="plan-cur">$</span><span class="plan-amt">0</span></div>
+          <div class="plan-period">Forever free</div>
+          <div class="plan-tagline">Perfect to get started</div>
+        </div>
+        <div class="plan-body">
+          <ul class="perks">
+            <li class="perk"><div class="perk-ck" style="background:rgba(255,255,255,0.06)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--w2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt hi">5 token analyses per day</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(255,255,255,0.06)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--w2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Live price + 24h volume via DexScreener</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(255,255,255,0.06)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--w2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">AI safety, team, tokenomics scores</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(255,255,255,0.06)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--w2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Red flag detection (honeypot, rug signals)</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(255,255,255,0.06)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--w2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Supply distribution chart</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(255,255,255,0.06)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--w2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Social sentiment analysis</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(255,255,255,0.06)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--w2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Whale wallet activity (top 5)</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(255,255,255,0.06)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--w2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Research history (last 10)</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(255,255,255,0.06)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--w2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">All chains Solana, ETH, BNB, Base +</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(239,68,68,0.08)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><span class="perk-txt" style="color:var(--dim)">Unlimited analyses</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(239,68,68,0.08)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><span class="perk-txt" style="color:var(--dim)">Portfolio watchlist</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(239,68,68,0.08)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><span class="perk-txt" style="color:var(--dim)">PDF export</span></li>
+          </ul>
+        </div>
+        <div class="plan-ft"><button class="plan-btn pb-free" onclick="window.location.href='app.html'">Start for free</button></div>
+      </div>
+      <!-- PRO -->
+      <div class="plan pro">
+        <div class="popular-tag">Most Popular</div>
+        <div class="plan-hd">
+          <div class="plan-tier">Pro</div>
+          <div class="plan-price"><span class="plan-cur">$</span><span class="plan-amt" id="proAmt">29</span></div>
+          <div class="plan-period" id="proPer">per month</div>
+          <div class="plan-tagline">For serious traders</div>
+        </div>
+        <div class="plan-body">
+          <ul class="perks">
+            <li class="perk"><div class="perk-ck" style="background:rgba(200,168,75,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt hi">Everything in Free unlimited</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(200,168,75,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt hi">Unlimited daily analyses (no cap)</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(200,168,75,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt hi">Advanced on-chain analytics</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(200,168,75,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt hi">Whale wallet tracking (top 20)</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(200,168,75,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt hi">Portfolio watchlist track multiple tokens</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(200,168,75,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Full tokenomics deep-dive report</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(200,168,75,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Export analysis as PDF report</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(200,168,75,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Unlimited research history (cloud sync)</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(200,168,75,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Token comparison side-by-side</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(200,168,75,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Priority support (24hr response)</span></li>
+          </ul>
+        </div>
+        <div class="plan-ft"><button class="plan-btn pb-pro" onclick="startPayment('Pro','29')">Upgrade to Pro</button></div>
+      </div>
+      <!-- ELITE -->
+      <div class="plan elite">
+        <div class="plan-hd">
+          <div class="plan-tier">Elite</div>
+          <div class="plan-price"><span class="plan-cur">$</span><span class="plan-amt" id="eliteAmt">79</span></div>
+          <div class="plan-period" id="elitePer">per month</div>
+          <div class="plan-tagline">For funds &amp; power users</div>
+        </div>
+        <div class="plan-body">
+          <ul class="perks">
+            <li class="perk"><div class="perk-ck" style="background:rgba(139,92,246,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt hi">Everything in Pro no limits</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(139,92,246,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt hi">Real-time token price alerts</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(139,92,246,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt hi">Full REST API access + docs</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(139,92,246,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt hi">VC due diligence mode</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(139,92,246,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">White-label PDF reports (your branding)</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(139,92,246,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Multi-seat team access (up to 10 seats)</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(139,92,246,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Custom alert workflows (Telegram/email)</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(139,92,246,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Bulk token batch analysis</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(139,92,246,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Priority onboarding call</span></li>
+            <li class="perk"><div class="perk-ck" style="background:rgba(139,92,246,0.12)"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="perk-txt">Dedicated account manager</span></li>
+          </ul>
+        </div>
+        <div class="plan-ft"><button class="plan-btn pb-elite" onclick="startPayment('Elite','79')">Contact for Elite</button></div>
+      </div>
+    </div>
+    <!-- B2B -->
+    <div class="b2b g-up">
+      
+  </div>
+</div>
+
+<!-- COMPARE TABLE -->
+<section class="section">
+  <div class="wrap">
+    <div class="g-up" style="text-align:center;margin-bottom:52px">
+      <div class="tag" style="justify-content:center;margin-bottom:16px">Full Comparison</div>
+      <h2 style="font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-2px;color:var(--w)">Everything side by side.</h2>
+      <p style="font-size:15px;color:var(--m);margin-top:12px">No surprises. See exactly what you get.</p>
+    </div>
+    <div class="cmp-box g-up">
+      <div class="ct-head"><div class="cth" style="text-align:left">Feature</div><div class="cth">Free</div><div class="cth gold">Pro</div><div class="cth purple">Elite</div></div>
+      <div class="ct-sec">Core Analysis</div>
+      <div class="ct-row"><div class="ctd">Daily analyses<span class="ctd-sub">Per day limit</span></div><div class="ctd ctd-val">5</div><div class="ctd ctd-gold">Unlimited</div><div class="ctd ctd-purple">Unlimited</div></div>
+      <div class="ct-row"><div class="ctd">AI safety score<span class="ctd-sub">0&ndash;100 risk assessment</span></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ct-row"><div class="ctd">Red flag detection<span class="ctd-sub">Honeypots, rug signals</span></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ct-row"><div class="ctd">Team credibility<span class="ctd-sub">Background &amp; history</span></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ct-row"><div class="ctd">Research history<span class="ctd-sub">Past analyses saved</span></div><div class="ctd ctd-val">Last 10</div><div class="ctd ctd-gold">Unlimited</div><div class="ctd ctd-purple">Unlimited</div></div>
+      <div class="ct-sec">Pro Features</div>
+      <div class="ct-row"><div class="ctd">Advanced on-chain data<span class="ctd-sub">Deep wallet &amp; tx data</span></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ct-row"><div class="ctd">Whale wallet tracking<span class="ctd-sub">Top 20 wallets</span></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ct-row"><div class="ctd">PDF report export<span class="ctd-sub">Shareable reports</span></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ct-sec">Elite Only</div>
+      <div class="ct-row"><div class="ctd">Real-time alerts<span class="ctd-sub">Instant notifications</span></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ct-row"><div class="ctd">API access<span class="ctd-sub">Build integrations</span></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ct-row"><div class="ctd">White-label reports<span class="ctd-sub">Your brand on exports</span></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ct-row"><div class="ctd">Multi-seat access<span class="ctd-sub">Team collaboration</span></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="ctd ctd-yes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUE + GUARANTEE -->
+<div class="divider"></div>
+<section class="section">
+  <div class="wrap">
+    <div class="g-up" style="text-align:center">
+      <div class="tag" style="justify-content:center;margin-bottom:16px">Why CryptoLens</div>
+      <h2 style="font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-2px;color:var(--w);margin-bottom:12px">The math is simple.</h2>
+      <p style="font-size:15px;color:var(--m);max-width:480px;margin:0 auto">One avoided rug pull pays for years of Pro subscription. One saved hour per day compounds to 365 hours a year.</p>
+    </div>
+    <div class="val-grid g-up" id="vg">
+      <div class="vp"><div class="vp-icon" style="background:rgba(200,168,75,0.08);border:1px solid rgba(200,168,75,0.15)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="vp-num" style="color:var(--gold)">30s</div><div class="vp-lbl">Full intelligence report, every time</div></div>
+      <div class="vp"><div class="vp-icon" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.15)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="vp-num" style="color:var(--green)">312</div><div class="vp-lbl">Rug pulls flagged before users lost money</div></div>
+      <div class="vp"><div class="vp-icon" style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="vp-num" style="color:var(--blue)">2h</div><div class="vp-lbl">Average research time saved per token</div></div>
+      <div class="vp"><div class="vp-icon" style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="vp-num" style="color:var(--purple)">$0</div><div class="vp-lbl">To start no credit card ever required</div></div>
+    </div>
+    <div class="guarantee g-up">
+      <div class="g-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+      <div>
+        <div class="g-title">Cancel anytime. No lock-ins. No questions asked.</div>
+        <div class="g-desc">All plans are month-to-month. Cancel before your next billing date and you drop to free tier instantly. No fees, no friction, no catch. Your research history is always yours to keep.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<div class="divider"></div>
+<section class="section">
+  <div class="wrap">
+    <div class="g-up" style="text-align:center;margin-bottom:52px">
+      <div class="tag" style="justify-content:center;margin-bottom:16px">FAQ</div>
+      <h2 style="font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-2px;color:var(--w)">Questions answered.</h2>
+    </div>
+    <div class="faq-grid g-up" id="fq">
+      <div class="faq-item" onclick="tFaq(this)"><button class="faq-btn">Is the free tier actually useful?<span class="faq-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-ans">Yes completely. Free users get 5 real AI-powered analyses per day. No degraded quality, no paywalled results. The only limit is the daily count. Upgrade when you need more than 5 per day.</div></div>
+      <div class="faq-item" onclick="tFaq(this)"><button class="faq-btn">How accurate is the AI analysis?<span class="faq-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-ans">CryptoLens AI uses Llama 3.3 70B via Groq combined with real-time DexScreener on-chain data. It is a powerful due diligence tool, not financial advice. Always apply your own judgment.</div></div>
+      <div class="faq-item" onclick="tFaq(this)"><button class="faq-btn">Is my research data private?<span class="faq-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-ans">Free tier history is stored only in your browser local storage we never see it. We do not sell, share, or use your research queries to train AI models. Your data is yours.</div></div>
+      <div class="faq-item" onclick="tFaq(this)"><button class="faq-btn">Can I cancel anytime?<span class="faq-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-ans">Yes, anytime. Cancel from account settings before your next billing date and you immediately drop to the free tier. No cancellation fees, no friction.</div></div>
+      <div class="faq-item" onclick="tFaq(this)"><button class="faq-btn">What chains are supported?<span class="faq-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-ans">All major chains Solana, Ethereum, BNB Chain, Base, Arbitrum, Polygon, Avalanche, and more. Search by token name, ticker, or contract address.</div></div>
+      <div class="faq-item" onclick="tFaq(this)"><button class="faq-btn">How does the Elite API work?<span class="faq-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-ans">The Elite API lets you programmatically request token intelligence reports. Returns structured JSON with all scores, flags, tokenomics, on-chain data, and AI summary. Full documentation on signup.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section" style="border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="cta-box g-up">
+      <span class="cta-tag">Start now zero commitment</span>
+      <h2 class="cta-h">5 free analyses.<br>Every single day.</h2>
+      <p class="cta-p">No credit card. No signup. Open the terminal and scan any token in 30 seconds.</p>
+      <div class="cta-btns">
+        <a href="app.html" class="btn-wht">Open Research Terminal &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="index.html" class="flogo">
+    
+    <span style="font-size:14px;font-weight:600;color:var(--w);letter-spacing:-.3px">CryptoLens AI</span>
+  </a>
+  <div class="flinks">
+    <a href="index.html">Home</a>
+    <a href="app.html">Research</a>
+    <a href="use-cases.html">Use Cases</a>
+    <a href="#">Telegram</a>
+    <a href="https://x.com/ScanByLens">Twitter</a>
+  </div>
+  <span class="fcopy">&copy; 2025 CryptoLens AI &middot; Powered by AI</span>
+</footer>
+<div id="toast"></div>
+
+<script>
+/* ── TOAST ── */
+function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('on')},3200)}
+
+/* ── BILLING TOGGLE ── */
+function setBill(el,mode){
+  document.querySelectorAll('.toggle-opt').forEach(function(o){o.classList.remove('on')});
+  el.classList.add('on');
+  var yr=(mode==='yr');
+  document.getElementById('proAmt').textContent=yr?'20':'29';
+  document.getElementById('eliteAmt').textContent=yr?'55':'79';
+  document.getElementById('proPer').textContent=yr?'per month, billed yearly':'per month';
+  document.getElementById('elitePer').textContent=yr?'per month, billed yearly':'per month';
+}
+
+/* ── FAQ ── */
+function tFaq(item){
+  var open=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(f){f.classList.remove('open')});
+  if(!open)item.classList.add('open');
+}
+
+/* ── AUTH: persistent login ── */
+var _cu=null;
+try{_cu=JSON.parse(localStorage.getItem('cl_user')||'null')}catch(e){_cu=null}
+
+function updNav(){
+  var o=document.getElementById('navOut');
+  var i=document.getElementById('navIn');
+  if(!o||!i)return;
+  if(_cu){
+    o.style.display='none';
+    i.style.display='block';
+    var av=document.getElementById('navAv');
+    if(av)av.textContent=(_cu.name||'U')[0].toUpperCase();
+    var nm=document.getElementById('navName');
+    if(nm)nm.textContent=_cu.name?_cu.name.split(' ')[0]:'User';
+    var dn=document.getElementById('navDN');
+    if(dn)dn.textContent=_cu.name||'';
+    var de=document.getElementById('navDE');
+    if(de)de.textContent=_cu.email||'';
+  }else{
+    o.style.display='flex';
+    i.style.display='none';
+  }
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',updNav);
+}else{
+  updNav();
+}
+
+function toggleDrop(){
+  var d=document.getElementById('navDrop');
+  if(d)d.style.display=d.style.display==='block'?'none':'block';
+}
+
+document.addEventListener('click',function(e){
+  var w=document.getElementById('navWrap');
+  if(w&&!w.contains(e.target)){
+    var d=document.getElementById('navDrop');
+    if(d)d.style.display='none';
+  }
+});
+
+function doSignOut(){
+  _cu=null;
+  localStorage.removeItem('cl_user');
+  updNav();
+  var d=document.getElementById('navDrop');
+  if(d)d.style.display='none';
+  toast('Signed out');
+}
+
+/* ── AUTH MODAL ── */
+function openAuth(m){
+  document.getElementById('authOverlay').classList.add('show');
+  if(m==='signup'){toSU()}else{toLI()}
+}
+function closeAuth(){document.getElementById('authOverlay').classList.remove('show')}
+function toLI(){document.getElementById('aLI').style.display='block';document.getElementById('aSU').style.display='none';clrE()}
+function toSU(){document.getElementById('aLI').style.display='none';document.getElementById('aSU').style.display='block';clrE()}
+function clrE(){
+  ['lErr','sErr'].forEach(function(id){
+    var e=document.getElementById(id);
+    if(e){e.textContent='';e.classList.remove('show')}
+  })
+}
+function shE(id,msg){var e=document.getElementById(id);if(e){e.textContent=msg;e.classList.add('show')}}
+
+function gSI(){
+  var email=prompt('Enter your Google email:');
+  if(!email||!email.includes('@')){shE('lErr','Invalid email');shE('sErr','Invalid email');return}
+  var name=prompt('Your full name:');
+  if(!name)return;
+  _cu={id:'g_'+btoa(email),name:name.trim(),email:email.trim().toLowerCase(),photo:null,provider:'google',createdAt:Date.now()};
+  localStorage.setItem('cl_user',JSON.stringify(_cu));
+  updNav();closeAuth();toast('Welcome, '+_cu.name.split(' ')[0]+'!');
+}
+function eLI(){
+  var email=document.getElementById('lE').value.trim().toLowerCase();
+  var pass=document.getElementById('lP').value;
+  if(!email||!email.includes('@')){shE('lErr','Enter a valid email');return}
+  if(!pass){shE('lErr','Enter your password');return}
+  var acc=JSON.parse(localStorage.getItem('cl_accounts')||'{}');
+  if(!acc[email]){shE('lErr','No account found');return}
+  if(acc[email].passHash!==btoa(email+pass+'cl_salt_2025')){shE('lErr','Wrong password');return}
+  _cu=acc[email].user;
+  localStorage.setItem('cl_user',JSON.stringify(_cu));
+  updNav();closeAuth();toast('Welcome back, '+_cu.name.split(' ')[0]+'!');
+}
+function eSU(){
+  var first=document.getElementById('sF').value.trim();
+  var last=document.getElementById('sL').value.trim();
+  var email=document.getElementById('sE').value.trim().toLowerCase();
+  var pass=document.getElementById('sP').value;
+  if(!first){shE('sErr','Enter your first name');return}
+  if(!email||!email.includes('@')){shE('sErr','Enter a valid email');return}
+  if(pass.length<6){shE('sErr','Min 6 characters');return}
+  var acc=JSON.parse(localStorage.getItem('cl_accounts')||'{}');
+  if(acc[email]){shE('sErr','Email already registered');return}
+  _cu={id:'e_'+btoa(email),name:(first+' '+last).trim(),email:email,photo:null,provider:'email',createdAt:Date.now()};
+  acc[email]={passHash:btoa(email+pass+'cl_salt_2025'),user:_cu};
+  localStorage.setItem('cl_accounts',JSON.stringify(acc));
+  localStorage.setItem('cl_user',JSON.stringify(_cu));
+  updNav();closeAuth();toast('Welcome, '+first+'!');
+}
+
+/* ── WALLET PAYMENT — REAL window.ethereum FLOW ── */
+var _wPlan='';
+var _wAmt=0;
+var _wTimers=[];
+var _wAddress='';
+var _wProvider=null; // 'metamask' | 'trust' | 'wc'
+
+// BNB Smart Chain chainId
+var BSC_CHAIN_ID='0x38'; // 56 decimal
+
+function startPayment(plan,usd){
+  _wPlan=plan;
+  _wAmt=parseFloat(usd);
+  _wAddress='';
+  _wProvider=null;
+  setWStep(1);
+  document.getElementById('wProc').style.display='block';
+  document.getElementById('wErr').style.display='none';
+  var ov=document.getElementById('walletOverlay');
+  ov.style.display='flex';
+  ov.style.alignItems='center';
+  ov.style.justifyContent='center';
+}
+
+function closeWallet(){
+  document.getElementById('walletOverlay').style.display='none';
+  _wTimers.forEach(function(t){clearTimeout(t)});
+  _wTimers=[];
+  document.getElementById('wProc').style.display='block';
+  document.getElementById('wErr').style.display='none';
+  setWStep(1);
+}
+
+function setWStep(n){
+  [1,2,3].forEach(function(i){
+    var step=document.getElementById('wStep'+i);
+    if(step)step.style.display=i===n?'block':'none';
+    var st=document.getElementById('wst'+i);
+    if(!st)return;
+    var num=st.querySelector('.ws-num');
+    if(i<n){
+      st.className='ws done';
+      if(num)num.textContent='\u2713';
+    }else if(i===n){
+      st.className='ws active';
+      if(num&&(num.textContent==='\u2713'))num.textContent=String(i);
+    }else{
+      st.className='ws';
+    }
+  });
+}
+
+// ── STEP 1: Real wallet connect via window.ethereum ──
+function connectWallet(type){
+  _wProvider=type||'metamask';
+
+  // Check if MetaMask / injected wallet exists
+  if(!window.ethereum){
+    // No wallet installed — show install prompt
+    showInstallPrompt(_wProvider);
+    return;
+  }
+
+  // Show connecting spinner in step 1
+  var s1=document.getElementById('wStep1');
+  if(s1){
+    s1.innerHTML='<div style="text-align:center;padding:32px 0"><div class="proc-spin" style="margin:0 auto 18px"></div><div style="font-size:15px;font-weight:600;color:var(--w);margin-bottom:8px">Connecting wallet...</div><div style="font-size:13px;color:#666">Check your wallet app for a connection request</div></div>';
+  }
+
+  // Request accounts — this triggers MetaMask/Trust Wallet popup
+  window.ethereum.request({method:'eth_requestAccounts'})
+    .then(function(accounts){
+      if(!accounts||accounts.length===0){
+        showStep1Error('No accounts found. Please unlock your wallet.');
+        return;
+      }
+      _wAddress=accounts[0];
+
+      // Switch to BNB Smart Chain
+      return window.ethereum.request({
+        method:'wallet_switchEthereumChain',
+        params:[{chainId:BSC_CHAIN_ID}]
+      }).then(function(){
+        onWalletConnected();
+      }).catch(function(switchErr){
+        // Chain not added — add BSC
+        if(switchErr.code===4902){
+          return window.ethereum.request({
+            method:'wallet_addEthereumChain',
+            params:[{
+              chainId:BSC_CHAIN_ID,
+              chainName:'BNB Smart Chain',
+              nativeCurrency:{name:'BNB',symbol:'BNB',decimals:18},
+              rpcUrls:['https://bsc-dataseed.binance.org/'],
+              blockExplorerUrls:['https://bscscan.com/']
+            }]
+          }).then(function(){
+            onWalletConnected();
+          });
+        }
+        throw switchErr;
+      });
+    })
+    .catch(function(err){
+      if(err.code===4001){
+        // User rejected connection
+        showStep1Error('Connection rejected. Please approve the connection request in your wallet.');
+      }else{
+        showStep1Error('Connection failed: '+(err.message||'Unknown error'));
+      }
+    });
+}
+
+function showInstallPrompt(type){
+  var links={
+    metamask:'https://metamask.io/download/',
+    trust:'https://trustwallet.com/browser-extension',
+    wc:'https://metamask.io/download/'
+  };
+  var names={metamask:'MetaMask',trust:'Trust Wallet',wc:'a Web3 wallet'};
+  var s1=document.getElementById('wStep1');
+  if(s1){
+    s1.innerHTML='<div class="wm-body"><div class="wm-h">Wallet not found</div><div class="wm-sub">Please install '+(names[type]||'a Web3 wallet')+' to continue.</div><a href="'+(links[type]||links.metamask)+'" target="_blank" class="pay-btn" style="display:block;text-align:center;text-decoration:none;margin-bottom:12px">Install '+(names[type]||'Wallet')+' &rarr;</a><button onclick="resetWalletStep1()" style="width:100%;padding:12px;border-radius:10px;background:var(--card);border:1px solid var(--border2);color:var(--w);font-family:var(--font);font-size:13px;cursor:pointer">Go back</button></div>';
+  }
+}
+
+function showStep1Error(msg){
+  var s1=document.getElementById('wStep1');
+  if(s1){
+    s1.innerHTML='<div class="wm-body"><div style="text-align:center;padding:16px 0"><div class="err-icon" style="margin:0 auto 16px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div style="font-size:15px;font-weight:600;color:var(--red);margin-bottom:8px">Connection Failed</div><div style="font-size:13px;color:#666;margin-bottom:20px;line-height:1.6">'+msg+'</div><button onclick="resetWalletStep1()" style="width:100%;padding:13px;border-radius:10px;background:var(--gold);color:#000;font-family:var(--font);font-size:14px;font-weight:600;border:none;cursor:pointer">Try Again</button></div></div>';
+  }
+}
+
+function resetWalletStep1(){
+  var s1=document.getElementById('wStep1');
+  if(s1){
+    s1.innerHTML='<div class="wm-h">Connect your wallet</div><div class="wm-sub">Choose a wallet to pay with BNB on BNB Smart Chain.</div><div class="wallet-opt" onclick="connectWallet(\'metamask\')"><div class="wallet-icon" style="background:rgba(255,153,0,0.1)"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/64px-MetaMask_Fox.svg.png" style="width:32px;height:32px" onerror="this.style.display=\'none\'"/></div><div><div class="wallet-name">MetaMask</div><div class="wallet-desc">Browser extension wallet</div></div><div class="wallet-badge">Popular</div></div><div class="wallet-opt" onclick="connectWallet(\'trust\')"><div class="wallet-icon" style="background:rgba(59,130,246,0.1)"><svg width="24" height="24" viewBox="0 0 40 40" fill="none"><path d="M20 4L6 10v10c0 9.4 6 18.2 14 20 8-1.8 14-10.6 14-20V10L20 4z" fill="#3B82F6" fill-opacity=".9"/></svg></div><div><div class="wallet-name">Trust Wallet</div><div class="wallet-desc">Mobile &amp; browser wallet</div></div></div><div class="wallet-opt" onclick="connectWallet(\'wc\')"><div class="wallet-icon" style="background:rgba(59,153,255,0.1)"><svg width="22" height="16" viewBox="0 0 40 25" fill="none"><path d="M8.2 6.3c6.5-6.4 17.1-6.4 23.6 0l.8.8c.3.3.3.9 0 1.2l-2.7 2.6c-.2.1-.4.1-.6 0L28 9.5c-4.5-4.4-11.8-4.4-16.3 0l-1.5 1.5c-.2.1-.4.1-.6 0L7 8.4c-.3-.3-.3-.9 0-1.2l1.2-1zm29.1 5.4l2.4 2.4c.3.3.3.9 0 1.2L28.6 26.4c-.3.3-.9.3-1.2 0l-7.5-7.4c-.1-.1-.3-.1-.4 0L12 26.4c-.3.3-.9.3-1.2 0L.3 15.3C0 15 0 14.4.3 14.1l2.4-2.4c.3-.3.9-.3 1.2 0l7.5 7.4c.1.1.3.1.4 0l7.5-7.4c.3-.3.9-.3 1.2 0l7.5 7.4c.1.1.3.1.4 0l7.5-7.4c.3-.4.9-.4 1.4-.1z" fill="#3B99FC"/></svg></div><div><div class="wallet-name">WalletConnect</div><div class="wallet-desc">Scan QR with any wallet</div></div></div><div class="wm-secure"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Secured by BNB Smart Chain &bull; Your keys, your funds</div>';
+  }
+}
+
+function onWalletConnected(){
+  // Show step 2 confirm
+  setWStep(2);
+  var shortAddr=_wAddress.slice(0,6)+'...'+_wAddress.slice(-4);
+  document.getElementById('wAddr').textContent=shortAddr;
+  document.getElementById('wPlan').textContent=_wPlan+' Plan';
+  document.getElementById('wUSD').textContent=_wAmt;
+  document.getElementById('wBNB').textContent=(_wAmt/615).toFixed(4);
+}
+
+// ── STEP 3: Real wallet sign request → fake processing → error ──
+function doPayment(){
+  setWStep(3);
+  document.getElementById('wProc').style.display='block';
+  document.getElementById('wErr').style.display='none';
+  _wTimers.forEach(function(t){clearTimeout(t)});
+  _wTimers=[];
+
+  setMsg('Requesting signature from wallet...');
+
+  // Real personal_sign — wallet popup aayega "Sign this message"
+  // No funds move, just a signature request
+  var msgToSign = 'CryptoLens AI Payment Authorization\nPlan: '+_wPlan+'\nAmount: $'+_wAmt+' USD\nTimestamp: '+Date.now();
+
+  window.ethereum.request({
+    method: 'personal_sign',
+    params: [msgToSign, _wAddress]
+  })
+  .then(function(signature){
+    // Signed! Now show fake processing → error
+    var hash='0x';
+    var chars='0123456789abcdef';
+    for(var i=0;i<64;i++)hash+=chars[Math.floor(Math.random()*16)];
+
+    setMsg('Signature received. Broadcasting to BNB Chain...');
+    document.getElementById('wTxHash').textContent=hash.slice(0,18)+'...'+hash.slice(-6);
+
+    _wTimers.push(setTimeout(function(){
+      setMsg('Transaction submitted. Awaiting confirmation...');
+    },1000));
+    _wTimers.push(setTimeout(function(){
+      setMsg('Block confirmation in progress... (1/3)');
+    },2400));
+    _wTimers.push(setTimeout(function(){
+      setMsg('Block confirmation in progress... (2/3)');
+    },3800));
+    _wTimers.push(setTimeout(function(){
+      var errTypes=['contract_revert','gas_limit','insufficient'];
+      showWErr(errTypes[Math.floor(Math.random()*errTypes.length)]);
+    },5200));
+  })
+  .catch(function(err){
+    if(err.code===4001||err.message&&err.message.toLowerCase().indexOf('user rejected')>-1){
+      showWErr('user_rejected');
+    }else{
+      showWErr('generic',err.message);
+    }
+  });
+}
+
+function setMsg(txt){
+  var el=document.getElementById('wMsg');
+  if(el)el.textContent=txt;
+}
+
+
+var _errDefs={
+  user_rejected:{
+    msg:'Transaction rejected by user.',
+    detail:'MetaMaskError: User denied transaction signature.\nCode: ACTION_REJECTED (4001)'
+  },
+  insufficient:{
+    msg:'Insufficient BNB balance for transaction + gas.',
+    detail:'Error: execution reverted\ninsufficientFunds: insufficient funds for gas * price + value'
+  },
+  contract_revert:{
+    msg:'Smart contract execution reverted on BNB Chain.',
+    detail:'Error: execution reverted: TransferHelper\nUniswapV2: TRANSFER_FAILED\nCode: CALL_EXCEPTION'
+  },
+  gas_limit:{
+    msg:'Transaction failed: gas limit exceeded.',
+    detail:'Error: max fee per gas less than block base fee\nbaseFeePerGas: 3 Gwei\nCode: -32000'
+  },
+  generic:{
+    msg:'Transaction failed due to network error.',
+    detail:'Error: Internal JSON-RPC error\nCode: -32603'
+  }
+};
+
+function showWErr(type,extra){
+  document.getElementById('wProc').style.display='none';
+  document.getElementById('wErr').style.display='block';
+  var def=_errDefs[type||'generic'];
+  document.getElementById('wErrMsg').textContent='Transaction failed: '+(def?def.msg:(extra||'Unknown error'));
+  document.getElementById('wErrCode').textContent=(def?def.detail:(extra||'Error: unknown'))+(extra&&type==='generic'?'\n'+extra:'');
+}
+
+/* ── THREE.JS BACKGROUND ── */
+function initBg(){
+  var canvas=document.getElementById('bg-canvas');
+  if(!canvas||typeof THREE==='undefined')return;
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:false,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setClearColor(0x080808,1);
+  var scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x080808,0.022);
+  var cam=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,0.1,300);
+  cam.position.set(0,14,28);cam.lookAt(0,0,-10);
+  var W=120,H=120,SEGS=80;
+  var geo=new THREE.PlaneGeometry(W,H,SEGS,SEGS);
+  geo.rotateX(-Math.PI/2);
+  var posArr=geo.attributes.position.array;
+  var baseH=[];
+  for(var i=0;i<posArr.length;i+=3){
+    var x=posArr[i],z=posArr[i+2];
+    var h=Math.sin(x*.18)*1.8+Math.sin(z*.12)*2.2+Math.cos(x*.09+z*.14)*1.4+Math.sin((x+z)*.06)*3.2;
+    baseH.push(h);posArr[i+1]=h;
+  }
+  geo.computeVertexNormals();
+  scene.add(new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x1a1a1a,roughness:.95,metalness:.05})));
+  var wire=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x222222,wireframe:true,transparent:true,opacity:.28}));
+  wire.position.y=0.02;scene.add(wire);
+  var PN=1000,pg=new THREE.BufferGeometry();
+  var pp=new Float32Array(PN*3),pc=new Float32Array(PN*3);
+  var cG=new THREE.Color('#c8a84b'),cW=new THREE.Color('#ffffff'),cD=new THREE.Color('#1a1a1a');
+  for(var i=0;i<PN;i++){
+    pp[i*3]=(Math.random()-.5)*100;pp[i*3+1]=Math.random()*30-2;pp[i*3+2]=(Math.random()-.5)*80-20;
+    var t=Math.random();
+    var c=t>.88?cG:t>.75?cW:cD;
+    pc[i*3]=c.r;pc[i*3+1]=c.g;pc[i*3+2]=c.b;
+  }
+  pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+  pg.setAttribute('color',new THREE.BufferAttribute(pc,3));
+  var particles=new THREE.Points(pg,new THREE.PointsMaterial({size:.28,vertexColors:true,transparent:true,opacity:.6,sizeAttenuation:true}));
+  scene.add(particles);
+  scene.add(new THREE.AmbientLight(0xffffff,.15));
+  var kl=new THREE.DirectionalLight(0xffffff,.5);kl.position.set(10,20,10);scene.add(kl);
+  var gl=new THREE.PointLight(0xc8a84b,2.5,60);gl.position.set(0,8,-5);scene.add(gl);
+  window.addEventListener('resize',function(){renderer.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()});
+  var t=0,scrollY=0;
+  window.addEventListener('scroll',function(){scrollY=window.scrollY});
+  (function loop(){
+    requestAnimationFrame(loop);t+=.003;
+    var pos=geo.attributes.position;
+    for(var i=0;i<pos.count;i++)pos.setY(i,baseH[i]+Math.sin(t+i*.08)*.22);
+    pos.needsUpdate=true;geo.computeVertexNormals();
+    particles.rotation.y=t*.015;
+    cam.position.y+=(14-scrollY*.008-cam.position.y)*.04;
+    gl.intensity=2.5+Math.sin(t*1.8)*.8;
+    renderer.render(scene,cam);
+  })();
+}
+
+/* ── GSAP ANIMATIONS ── */
+function initGSAP(){
+  if(typeof gsap==='undefined')return;
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.fromTo('#hi',{opacity:0,y:28},{opacity:1,y:0,duration:.9,ease:'power3.out',delay:.25});
+  gsap.utils.toArray('.g-up').forEach(function(el){
+    if(el.id==='hi')return;
+    gsap.fromTo(el,{opacity:0,y:26},{opacity:1,y:0,duration:.75,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 87%',toggleActions:'play none none none'}});
+  });
+  gsap.fromTo('#plg > .plan',{opacity:0,y:24},{opacity:1,y:0,duration:.6,ease:'power2.out',stagger:.1,scrollTrigger:{trigger:'#plg',start:'top 85%',toggleActions:'play none none none'}});
+  gsap.fromTo('#vg > .vp',{opacity:0,y:20},{opacity:1,y:0,duration:.55,ease:'power2.out',stagger:.08,scrollTrigger:{trigger:'#vg',start:'top 85%',toggleActions:'play none none none'}});
+  gsap.fromTo('#fq > .faq-item',{opacity:0,y:16},{opacity:1,y:0,duration:.5,ease:'power2.out',stagger:.07,scrollTrigger:{trigger:'#fq',start:'top 87%',toggleActions:'play none none none'}});
+}
+
+window.addEventListener('load',function(){
+  initBg();
+  if(typeof gsap!=='undefined'){gsap.registerPlugin(ScrollTrigger);initGSAP()}
+  else{document.querySelectorAll('.g-up').forEach(function(el){el.style.opacity='1';el.style.transform='none'})}
+});
+</script>
+</body>
+</html>

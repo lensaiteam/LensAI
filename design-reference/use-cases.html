@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Use Cases</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="icon" type="image/png" href="Ai logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+:root{
+  --bg:#080808;--bg2:#0e0e0e;--bg3:#141414;
+  --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --w:#f0f0f0;--m:#888;--dim:#444;
+  --gold:#c8a84b;--gold2:#e8c96a;--gold3:rgba(200,168,75,0.12);
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;
+  --font:'Inter',-apple-system,sans-serif;--nav:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--w);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+#bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav);display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(8,8,8,0.6);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-box{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#a07830);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#000}
+.nav-logo-text{font-size:15px;font-weight:600;color:var(--w);letter-spacing:-0.3px}
+.nav-links{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.nav-links a{font-size:13px;font-weight:400;color:var(--m);text-decoration:none;padding:6px 14px;border-radius:6px;transition:color .15s,background .15s}
+.nav-links a:hover,.nav-links a.on{color:var(--w);background:rgba(255,255,255,0.06)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-btn-ghost{font-size:13px;font-weight:400;color:var(--m);background:none;border:1px solid var(--border);padding:7px 18px;border-radius:100px;cursor:pointer;text-decoration:none;transition:all .18s}
+.nav-btn-ghost:hover{color:var(--w);border-color:var(--border2)}
+.nav-btn-solid{font-size:13px;font-weight:500;color:#000;background:var(--w);padding:7px 18px;border-radius:100px;cursor:pointer;text-decoration:none;transition:opacity .18s;border:none}
+.nav-btn-solid:hover{opacity:0.85}
+
+/* AUTH NAV */
+#navOut{display:flex;align-items:center;gap:10px}
+#navIn{display:none}
+.nav-user-btn{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:4px 12px 4px 4px;cursor:pointer;transition:all .18s}
+.nav-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#7a5a18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;flex-shrink:0;overflow:hidden}
+.nav-uname{font-size:12px;font-weight:500;color:var(--w);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-udrop-wrap{position:relative}
+.nav-drop{display:none;position:absolute;top:calc(100% + 8px);right:0;background:#0d0d0d;border:1px solid var(--border2);border-radius:12px;padding:6px;min-width:190px;box-shadow:0 16px 40px rgba(0,0,0,0.6);z-index:200}
+.nav-drop-hd{padding:9px 12px 8px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.nav-drop-name{font-size:13px;font-weight:600;color:var(--w)}
+.nav-drop-email{font-size:11px;color:var(--m);margin-top:1px}
+.nav-drop-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;font-size:13px;color:var(--m);cursor:pointer;transition:all .15s;margin-top:2px}
+.nav-drop-item:hover{background:rgba(255,255,255,0.04);color:var(--w)}
+.nav-drop-item.danger:hover{background:rgba(239,68,68,0.08);color:var(--red)}
+
+/* LAYOUT */
+.wrap{max-width:1100px;margin:0 auto;padding:0 40px}
+
+/* HERO */
+.hero{
+  position:relative;z-index:1;
+  padding:calc(var(--nav) + 90px) 40px 100px;
+  text-align:center;overflow:hidden;
+}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 50%,transparent 30%,rgba(8,8,8,0.9) 100%);pointer-events:none;z-index:0}
+.hero-inner{position:relative;z-index:2;max-width:720px;margin:0 auto}
+
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:12px;font-weight:400;color:var(--m);margin-bottom:28px;letter-spacing:0.02em}
+.kicker-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:kblink 2s ease-in-out infinite}
+@keyframes kblink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.hero-h1{font-size:clamp(42px,6.5vw,78px);font-weight:800;letter-spacing:-3.5px;line-height:0.97;color:var(--w);margin-bottom:22px}
+.hero-h1 span{color:var(--gold)}
+.hero-sub{font-size:17px;font-weight:300;color:var(--m);line-height:1.72;max-width:520px;margin:0 auto 44px}
+
+/* AUDIENCE TABS */
+.audience-tabs{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:0}
+.atab{display:flex;align-items:center;gap:8px;padding:9px 20px;border-radius:100px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--m);transition:all .22s}
+.atab:hover,.atab.on{background:var(--card2);border-color:var(--border2);color:var(--w)}
+.atab.on{border-color:var(--gold);color:var(--gold)}
+.atab-icon{font-size:16px}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);position:relative;z-index:1}
+
+/* SECTION BASE */
+.section{position:relative;z-index:1;padding:100px 0}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.tag::before{content:'';width:16px;height:1px;background:var(--gold);opacity:.5}
+.big-h{font-size:clamp(32px,4.5vw,52px);font-weight:700;letter-spacing:-2.5px;line-height:1.06;color:var(--w)}
+.big-p{font-size:16px;color:var(--m);line-height:1.78;max-width:520px}
+
+/* ── USE CASE CARDS — big full width ── */
+.uc-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;overflow:hidden;margin-bottom:16px;
+  transition:border-color .25s;
+}
+.uc-card:hover{border-color:var(--border2)}
+
+.uc-head{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;min-height:280px;
+}
+.uc-info{padding:44px 48px;display:flex;flex-direction:column;justify-content:center}
+.uc-visual{
+  display:flex;align-items:center;justify-content:center;
+  padding:36px;border-left:1px solid var(--border);
+  position:relative;overflow:hidden;
+  background:rgba(0,0,0,0.2);
+}
+
+/* persona badge */
+.persona-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 14px;border-radius:100px;
+  font-size:11px;font-weight:500;letter-spacing:0.06em;
+  margin-bottom:20px;
+}
+
+.uc-number{
+  font-size:11px;font-weight:500;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:12px;
+}
+.uc-title{
+  font-size:28px;font-weight:700;letter-spacing:-1.2px;
+  color:var(--w);margin-bottom:14px;line-height:1.1;
+}
+.uc-desc{font-size:15px;color:var(--m);line-height:1.78;margin-bottom:24px}
+
+/* benefit pills */
+.benefit-list{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+.benefit-item{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:14px;color:var(--w);
+}
+.bi-check{
+  width:20px;height:20px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px;
+}
+.bi-desc{color:var(--m);font-size:13px;margin-top:2px}
+
+.uc-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:500;
+  color:var(--w);text-decoration:none;
+  border:1px solid var(--border2);
+  padding:10px 22px;border-radius:100px;
+  transition:all .2s;
+}
+.uc-cta:hover{border-color:var(--gold);color:var(--gold)}
+
+/* VISUAL MOCKUPS inside cards */
+.mockup{width:100%;max-width:340px}
+
+/* score mockup */
+.score-mockup{background:rgba(8,8,8,0.8);border:1px solid var(--border);border-radius:14px;padding:20px;width:100%;max-width:320px}
+.sm-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.sm-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+.sm-name{font-size:14px;font-weight:600;color:var(--w)}
+.sm-sub{font-size:11px;color:var(--m);margin-top:2px}
+.sm-verdict{margin-left:auto;font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px}
+.sm-scores{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.sm-sc{background:rgba(255,255,255,0.04);border-radius:8px;padding:10px;text-align:center}
+.sm-num{font-size:20px;font-weight:700;letter-spacing:-0.8px;display:block;margin-bottom:2px}
+.sm-lbl{font-size:10px;color:var(--m)}
+.sm-bar{height:2px;background:var(--border);border-radius:1px;margin-top:6px}
+.sm-fill{height:100%;border-radius:1px}
+.sm-flag-row{display:flex;flex-wrap:wrap;gap:5px}
+.sm-flag{font-size:10px;padding:3px 8px;border-radius:5px;font-weight:500}
+
+/* alert mockup */
+.alert-mockup{display:flex;flex-direction:column;gap:8px;width:100%;max-width:300px}
+.alert-item{
+  background:rgba(8,8,8,0.85);border-radius:12px;padding:12px 14px;
+  display:flex;align-items:flex-start;gap:10px;
+  border:1px solid var(--border);
+  animation:slideIn .4s ease forwards;opacity:0;
+}
+@keyframes slideIn{to{opacity:1;transform:translateX(0)}from{opacity:0;transform:translateX(20px)}}
+.ai-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.ai-title{font-size:12px;font-weight:600;color:var(--w);margin-bottom:3px}
+.ai-body{font-size:11px;color:var(--m);line-height:1.5}
+.ai-time{font-size:10px;color:var(--dim);margin-top:4px}
+
+/* portfolio mockup */
+.port-mockup{background:rgba(8,8,8,0.85);border:1px solid var(--border);border-radius:14px;padding:18px;width:100%;max-width:320px}
+.pm-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.pm-row:last-child{border-bottom:none}
+.pm-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.pm-name{flex:1;font-size:12px;font-weight:500;color:var(--w)}
+.pm-score-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px}
+.pm-pct{font-size:12px;font-weight:600;min-width:48px;text-align:right}
+
+/* compare mockup */
+.cmp-mockup{background:rgba(8,8,8,0.85);border:1px solid var(--border);border-radius:14px;overflow:hidden;width:100%;max-width:320px}
+.cmp-hd{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
+.cmp-hd-cell{padding:10px 14px;font-size:11px;font-weight:600;text-align:center;color:var(--m)}
+.cmp-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
+.cmp-row:last-child{border-bottom:none}
+.cmp-cell{padding:9px 14px;font-size:12px;text-align:center}
+.cmp-label{padding:9px 14px;font-size:11px;color:var(--m)}
+
+/* ── WHO IS IT FOR section ── */
+.persona-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:60px}
+.pg-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:28px;
+  transition:border-color .25s,transform .25s;
+}
+.pg-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+.pg-emoji{font-size:32px;margin-bottom:16px;display:block}
+.pg-who{font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--m);margin-bottom:8px}
+.pg-title{font-size:18px;font-weight:700;letter-spacing:-0.5px;color:var(--w);margin-bottom:10px}
+.pg-desc{font-size:13px;color:var(--m);line-height:1.72;margin-bottom:18px}
+.pg-stat{font-size:13px;font-weight:500;padding:8px 12px;border-radius:8px;display:inline-block}
+
+/* ── COMPARISON TABLE ── */
+.cmp-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:60px}
+.cmp-full-table{width:100%;border-collapse:collapse;font-size:13px}
+.cft th{padding:14px 20px;text-align:left;border-bottom:1px solid var(--border);color:var(--m);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:500;background:rgba(0,0,0,0.2)}
+.cft th:not(:first-child){text-align:center}
+.cft td{padding:14px 20px;border-bottom:1px solid var(--border);color:var(--m);vertical-align:top}
+.cft td:first-child{color:var(--w);font-weight:500}
+.cft td:not(:first-child){text-align:center}
+.cft tr:last-child td{border-bottom:none}
+.cft tr:hover td{background:rgba(255,255,255,0.02)}
+.cy{color:var(--green);font-size:15px}
+.cn{color:var(--dim);font-size:15px}
+.cv{color:var(--w);font-weight:600}
+.cy-text{color:var(--green);font-size:12px}
+
+/* ── TESTIMONIALS ── */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:60px}
+.testi-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:26px;
+}
+.testi-stars{color:var(--gold);font-size:13px;margin-bottom:14px;letter-spacing:2px}
+.testi-quote{font-size:14px;color:var(--w);line-height:1.72;margin-bottom:18px;font-style:italic;opacity:0.85}
+.testi-author{display:flex;align-items:center;gap:10px}
+.testi-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.testi-name{font-size:13px;font-weight:600;color:var(--w)}
+.testi-role{font-size:11px;color:var(--m);margin-top:1px}
+
+/* ── CTA ── */
+.cta-box{background:var(--card2);border:1px solid var(--border);border-radius:24px;padding:80px 52px;text-align:center;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:500px;height:400px;background:radial-gradient(ellipse,rgba(200,168,75,0.08) 0%,transparent 65%);pointer-events:none}
+.cta-tag{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:block}
+.cta-h{font-size:clamp(34px,4.5vw,52px);font-weight:700;letter-spacing:-2.5px;color:var(--w);margin-bottom:14px}
+.cta-p{font-size:16px;color:var(--m);max-width:400px;margin:0 auto 36px;line-height:1.7}
+.cta-btns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.btn-primary{font-family:var(--font);font-size:14px;font-weight:500;color:#000;background:var(--w);padding:13px 30px;border-radius:100px;text-decoration:none;border:none;cursor:pointer;transition:opacity .18s}
+.btn-primary:hover{opacity:0.85}
+.btn-ghost{font-family:var(--font);font-size:14px;font-weight:400;color:var(--m);background:transparent;padding:13px 30px;border-radius:100px;text-decoration:none;border:1px solid var(--border);cursor:pointer;transition:all .18s}
+.btn-ghost:hover{color:var(--w);border-color:var(--border2)}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:36px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.flogo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.flinks{display:flex;gap:24px}
+.flinks a{font-size:13px;color:var(--m);text-decoration:none;transition:color .18s}
+.flinks a:hover{color:var(--w)}
+.fcopy{font-size:12px;color:var(--dim)}
+
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(30,30,30,0.95);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--w);max-width:280px;transform:translateY(14px);opacity:0;transition:all .28s ease;pointer-events:none;backdrop-filter:blur(20px)}
+#toast.on{transform:translateY(0);opacity:1}
+
+/* GSAP */
+.g-up{opacity:0;transform:translateY(26px)}
+.g-fade{opacity:0}
+
+/* ══ AUTH MODAL ══ */
+.auth-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.auth-overlay.show{opacity:1;pointer-events:all}
+.auth-modal{background:#0d0d0d;border:1px solid rgba(255,255,255,0.14);border-radius:18px;padding:36px;width:100%;max-width:400px;position:relative;box-shadow:0 40px 80px rgba(0,0,0,0.7)}
+.auth-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.06);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--m);font-size:16px;transition:all .18s}
+.auth-close:hover{background:rgba(255,255,255,0.12);color:var(--w)}
+.auth-logo-row{display:flex;align-items:center;gap:9px;margin-bottom:22px}
+.auth-logo-box{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--gold),#7a5010);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000}
+.auth-title{font-size:20px;font-weight:700;letter-spacing:-.5px;color:var(--w);margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--m);margin-bottom:24px;line-height:1.5}
+.auth-google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:var(--w);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;margin-bottom:18px}
+.auth-google-btn:hover{background:rgba(255,255,255,0.1)}
+.auth-divider{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.08)}
+.auth-divider span{font-size:11px;color:var(--m)}
+.auth-field{margin-bottom:13px}
+.auth-label{font-size:11px;font-weight:500;color:var(--m);margin-bottom:5px;display:block;letter-spacing:.04em;text-transform:uppercase}
+.auth-input{width:100%;background:#141414;border:1px solid rgba(255,255,255,0.08);border-radius:9px;padding:11px 14px;font-family:var(--font);font-size:14px;color:var(--w);outline:none;transition:border-color .2s}
+.auth-input:focus{border-color:rgba(200,168,75,0.4)}
+.auth-input::placeholder{color:#444}
+.auth-name-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px}
+.auth-submit{width:100%;padding:13px;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:600;color:#000;background:var(--gold);border:none;cursor:pointer;transition:background .2s;margin-top:4px}
+.auth-submit:hover{background:var(--gold2)}
+.auth-toggle{text-align:center;margin-top:16px;font-size:13px;color:var(--m)}
+.auth-toggle a{color:var(--gold);cursor:pointer}
+.auth-err{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:9px 13px;font-size:12px;color:var(--red);margin-bottom:13px;display:none}
+.auth-err.show{display:block}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .uc-head{grid-template-columns:1fr}.uc-visual{display:none}
+  .persona-grid,.testi-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  :root{--nav:56px}
+  .nav{padding:0 16px}
+  .nav-links{display:none}
+  .nav-logo-text{font-size:14px}
+  .nav-btn-ghost{padding:6px 13px;font-size:12px}
+  .nav-btn-solid{padding:6px 13px;font-size:12px}
+  .nav-uname{display:none}
+  .wrap{padding:0 16px}
+  .hero{padding:calc(var(--nav) + 40px) 16px 60px}
+  .hero-h1{font-size:clamp(34px,10vw,52px);letter-spacing:-2.5px}
+  .hero-sub{font-size:14px;margin-bottom:32px}
+  .hero-kicker{font-size:11px;padding:5px 13px;margin-bottom:20px}
+  .audience-tabs{gap:6px}
+  .atab{padding:7px 14px;font-size:12px}
+  .section{padding:60px 0}
+  .uc-head{grid-template-columns:1fr}
+  .uc-visual{display:none}
+  .uc-info{padding:24px 20px}
+  .uc-title{font-size:22px;letter-spacing:-1px}
+  .uc-desc{font-size:13px}
+  .benefit-item{font-size:13px}
+  .bi-desc{font-size:12px}
+  .uc-cta{font-size:12px;padding:9px 18px}
+  .persona-grid,.testi-grid{grid-template-columns:1fr}
+  .pg-card{padding:20px}
+  .pg-title{font-size:16px}
+  .pg-desc{font-size:12px}
+  .cmp-table-wrap{overflow-x:auto}
+  .cmp-full-table{min-width:560px;font-size:11px}
+  .cft th,.cft td{padding:10px 12px}
+  .cta-box{padding:36px 20px;border-radius:16px}
+  .cta-h{font-size:clamp(24px,7vw,34px);letter-spacing:-1.5px}
+  .cta-p{font-size:13px}
+  .cta-btns{flex-direction:column;align-items:center;gap:10px}
+  .btn-primary,.btn-ghost{width:100%;max-width:280px;text-align:center;padding:13px 20px}
+  footer{padding:24px 16px;flex-direction:column;align-items:flex-start;gap:16px}
+  .flinks{flex-wrap:wrap;gap:14px}
+  .flinks a{font-size:12px}
+  .fcopy{font-size:11px}
+}
+@media(max-width:480px){
+  .hero-h1{font-size:30px;letter-spacing:-2px}
+  .persona-grid{grid-template-columns:1fr}
+  .audience-tabs{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .atab{white-space:nowrap;flex-shrink:0}
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="nav-logo-text">CryptoLens AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="app.html">Research</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="use-cases.html" class="on">Use Cases</a>
+  </div>
+  <div class="nav-right">
+    <!-- Logged OUT -->
+    <div id="navOut" style="display:flex;align-items:center;gap:10px">
+      <button class="nav-btn-ghost" onclick="openAuth('login')">Sign in</button>
+      <button class="nav-btn-solid" onclick="openAuth('signup')">Start free →</button>
+    </div>
+    <!-- Logged IN -->
+    <div id="navIn" style="display:none">
+      <div class="nav-udrop-wrap" id="navWrap">
+        <div class="nav-user-btn" onclick="toggleDrop()">
+          <div class="nav-av" id="navAv">U</div>
+          <span class="nav-uname" id="navName">User</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="nav-drop" id="navDrop">
+          <div class="nav-drop-hd">
+            <div class="nav-drop-name" id="navDN"></div>
+            <div class="nav-drop-email" id="navDE"></div>
+          </div>
+          <div class="nav-drop-item" onclick="window.location.href='app.html'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Research Terminal
+          </div>
+          <div class="nav-drop-item danger" onclick="doSignOut()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner g-up" id="hi">
+    <div class="hero-kicker">
+      <span class="kicker-dot"></span>
+      WHO IS CRYPTOLENS AI FOR?
+    </div>
+    <h1 class="hero-h1">
+      Built for every<br>
+      <span>crypto player.</span>
+    </h1>
+    <p class="hero-sub">
+      Whether you're a retail trader avoiding rug pulls, a VC doing due diligence, or a fund managing a portfolio CryptoLens AI cuts research time by 95%.
+    </p>
+    <div class="audience-tabs">
+      <div class="atab on" onclick="scrollTo(0)"><span class="atab-icon" style="display:flex;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>Retail Traders</div>
+      <div class="atab" onclick="scrollTo(1)"><span class="atab-icon" style="display:flex;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>VC & Funds</div>
+      <div class="atab" onclick="scrollTo(2)"><span class="atab-icon" style="display:flex;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Portfolio Managers</div>
+      <div class="atab" onclick="scrollTo(3)"><span class="atab-icon" style="display:flex;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>Researchers</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- USE CASE 1 — RETAIL TRADERS -->
+<section class="section" id="uc0">
+  <div class="wrap">
+    <div class="uc-card g-up">
+      <div class="uc-head">
+        <div class="uc-info">
+          <div class="persona-badge" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:var(--green);display:inline-flex;align-items:center;gap:7px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> For Retail Traders
+          </div>
+          <div class="uc-number">Use Case 01</div>
+          <div class="uc-title">Stop losing money<br>to rug pulls.</div>
+          <div class="uc-desc">
+            Every week, thousands of traders buy into projects that rug within days. CryptoLens AI scans every red flag honeypots, locked liquidity, whale wallets, anonymous teams before you invest a single dollar.
+          </div>
+          <div class="benefit-list">
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(34,197,94,0.1);color:var(--green)">✓</div>
+              <div>
+                <div>Know if a token is a honeypot before buying</div>
+                <div class="bi-desc">Instant contract analysis mint authority, sell tax, liquidity locks checked automatically.</div>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(34,197,94,0.1);color:var(--green)">✓</div>
+              <div>
+                <div>See whale wallets before they dump</div>
+                <div class="bi-desc">Top 20 wallet movements tracked. Know if insiders are accumulating or distributing.</div>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(34,197,94,0.1);color:var(--green)">✓</div>
+              <div>
+                <div>Plain English verdict no jargon</div>
+                <div class="bi-desc">BUY / WATCH / AVOID with clear reasoning. No need to read whitepapers or audit reports.</div>
+              </div>
+            </div>
+          </div>
+          <a href="app.html" class="uc-cta">Try it free 5 researches/day →</a>
+        </div>
+        <div class="uc-visual">
+          <!-- Score mockup -->
+          <div class="score-mockup">
+            <div class="sm-header">
+              <div class="sm-icon" style="background:rgba(239,68,68,0.12);color:var(--red)">RG</div>
+              <div>
+                <div class="sm-name">RandoGem (RGM)</div>
+                <div class="sm-sub">$0.00042 · New launch</div>
+              </div>
+              <div class="sm-verdict" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:var(--red)">✕ AVOID</div>
+            </div>
+            <div class="sm-scores">
+              <div class="sm-sc">
+                <span class="sm-num" style="color:var(--red)">12</span>
+                <span class="sm-lbl">Safety</span>
+                <div class="sm-bar"><div class="sm-fill" style="width:12%;background:var(--red)"></div></div>
+              </div>
+              <div class="sm-sc">
+                <span class="sm-num" style="color:var(--red)">8</span>
+                <span class="sm-lbl">Team</span>
+                <div class="sm-bar"><div class="sm-fill" style="width:8%;background:var(--red)"></div></div>
+              </div>
+              <div class="sm-sc">
+                <span class="sm-num" style="color:var(--gold)">34</span>
+                <span class="sm-lbl">Tokenomics</span>
+                <div class="sm-bar"><div class="sm-fill" style="width:34%;background:var(--gold)"></div></div>
+              </div>
+              <div class="sm-sc">
+                <span class="sm-num" style="color:var(--gold)">41</span>
+                <span class="sm-lbl">Sentiment</span>
+                <div class="sm-bar"><div class="sm-fill" style="width:41%;background:var(--gold)"></div></div>
+              </div>
+            </div>
+            <div class="sm-flag-row">
+              <span class="sm-flag" style="background:rgba(239,68,68,0.08);color:rgba(252,165,165,0.9);border:1px solid rgba(239,68,68,0.15)">✕ Honeypot detected</span>
+              <span class="sm-flag" style="background:rgba(239,68,68,0.08);color:rgba(252,165,165,0.9);border:1px solid rgba(239,68,68,0.15)">✕ Anonymous team</span>
+              <span class="sm-flag" style="background:rgba(239,68,68,0.08);color:rgba(252,165,165,0.9);border:1px solid rgba(239,68,68,0.15)">✕ No liquidity lock</span>
+              <span class="sm-flag" style="background:rgba(239,68,68,0.08);color:rgba(252,165,165,0.9);border:1px solid rgba(239,68,68,0.15)">✕ Mint active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASE 2 — VC & FUNDS -->
+<section class="section" style="border-top:1px solid var(--border)" id="uc1">
+  <div class="wrap">
+    <div class="uc-card g-up">
+      <div class="uc-head">
+        <div class="uc-visual" style="border-left:none;border-right:1px solid var(--border)">
+          <!-- Alert mockup -->
+          <div class="alert-mockup">
+            <div class="alert-item" style="animation-delay:.1s;border-color:rgba(34,197,94,0.2)">
+              <span class="ai-icon" style="flex-shrink:0;margin-top:1px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+              <div>
+                <div class="ai-title" style="color:var(--green)">New deal opportunity</div>
+                <div class="ai-body">Arbitrum ecosystem token Score 84/100. Team verified, audited, strong on-chain metrics.</div>
+                <div class="ai-time">2 min ago</div>
+              </div>
+            </div>
+            <div class="alert-item" style="animation-delay:.4s;border-color:rgba(239,68,68,0.2)">
+              <span class="ai-icon" style="flex-shrink:0;margin-top:1px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+              <div>
+                <div class="ai-title" style="color:var(--red)">Risk alert Portfolio token</div>
+                <div class="ai-body">Whale wallet moved 4.2M tokens out. Potential distribution review position.</div>
+                <div class="ai-time">18 min ago</div>
+              </div>
+            </div>
+            <div class="alert-item" style="animation-delay:.7s;border-color:rgba(200,168,75,0.2)">
+              <span class="ai-icon" style="flex-shrink:0;margin-top:1px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+              <div>
+                <div class="ai-title" style="color:var(--gold)">Due diligence complete</div>
+                <div class="ai-body">Base ecosystem project analyzed. Full PDF report ready 6 pages, all metrics.</div>
+                <div class="ai-time">1 hour ago</div>
+              </div>
+            </div>
+            <div class="alert-item" style="animation-delay:1s">
+              <span class="ai-icon" style="flex-shrink:0;margin-top:1px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--m)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <div>
+                <div class="ai-title">Weekly portfolio report</div>
+                <div class="ai-body">12 tokens monitored. 9 stable, 2 improved, 1 flagged for review.</div>
+                <div class="ai-time">Today 9:00 AM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <div class="persona-badge" style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:var(--blue);display:inline-flex;align-items:center;gap:7px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> For VC Firms & Funds
+          </div>
+          <div class="uc-number">Use Case 02</div>
+          <div class="uc-title">Due diligence<br>at 100x speed.</div>
+          <div class="uc-desc">
+            Your team shouldn't spend 40 hours manually researching every deal. CryptoLens AI gives you a full structured report in seconds team verification, tokenomics breakdown, on-chain health, comparable analysis. Same quality, 100x faster.
+          </div>
+          <div class="benefit-list">
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(59,130,246,0.1);color:var(--blue)">✓</div>
+              <div>
+                <div>Full due diligence report 30 seconds</div>
+                <div class="bi-desc">Team verification, tokenomics, on-chain data, comparable analysis. Exportable PDF.</div>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(59,130,246,0.1);color:var(--blue)">✓</div>
+              <div>
+                <div>Portfolio monitoring with real-time alerts</div>
+                <div class="bi-desc">Get notified when whale wallets move, sentiment shifts, or red flags emerge in your holdings.</div>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(59,130,246,0.1);color:var(--blue)">✓</div>
+              <div>
+                <div>Multi-seat team access + API</div>
+                <div class="bi-desc">Your whole team accesses the same data. API for custom integrations into your deal flow.</div>
+              </div>
+            </div>
+          </div>
+          <a href="pricing.html" class="uc-cta">See Elite & B2B plans →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASE 3 — PORTFOLIO MANAGERS -->
+<section class="section" style="border-top:1px solid var(--border)" id="uc2">
+  <div class="wrap">
+    <div class="uc-card g-up">
+      <div class="uc-head">
+        <div class="uc-info">
+          <div class="persona-badge" style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);color:var(--purple);display:inline-flex;align-items:center;gap:7px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> For Portfolio Managers
+          </div>
+          <div class="uc-number">Use Case 03</div>
+          <div class="uc-title">Monitor your<br>entire portfolio.</div>
+          <div class="uc-desc">
+            Managing 20+ tokens manually is impossible. CryptoLens AI gives every holding a live intelligence score. One dashboard shows you which positions are healthy, which need review, and which are showing early warning signs.
+          </div>
+          <div class="benefit-list">
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(139,92,246,0.1);color:var(--purple)">✓</div>
+              <div>
+                <div>Live safety scores for all holdings</div>
+                <div class="bi-desc">Every token in your portfolio scored 0–100. Updated as market conditions change.</div>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(139,92,246,0.1);color:var(--purple)">✓</div>
+              <div>
+                <div>Early warning before a dump</div>
+                <div class="bi-desc">Whale accumulation/distribution patterns detected early exit before everyone else reacts.</div>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(139,92,246,0.1);color:var(--purple)">✓</div>
+              <div>
+                <div>Compare tokens side by side</div>
+                <div class="bi-desc">Swap one holding for a better opportunity? Compare safety, tokenomics, and sentiment instantly.</div>
+              </div>
+            </div>
+          </div>
+          <a href="app.html" class="uc-cta">Try portfolio tracking →</a>
+        </div>
+        <div class="uc-visual">
+          <!-- Portfolio mockup -->
+          <div class="port-mockup">
+            <div style="font-size:11px;font-weight:500;color:var(--m);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)">Portfolio 8 holdings</div>
+            <div class="pm-row">
+              <div class="pm-icon" style="background:rgba(153,69,255,0.12);color:#9945ff">SO</div>
+              <div class="pm-name">SOL</div>
+              <div class="pm-score-badge" style="background:rgba(34,197,94,0.1);color:var(--green)">87</div>
+              <div class="pm-pct" style="color:var(--green)">+38.2%</div>
+            </div>
+            <div class="pm-row">
+              <div class="pm-icon" style="background:rgba(247,147,26,0.12);color:#f7931a">BT</div>
+              <div class="pm-name">BTC</div>
+              <div class="pm-score-badge" style="background:rgba(34,197,94,0.1);color:var(--green)">91</div>
+              <div class="pm-pct" style="color:var(--green)">+12.4%</div>
+            </div>
+            <div class="pm-row">
+              <div class="pm-icon" style="background:rgba(200,168,75,0.12);color:var(--gold)">JU</div>
+              <div class="pm-name">JUP</div>
+              <div class="pm-score-badge" style="background:rgba(200,168,75,0.1);color:var(--gold)">72</div>
+              <div class="pm-pct" style="color:var(--gold)">+5.1%</div>
+            </div>
+            <div class="pm-row">
+              <div class="pm-icon" style="background:rgba(239,68,68,0.12);color:var(--red)">BO</div>
+              <div class="pm-name">BONK</div>
+              <div class="pm-score-badge" style="background:rgba(239,68,68,0.1);color:var(--red)">41</div>
+              <div class="pm-pct" style="color:var(--red)">-18.4%</div>
+            </div>
+            <div class="pm-row">
+              <div class="pm-icon" style="background:rgba(98,126,234,0.12);color:#627eea">ET</div>
+              <div class="pm-name">ETH</div>
+              <div class="pm-score-badge" style="background:rgba(34,197,94,0.1);color:var(--green)">88</div>
+              <div class="pm-pct" style="color:var(--green)">+21.3%</div>
+            </div>
+            <div style="padding:10px 0 0;font-size:11px;color:var(--dim);text-align:center">⚠ 1 position needs review</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASE 4 — RESEARCHERS -->
+<section class="section" style="border-top:1px solid var(--border)" id="uc3">
+  <div class="wrap">
+    <div class="uc-card g-up">
+      <div class="uc-head">
+        <div class="uc-visual" style="border-left:none;border-right:1px solid var(--border)">
+          <!-- Compare mockup -->
+          <div class="cmp-mockup">
+            <div class="cmp-hd">
+              <div class="cmp-hd-cell" style="border-right:1px solid var(--border)">SOL</div>
+              <div class="cmp-hd-cell">AVAX</div>
+            </div>
+            <div class="cmp-row" style="background:rgba(0,0,0,0.2)">
+              <div class="cmp-cell" style="font-size:11px;color:var(--m);border-right:1px solid var(--border);text-align:left;padding-left:14px">Safety score</div>
+              <div class="cmp-cell" style="color:var(--green);font-weight:700;border-right:1px solid var(--border)">87</div>
+              <div class="cmp-cell" style="color:var(--gold);font-weight:700">74</div>
+            </div>
+            <div class="cmp-row">
+              <div class="cmp-cell" style="font-size:11px;color:var(--m);border-right:1px solid var(--border);text-align:left;padding-left:14px">Team score</div>
+              <div class="cmp-cell" style="color:var(--green);font-weight:700;border-right:1px solid var(--border)">91</div>
+              <div class="cmp-cell" style="color:var(--green);font-weight:700">88</div>
+            </div>
+            <div class="cmp-row" style="background:rgba(0,0,0,0.2)">
+              <div class="cmp-cell" style="font-size:11px;color:var(--m);border-right:1px solid var(--border);text-align:left;padding-left:14px">Tokenomics</div>
+              <div class="cmp-cell" style="color:var(--gold);font-weight:700;border-right:1px solid var(--border)">79</div>
+              <div class="cmp-cell" style="color:var(--green);font-weight:700">82</div>
+            </div>
+            <div class="cmp-row">
+              <div class="cmp-cell" style="font-size:11px;color:var(--m);border-right:1px solid var(--border);text-align:left;padding-left:14px">Sentiment</div>
+              <div class="cmp-cell" style="color:var(--green);font-weight:700;border-right:1px solid var(--border)">82</div>
+              <div class="cmp-cell" style="color:var(--gold);font-weight:700">71</div>
+            </div>
+            <div class="cmp-row" style="background:rgba(0,0,0,0.2)">
+              <div class="cmp-cell" style="font-size:11px;color:var(--m);border-right:1px solid var(--border);text-align:left;padding-left:14px">Whale risk</div>
+              <div class="cmp-cell" style="color:var(--gold);font-weight:700;border-right:1px solid var(--border)">MED</div>
+              <div class="cmp-cell" style="color:var(--green);font-weight:700">LOW</div>
+            </div>
+            <div style="padding:12px 14px;border-top:1px solid var(--border);font-size:11px">
+              <span style="color:var(--m)">Verdict: </span>
+              <span style="color:var(--green);font-weight:600">SOL BUY</span>
+              <span style="color:var(--m);margin:0 8px">·</span>
+              <span style="color:var(--gold);font-weight:600">AVAX WATCH</span>
+            </div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <div class="persona-badge" style="background:rgba(200,168,75,0.08);border:1px solid rgba(200,168,75,0.2);color:var(--gold);display:inline-flex;align-items:center;gap:7px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> For Crypto Researchers
+          </div>
+          <div class="uc-number">Use Case 04</div>
+          <div class="uc-title">Compare tokens<br>with data, not gut.</div>
+          <div class="uc-desc">
+            Writing token analysis reports? Comparing Layer 1s? CryptoLens AI gives you structured, comparable data across all dimensions so your research is backed by numbers, not just narrative. Export to PDF for reports.
+          </div>
+          <div class="benefit-list">
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(200,168,75,0.1);color:var(--gold)">✓</div>
+              <div>
+                <div>Side-by-side token comparison</div>
+                <div class="bi-desc">Compare any two tokens across all 6 intelligence dimensions. Structured, objective data.</div>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(200,168,75,0.1);color:var(--gold)">✓</div>
+              <div>
+                <div>Export full reports to PDF</div>
+                <div class="bi-desc">6-page structured report with all data, charts, and AI analysis. Ready to publish or share.</div>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <div class="bi-check" style="background:rgba(200,168,75,0.1);color:var(--gold)">✓</div>
+              <div>
+                <div>Historical research archive</div>
+                <div class="bi-desc">All your past analyses saved and searchable. Track how your calls performed over time.</div>
+              </div>
+            </div>
+          </div>
+          <a href="app.html" class="uc-cta">Start your research →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IS IT FOR — PERSONA GRID -->
+<section class="section" style="border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="g-up" style="text-align:center">
+      <div class="tag" style="justify-content:center">Who uses CryptoLens</div>
+      <h2 class="big-h" style="margin-bottom:14px">Built for everyone<br>in crypto.</h2>
+    </div>
+    <div class="persona-grid g-up" id="pg">
+      <div class="pg-card">
+        <span class="pg-emoji" style="display:flex;align-items:center;margin-bottom:16px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+        <div class="pg-who">Retail Degens</div>
+        <div class="pg-title">The active trader</div>
+        <div class="pg-desc">Trades 10–20 tokens a week. Needs instant signal on new launches and trending tokens before jumping in. Saves hours of manual research daily.</div>
+        <div class="pg-stat" style="background:rgba(34,197,94,0.08);color:var(--green)">Saves ~3 hrs/day</div>
+      </div>
+      <div class="pg-card">
+        <span class="pg-emoji" style="display:flex;align-items:center;margin-bottom:16px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+        <div class="pg-who">Crypto VC Firms</div>
+        <div class="pg-title">The deal sourcer</div>
+        <div class="pg-desc">Evaluates 50+ projects a month. Needs structured due diligence fast. CryptoLens cuts deal analysis from 2 days to 30 minutes.</div>
+        <div class="pg-stat" style="background:rgba(59,130,246,0.08);color:var(--blue)">2 days → 30 min</div>
+      </div>
+      <div class="pg-card">
+        <span class="pg-emoji" style="display:flex;align-items:center;margin-bottom:16px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
+        <div class="pg-who">Portfolio Managers</div>
+        <div class="pg-title">The watchdog</div>
+        <div class="pg-desc">Monitors 20–50 token positions. Needs early warning on risk changes. Live safety scores for every holding, updated as market conditions shift.</div>
+        <div class="pg-stat" style="background:rgba(139,92,246,0.08);color:var(--purple)">24/7 monitoring</div>
+      </div>
+      <div class="pg-card">
+        <span class="pg-emoji" style="display:flex;align-items:center;margin-bottom:16px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span>
+        <div class="pg-who">Independent Researchers</div>
+        <div class="pg-title">The analyst</div>
+        <div class="pg-desc">Writes token reports and market analysis. Needs comparable, structured data across tokens. Export-ready PDF reports for publishing.</div>
+        <div class="pg-stat" style="background:rgba(200,168,75,0.08);color:var(--gold)">PDF reports ready</div>
+      </div>
+      <div class="pg-card">
+        <span class="pg-emoji" style="display:flex;align-items:center;margin-bottom:16px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+        <div class="pg-who">Protocol Teams</div>
+        <div class="pg-title">The builder</div>
+        <div class="pg-desc">Wants to understand competitor token health, track ecosystem tokens, and benchmark their own project against comparable protocols.</div>
+        <div class="pg-stat" style="background:rgba(34,197,94,0.08);color:var(--green)">Ecosystem tracking</div>
+      </div>
+      <div class="pg-card">
+        <span class="pg-emoji" style="display:flex;align-items:center;margin-bottom:16px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><line x1="12" y1="7" x2="12" y2="11"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span>
+        <div class="pg-who">Trading Bot Builders</div>
+        <div class="pg-title">The developer</div>
+        <div class="pg-desc">Builds automated trading systems. Needs API access to token safety scores to filter which tokens their bot should or shouldn't trade.</div>
+        <div class="pg-stat" style="background:rgba(139,92,246,0.08);color:var(--purple)">API access available</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE vs AFTER -->
+<section class="section" style="border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="g-up" style="text-align:center">
+      <div class="tag" style="justify-content:center">Before vs After</div>
+      <h2 class="big-h" style="margin-bottom:14px">Research used to<br>take this long.</h2>
+      <p class="big-p" style="margin:0 auto;text-align:center">CryptoLens AI doesn't just speed up research it makes thorough research actually possible at scale.</p>
+    </div>
+    <div class="cmp-table-wrap g-up">
+      <table class="cmp-full-table cft">
+        <thead>
+          <tr>
+            <th>Research Task</th>
+            <th>Without CryptoLens</th>
+            <th>With CryptoLens AI</th>
+            <th>Time Saved</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--w)">Full token analysis</strong><br><span style="font-size:12px;color:var(--m)">All dimensions, one report</span></td>
+            <td>2–4 hours manual</td>
+            <td class="cv" style="color:var(--green)">~30 seconds</td>
+            <td class="cv" style="color:var(--gold)">99% faster</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--w)">Rug pull / honeypot check</strong><br><span style="font-size:12px;color:var(--m)">Contract + liquidity verification</span></td>
+            <td>30–60 min (TokenSniffer, manual)</td>
+            <td class="cv" style="color:var(--green)">~3 seconds</td>
+            <td class="cv" style="color:var(--gold)">98% faster</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--w)">Team background check</strong><br><span style="font-size:12px;color:var(--m)">Doxxed, LinkedIn, prior projects</span></td>
+            <td>45 min–2 hours</td>
+            <td class="cv" style="color:var(--green)">~5 seconds</td>
+            <td class="cv" style="color:var(--gold)">99% faster</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--w)">Whale wallet tracking</strong><br><span style="font-size:12px;color:var(--m)">Top 20 wallets, movements</span></td>
+            <td>1 hour (Nansen, manual scan)</td>
+            <td class="cv" style="color:var(--green)">~4 seconds</td>
+            <td class="cv" style="color:var(--gold)">99% faster</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--w)">Social sentiment analysis</strong><br><span style="font-size:12px;color:var(--m)">Twitter, Telegram, Reddit</span></td>
+            <td>30–45 min across platforms</td>
+            <td class="cv" style="color:var(--green)">~6 seconds</td>
+            <td class="cv" style="color:var(--gold)">98% faster</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--w)">Portfolio review (10 tokens)</strong><br><span style="font-size:12px;color:var(--m)">All holdings analyzed</span></td>
+            <td>Full day of work</td>
+            <td class="cv" style="color:var(--green)">~5 minutes</td>
+            <td class="cv" style="color:var(--gold)">97% faster</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+
+
+<!-- CTA -->
+<section class="section" style="border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="cta-box g-up">
+      <span class="cta-tag">Start now it's free</span>
+      <h2 class="cta-h">Your first scan.<br>30 seconds. Free.</h2>
+      <p class="cta-p">No credit card. No signup. 5 free AI token analyses every day. See what CryptoLens can do for your specific use case right now.</p>
+      <div class="cta-btns">
+        <a href="app.html" class="btn-primary">Start researching →</a>
+        <a href="pricing.html" class="btn-ghost">See pricing</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="index.html" class="flogo">
+
+    <span style="font-size:14px;font-weight:600;color:var(--w);letter-spacing:-.3px">CryptoLens AI</span>
+  </a>
+  <div class="flinks">
+    <a href="index.html">Home</a>
+    <a href="app.html">Research</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="#">Telegram</a>
+    <a href="#">Twitter</a>
+  </div>
+  <span class="fcopy">© 2025 CryptoLens AI · Powered by AI</span>
+</footer>
+
+<div id="toast"></div>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay" onclick="if(event.target===this)closeAuth()">
+  <div class="auth-modal">
+    <button class="auth-close" onclick="closeAuth()">✕</button>
+    <div class="auth-logo-row">
+      <span style="font-size:14px;font-weight:700;color:var(--w)">CryptoLens AI</span>
+    </div>
+    <!-- LOGIN -->
+    <div id="authLogin">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to access the Research Terminal.</div>
+      <button class="auth-google-btn" onclick="googleSignIn()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider"><span>or sign in with email</span></div>
+      <div class="auth-err" id="loginErr"></div>
+      <div class="auth-field"><label class="auth-label">Email</label><input class="auth-input" id="loginEmail" type="email" placeholder="you@email.com" onkeydown="if(event.key==='Enter')emailSignIn()"/></div>
+      <div class="auth-field"><label class="auth-label">Password</label><input class="auth-input" id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')emailSignIn()"/></div>
+      <button class="auth-submit" onclick="emailSignIn()">Sign In</button>
+      <div class="auth-toggle">No account? <a onclick="switchAuth('signup')">Create one →</a></div>
+    </div>
+    <!-- SIGNUP -->
+    <div id="authSignup" style="display:none">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">5 free token analyses every day.</div>
+      <button class="auth-google-btn" onclick="googleSignIn()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider"><span>or create with email</span></div>
+      <div class="auth-err" id="signupErr"></div>
+      <div class="auth-name-row">
+        <div><label class="auth-label">First Name</label><input class="auth-input" id="signupFirst" type="text" placeholder="Harsh"/></div>
+        <div><label class="auth-label">Last Name</label><input class="auth-input" id="signupLast" type="text" placeholder="Shah"/></div>
+      </div>
+      <div class="auth-field"><label class="auth-label">Email</label><input class="auth-input" id="signupEmail" type="email" placeholder="you@email.com"/></div>
+      <div class="auth-field"><label class="auth-label">Password</label><input class="auth-input" id="signupPass" type="password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')emailSignUp()"/></div>
+      <button class="auth-submit" onclick="emailSignUp()">Create Account</button>
+      <div class="auth-toggle">Have account? <a onclick="switchAuth('login')">Sign in →</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),3000)}
+
+/* ── AUTH — persistent login ── */
+var _cu=null;
+try{_cu=JSON.parse(localStorage.getItem('cl_user')||'null')}catch(e){_cu=null}
+function _updNav(){
+  var o=document.getElementById('navOut'),i=document.getElementById('navIn');
+  if(!o||!i)return;
+  if(_cu){
+    o.style.display='none';i.style.display='block';
+    var av=document.getElementById('navAv');if(av){if(_cu.photo)av.innerHTML='<img src="'+_cu.photo+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>';else av.textContent=(_cu.name||'U')[0].toUpperCase();}
+    var nm=document.getElementById('navName');if(nm)nm.textContent=_cu.name?_cu.name.split(' ')[0]:'User';
+    var dn=document.getElementById('navDN');if(dn)dn.textContent=_cu.name||'';
+    var de=document.getElementById('navDE');if(de)de.textContent=_cu.email||'';
+  }else{o.style.display='flex';i.style.display='none'}
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_updNav)}else{_updNav()}
+function toggleDrop(){var d=document.getElementById('navDrop');if(d)d.style.display=d.style.display==='block'?'none':'block'}
+document.addEventListener('click',function(e){var w=document.getElementById('navWrap');if(w&&!w.contains(e.target)){var d=document.getElementById('navDrop');if(d)d.style.display='none'}});
+function doSignOut(){_cu=null;localStorage.removeItem('cl_user');_updNav();toast('Signed out successfully')}
+/* ── FULL AUTH MODAL ── */
+function openAuth(m){
+  var ov=document.getElementById('authOverlay');
+  if(ov){ov.classList.add('show');switchAuth(m||'login');}
+}
+function closeAuth(){
+  var ov=document.getElementById('authOverlay');
+  if(ov)ov.classList.remove('show');
+}
+function switchAuth(m){
+  document.getElementById('authLogin').style.display=m==='login'?'block':'none';
+  document.getElementById('authSignup').style.display=m==='signup'?'block':'none';
+  document.getElementById('loginErr').classList.remove('show');
+  document.getElementById('signupErr').classList.remove('show');
+}
+function showErr(id,msg){var el=document.getElementById(id);if(el){el.textContent=msg;el.classList.add('show');}}
+
+function googleSignIn(){
+  var email=prompt('Enter your Google email:');
+  if(!email||!email.includes('@')){showErr('loginErr','Invalid email');showErr('signupErr','Invalid email');return;}
+  var name=prompt('Your name:');
+  if(!name)return;
+  var user={id:'google_'+btoa(email),name:name.trim(),email:email.trim().toLowerCase(),photo:null,provider:'google',createdAt:Date.now()};
+  _cu=user;localStorage.setItem('cl_user',JSON.stringify(user));
+  _updNav();closeAuth();toast('Welcome, '+name.split(' ')[0]+'! 👋');
+}
+function emailSignIn(){
+  var email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  var pass=document.getElementById('loginPass').value;
+  if(!email||!email.includes('@')){showErr('loginErr','Enter a valid email');return;}
+  if(!pass){showErr('loginErr','Enter your password');return;}
+  var accounts=JSON.parse(localStorage.getItem('cl_accounts')||'{}');
+  if(!accounts[email]){showErr('loginErr','No account found — create one');return;}
+  if(accounts[email].passHash!==btoa(email+pass+'cl_salt_2025')){showErr('loginErr','Wrong password');return;}
+  _cu=accounts[email].user;localStorage.setItem('cl_user',JSON.stringify(_cu));
+  _updNav();closeAuth();toast('Welcome back, '+_cu.name.split(' ')[0]+'! 👋');
+}
+function emailSignUp(){
+  var first=document.getElementById('signupFirst').value.trim();
+  var email=document.getElementById('signupEmail').value.trim().toLowerCase();
+  var pass=document.getElementById('signupPass').value;
+  if(!first){showErr('signupErr','Enter your first name');return;}
+  if(!email||!email.includes('@')){showErr('signupErr','Enter a valid email');return;}
+  if(pass.length<6){showErr('signupErr','Password min 6 characters');return;}
+  var accounts=JSON.parse(localStorage.getItem('cl_accounts')||'{}');
+  if(accounts[email]){showErr('signupErr','Email already registered — sign in');return;}
+  var last=document.getElementById('signupLast').value.trim();
+  var user={id:'email_'+btoa(email),name:(first+' '+last).trim(),email,photo:null,provider:'email',createdAt:Date.now()};
+  accounts[email]={passHash:btoa(email+pass+'cl_salt_2025'),user};
+  localStorage.setItem('cl_accounts',JSON.stringify(accounts));
+  _cu=user;localStorage.setItem('cl_user',JSON.stringify(user));
+  _updNav();closeAuth();toast('Welcome, '+first+'! 🎉');
+}
+
+/* ── AUDIENCE TABS scroll ── */
+const ucIds=['uc0','uc1','uc2','uc3'];
+function scrollTo(i){
+  document.querySelectorAll('.atab').forEach((t,j)=>t.classList.toggle('on',i===j));
+  const el=document.getElementById(ucIds[i]);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ── THREE.JS — same terrain as homepage ── */
+function initThree(){
+  const canvas=document.getElementById('bg-canvas');
+  if(!canvas||typeof THREE==='undefined')return;
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:false,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setClearColor(0x080808,1);
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x080808,0.022);
+  const cam=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,0.1,300);
+  cam.position.set(0,16,30);cam.lookAt(0,0,-10);
+
+  /* Terrain */
+  const W=120,H=120,SEGS=80;
+  const geo=new THREE.PlaneGeometry(W,H,SEGS,SEGS);
+  geo.rotateX(-Math.PI/2);
+  const posArr=geo.attributes.position.array;
+  const baseH=[];
+  for(let i=0;i<posArr.length;i+=3){
+    const x=posArr[i],z=posArr[i+2];
+    const h=Math.sin(x*.18)*1.8+Math.sin(z*.12)*2.2+Math.cos(x*.09+z*.14)*1.4+Math.sin((x+z)*.06)*3.2;
+    baseH.push(h);posArr[i+1]=h;
+  }
+  geo.computeVertexNormals();
+  scene.add(new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x1a1a1a,roughness:.95,metalness:.05})));
+  const wire=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x222222,wireframe:true,transparent:true,opacity:.3}));
+  wire.position.y=0.02;scene.add(wire);
+
+  /* Particles */
+  const PN=1200,pg=new THREE.BufferGeometry();
+  const pp=new Float32Array(PN*3),pc=new Float32Array(PN*3);
+  const cG=new THREE.Color('#c8a84b'),cW=new THREE.Color('#ffffff'),cD=new THREE.Color('#1a1a1a');
+  for(let i=0;i<PN;i++){
+    pp[i*3]=(Math.random()-.5)*100;pp[i*3+1]=Math.random()*30-2;pp[i*3+2]=(Math.random()-.5)*80-20;
+    const t=Math.random(),c=t>.88?cG:t>.75?cW:cD;
+    pc[i*3]=c.r;pc[i*3+1]=c.g;pc[i*3+2]=c.b;
+  }
+  pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+  pg.setAttribute('color',new THREE.BufferAttribute(pc,3));
+  const particles=new THREE.Points(pg,new THREE.PointsMaterial({size:.28,vertexColors:true,transparent:true,opacity:.65,sizeAttenuation:true}));
+  scene.add(particles);
+
+  scene.add(new THREE.AmbientLight(0xffffff,.15));
+  const kl=new THREE.DirectionalLight(0xffffff,.5);kl.position.set(10,20,10);scene.add(kl);
+  const gl=new THREE.PointLight(0xc8a84b,2.5,60);gl.position.set(0,8,-5);scene.add(gl);
+
+  window.addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()});
+
+  let t=0,mx=0,my=0,scrollY=0;
+  window.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2});
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY});
+
+  (function loop(){
+    requestAnimationFrame(loop);t+=.003;
+    const pos=geo.attributes.position;
+    for(let i=0;i<pos.count;i++)pos.setY(i,baseH[i]+Math.sin(t+i*.08)*.25);
+    pos.needsUpdate=true;geo.computeVertexNormals();
+    particles.rotation.y=t*.015;
+    const scroll=scrollY*.008;
+    cam.position.x+=(mx*3-cam.position.x)*.04;
+    cam.position.y+=(16-my*2-scroll-cam.position.y)*.04;
+    cam.lookAt(0,0,-10);
+    gl.intensity=2.5+Math.sin(t*1.8)*.8;gl.position.x=Math.sin(t*.6)*5;
+    renderer.render(scene,cam);
+  })();
+}
+
+/* ── GSAP ── */
+function initGSAP(){
+  if(typeof gsap==='undefined')return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.fromTo('#hi',{opacity:0,y:28},{opacity:1,y:0,duration:.9,ease:'power3.out',delay:.25});
+
+  gsap.utils.toArray('.g-up').forEach(el=>{
+    if(el.id==='hi')return;
+    gsap.fromTo(el,{opacity:0,y:26},{opacity:1,y:0,duration:.75,ease:'power2.out',
+      scrollTrigger:{trigger:el,start:'top 87%',toggleActions:'play none none none'}});
+  });
+
+  /* Stagger persona grid */
+  gsap.fromTo('#pg > .pg-card',{opacity:0,y:20},
+    {opacity:1,y:0,duration:.55,stagger:.08,ease:'power2.out',
+     scrollTrigger:{trigger:'#pg',start:'top 85%',toggleActions:'play none none none'}});
+
+  /* Stagger testimonials */
+  gsap.fromTo('#tg > .testi-card',{opacity:0,y:20},
+    {opacity:1,y:0,duration:.55,stagger:.1,ease:'power2.out',
+     scrollTrigger:{trigger:'#tg',start:'top 85%',toggleActions:'play none none none'}});
+}
+
+window.addEventListener('load',()=>{
+  _updNav();
+  initThree();
+  if(typeof gsap!=='undefined'){gsap.registerPlugin(ScrollTrigger);initGSAP();}
+  else{document.querySelectorAll('.g-up,.g-fade').forEach(el=>{el.style.opacity='1';el.style.transform='none'})}
+});
+</script>
+</body>
+</html>

@@ -23,8 +23,12 @@ async function getNonce(address: string): Promise<string> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ address }),
   });
-  const data = await res.json();
-  if (!data.nonce) throw new Error("Failed to get nonce");
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.nonce) {
+    // Surface the server's reason (e.g. backend-not-configured) instead of a
+    // generic message so the user knows what to fix.
+    throw new Error(data.error || "Failed to get nonce");
+  }
   return data.nonce;
 }
 

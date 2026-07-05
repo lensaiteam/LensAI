@@ -52,6 +52,10 @@ export const env = {
   appUrl: () => optional("NEXT_PUBLIC_APP_URL", "http://localhost:3000"),
   cronSecret: () => required("CRON_SECRET"),
 
+  /** True once the datastore is wired (needed for auth, cache, history). */
+  dbConfigured: () =>
+    Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY),
+
   isConfigured: () => {
     const providerKey =
       optional("LLM_PROVIDER", "gemini").toLowerCase() === "anthropic"

@@ -1,47 +1,47 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Design tokens ported verbatim from the prototype's app.html (:root) so the
- * rebuilt app is visually identical to the approved design. Do not invent new
- * shades — extend this palette instead.
+ * Brand theme — "private intelligence terminal" (see brand/foundation.html).
+ * Colors map to the CSS custom properties in globals.css so tokens stay single-
+ * sourced and theme-aware.
  */
 const config: Config = {
-  content: [
-    "./src/app/**/*.{ts,tsx}",
-    "./src/components/**/*.{ts,tsx}",
-  ],
+  content: ["./src/app/**/*.{ts,tsx}", "./src/components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        bg: "#07070f",
-        bg2: "#0b0b18",
-        bg3: "#0f0f20",
-        panel: "#13131f",
-        card: "#181828",
-        card2: "#1d1d30",
-        gold: "#c8a84b",
-        gold2: "#e8c96a",
-        gold3: "#f5d97a",
-        green: "#22c55e",
-        red: "#ef4444",
-        orange: "#f59e0b",
-        cyan: "#06b6d4",
-        purple: "#a78bfa",
-        // Text ramp
-        w: "#eef0ff",
-        w2: "#9999b5",
-        m: "#555570",
-        dim: "#252538",
-      },
-      borderColor: {
-        DEFAULT: "rgba(255,255,255,0.07)",
-        strong: "rgba(255,255,255,0.13)",
+        void: "var(--void)",
+        ink: {
+          1: "var(--ink-1)",
+          2: "var(--ink-2)",
+          3: "var(--ink-3)",
+        },
+        line: { DEFAULT: "var(--line)", strong: "var(--line-2)" },
+        gold: {
+          DEFAULT: "var(--gold)",
+          d: "var(--gold-d)",
+          l: "var(--gold-l)",
+          h: "var(--gold-h)",
+        },
+        aqua: "var(--aqua)",
+        iris: "var(--iris)",
+        pos: "var(--pos)",
+        neg: "var(--neg)",
+        warn: "var(--warn)",
+        txt: "var(--txt)",
+        sec: "var(--sec)",
+        mut: "var(--mut)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "Inter", "-apple-system", "sans-serif"],
+        serif: ["var(--font-serif)", "Iowan Old Style", "Palatino", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "SF Mono", "Menlo", "monospace"],
       },
-      maxWidth: {
-        content: "1100px",
+      maxWidth: { content: "1180px" },
+      transitionTimingFunction: { brand: "cubic-bezier(0.16,1,0.3,1)" },
+      boxShadow: {
+        gold: "0 12px 32px -12px var(--glow-gold)",
+        "gold-lg": "0 18px 44px -12px var(--glow-gold)",
       },
     },
   },

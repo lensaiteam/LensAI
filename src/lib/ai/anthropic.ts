@@ -19,7 +19,3 @@ export const WEB_SEARCH_TOOL = {
   max_uses: 4,
 };
 export const MAX_WEB_SEARCHES = WEB_SEARCH_TOOL.max_uses;
-
-// Sentinel that separates the streamed prose from the machine-readable trailer.
-// The client stops rendering at this marker; the server parses the JSON after it.
-export const TRAILER_SENTINEL = "<<<LENSAI_DATA>>>";

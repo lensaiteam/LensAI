@@ -1,45 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { env } from "@/lib/env";
-import { submitPrecomputeBatch, collectPrecomputeBatch, TOP_TOKENS } from "@/lib/precompute";
+import { runPrecompute, TOP_TOKENS } from "@/lib/precompute";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 const Body = z.object({
-  mode: z.enum(["submit", "collect"]),
-  batchId: z.string().optional(),
   tokens: z.array(z.string()).optional(),
+  concurrency: z.number().int().min(1).max(8).optional(),
 });
 
 /**
- * Background top-token refresh (spec §4.2–4.4). Protected by CRON_SECRET.
- * Two phases because the Batch API is asynchronous:
- *   POST { mode: "submit" }               -> returns { batchId }
- *   POST { mode: "collect", batchId }     -> writes finished results to cache
- * Schedule "submit" every 30–60 min and "collect" a few minutes later (or poll).
+ * Background top-token refresh (spec §4.2–4.3). Protected by CRON_SECRET.
+ * Runs through the provider gateway with a concurrency cap. Schedule this every
+ * 30–60 min (e.g. Vercel Cron). Keep the token set small enough to finish within
+ * maxDuration on the free tier — chunk across calls if needed.
+ *
+ *   POST { tokens?: string[], concurrency?: number }  ->  { total, written, failed }
  */
 export async function POST(req: NextRequest) {
-  const authHeader = req.headers.get("authorization") ?? "";
-  const token = authHeader.replace(/^Bearer\s+/i, "");
+  const token = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
   if (token !== env.cronSecret()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const parsed = Body.safeParse(await req.json().catch(() => null));
+  const parsed = Body.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 
   try {
-    if (parsed.data.mode === "submit") {
-      const batchId = await submitPrecomputeBatch(parsed.data.tokens ?? TOP_TOKENS);
-      return NextResponse.json({ batchId, submitted: (parsed.data.tokens ?? TOP_TOKENS).length });
-    }
-
-    if (!parsed.data.batchId) {
-      return NextResponse.json({ error: "batchId required for collect" }, { status: 400 });
-    }
-    const result = await collectPrecomputeBatch(parsed.data.batchId);
+    const result = await runPrecompute(parsed.data.tokens ?? TOP_TOKENS, parsed.data.concurrency ?? 3);
     return NextResponse.json(result);
   } catch (err) {
     console.error("[cron/precompute]", err);

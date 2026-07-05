@@ -4,10 +4,14 @@ import { env } from "../../env";
 import type { LLMProvider, LLMRequest, LLMResult } from "./types";
 
 /**
- * Google Gemini adapter (dev-oriented free tier). PHASE 1 STUB — the client is
- * wired and the shape is real, but generation is not implemented yet. Real
- * streaming + Google Search grounding land in the pipeline phases (§15 steps
- * 4/6/7), where analyze/chat/precompute are repointed to the gateway.
+ * Google Gemini adapter (dev-oriented free tier). Maps the provider-neutral
+ * request onto Gemini's generateContentStream:
+ *   - system prompt  -> config.systemInstruction
+ *   - messages       -> contents (assistant -> "model")
+ *   - webSearch      -> Google Search grounding tool
+ * Thinking is disabled (thinkingBudget: 0) so the whole maxTokens budget goes to
+ * the answer — 2.5-flash otherwise spends output tokens on hidden reasoning and
+ * can truncate the structured analysis.
  */
 let client: GoogleGenAI | null = null;
 
@@ -19,12 +23,44 @@ function gemini(): GoogleGenAI {
 export function geminiProvider(): LLMProvider {
   return {
     name: "gemini",
-    async streamMessage(_req: LLMRequest, _onText): Promise<LLMResult> {
-      // Touch the client so mis-set credentials surface here, not at wiring time.
-      void gemini;
-      throw new Error(
-        "Gemini provider not implemented yet (Phase 1 stub). Real generation is wired in the analyze/chat phases.",
-      );
+    async streamMessage(req: LLMRequest, onText): Promise<LLMResult> {
+      const contents = req.messages.map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
+
+      const stream = await gemini().models.generateContentStream({
+        model: req.model,
+        contents,
+        config: {
+          systemInstruction: req.system,
+          maxOutputTokens: req.maxTokens,
+          thinkingConfig: { thinkingBudget: 0 },
+          ...(req.webSearch ? { tools: [{ googleSearch: {} }] } : {}),
+        },
+      });
+
+      let text = "";
+      let inputTokens = 0;
+      let outputTokens = 0;
+      const searchQueries = new Set<string>();
+
+      for await (const chunk of stream) {
+        const t = chunk.text;
+        if (t) {
+          text += t;
+          onText(t);
+        }
+        const um = chunk.usageMetadata;
+        if (um) {
+          inputTokens = um.promptTokenCount ?? inputTokens;
+          outputTokens = um.candidatesTokenCount ?? outputTokens;
+        }
+        const queries = chunk.candidates?.[0]?.groundingMetadata?.webSearchQueries;
+        if (queries) for (const q of queries) searchQueries.add(q);
+      }
+
+      return { text, inputTokens, outputTokens, webSearches: searchQueries.size };
     },
   };
 }

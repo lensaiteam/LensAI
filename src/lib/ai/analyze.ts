@@ -1,5 +1,6 @@
 import "server-only";
-import { anthropic, WEB_SEARCH_TOOL, TRAILER_SENTINEL } from "./anthropic";
+import { anthropic, WEB_SEARCH_TOOL } from "./anthropic";
+import { splitTrailer, inferSignal } from "./trailer";
 import {
   ANALYSIS_SYSTEM_PROMPT,
   buildMarketBlock,
@@ -10,7 +11,6 @@ import { SHORT_DISCLAIMER } from "./disclaimer";
 import { env } from "../env";
 import type {
   Analysis,
-  AnalysisTrailer,
   MarketData,
   NewsDigest,
   NewsItem,
@@ -126,31 +126,4 @@ export async function streamAnalysis(
     outputTokens: usage.output_tokens ?? 0,
     webSearches,
   };
-}
-
-/** Split the streamed output into display prose and the parsed JSON trailer. */
-export function splitTrailer(fullText: string): { prose: string; trailer: AnalysisTrailer | null } {
-  const idx = fullText.indexOf(TRAILER_SENTINEL);
-  if (idx === -1) return { prose: fullText.trim(), trailer: null };
-
-  const prose = fullText.slice(0, idx).trim();
-  const after = fullText.slice(idx + TRAILER_SENTINEL.length);
-
-  // Extract the JSON from a fenced ```json block, or the first {...} object.
-  const fenced = after.match(/```json\s*([\s\S]*?)```/);
-  const raw = fenced ? fenced[1] : (after.match(/\{[\s\S]*\}/)?.[0] ?? "");
-  if (!raw.trim()) return { prose, trailer: null };
-
-  try {
-    return { prose, trailer: JSON.parse(raw) as AnalysisTrailer };
-  } catch {
-    return { prose, trailer: null };
-  }
-}
-
-/** Fallback signal detection if the trailer is missing/unparseable. */
-function inferSignal(prose: string): Signal {
-  const m = prose.match(/Signal:\s*\**\s*(POSITIVE|MIXED|NEGATIVE)/i);
-  if (m) return m[1].toUpperCase() as Signal;
-  return "MIXED";
 }

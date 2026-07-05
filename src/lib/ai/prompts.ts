@@ -1,5 +1,5 @@
 import "server-only";
-import { TRAILER_SENTINEL } from "./anthropic";
+import { TRAILER_SENTINEL } from "./trailer";
 import { SHORT_DISCLAIMER } from "./disclaimer";
 import type { MarketData, NewsDigest } from "../types";
 

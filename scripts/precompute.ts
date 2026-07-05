@@ -1,29 +1,25 @@
 /**
- * Standalone driver for the background top-token refresh (CLAUDE.md §4.2–4.4).
+ * Standalone driver for the background top-token refresh (CLAUDE.md §4.2–4.3).
  * Calls the protected /api/cron/precompute endpoint rather than importing the
  * server-only libs directly. Run with a dev/prod server up:
  *
- *   CRON_SECRET=... APP_URL=http://localhost:3000 npm run precompute -- submit
- *   CRON_SECRET=... APP_URL=http://localhost:3000 npm run precompute -- collect <batchId>
+ *   CRON_SECRET=... APP_URL=http://localhost:3000 npm run precompute
+ *   CRON_SECRET=... APP_URL=http://localhost:3000 npm run precompute -- BTC ETH SOL
  *
- * In production, schedule "submit" every 30–60 min and "collect" a few minutes
- * later (e.g. via Vercel Cron or an external scheduler hitting the same route).
+ * In production, schedule this every 30–60 min (e.g. Vercel Cron hitting the
+ * same route). Optionally pass a token subset as CLI args.
  */
 const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 const SECRET = process.env.CRON_SECRET;
 
 async function main() {
   if (!SECRET) throw new Error("CRON_SECRET env var is required");
-  const [mode, batchId] = process.argv.slice(2);
-  if (mode !== "submit" && mode !== "collect") {
-    console.error("Usage: npm run precompute -- <submit|collect> [batchId]");
-    process.exit(1);
-  }
+  const tokens = process.argv.slice(2).map((t) => t.toUpperCase());
 
   const res = await fetch(`${APP_URL}/api/cron/precompute`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${SECRET}` },
-    body: JSON.stringify(mode === "submit" ? { mode } : { mode, batchId }),
+    body: JSON.stringify(tokens.length ? { tokens } : {}),
   });
   console.log(res.status, await res.text());
 }

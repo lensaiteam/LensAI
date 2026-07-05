@@ -1,11 +1,38 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent, useReducedMotion } from "framer-motion";
 import { Reveal, SmoothScroll } from "@/components/motion";
 import "./landing.css";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+// The instrument scans across these live (hero read cycles through them).
+const TOKENS = [
+  { sym: "BTC", name: "Bitcoin", price: "$62,578.74", c24: "−0.46%", up24: false, c7: "+5.22%", up7: true, mcap: "$1.25T", rank: "#01", v: "pos", vt: "POSITIVE", conf: "78%", spark: [40, 41, 39, 43, 42, 46, 44, 43, 48, 47, 51, 49, 54, 52, 57, 56, 60, 63] },
+  { sym: "ETH", name: "Ethereum", price: "$1,770.52", c24: "−0.84%", up24: false, c7: "+12.81%", up7: true, mcap: "$214B", rank: "#02", v: "pos", vt: "POSITIVE", conf: "71%", spark: [30, 32, 31, 35, 34, 38, 40, 39, 44, 47, 49, 52, 55, 58, 60, 62, 64, 66] },
+  { sym: "SOL", name: "Solana", price: "$80.98", c24: "−1.41%", up24: false, c7: "+13.61%", up7: true, mcap: "$47B", rank: "#07", v: "mix", vt: "MIXED", conf: "58%", spark: [50, 48, 52, 49, 54, 51, 56, 53, 58, 55, 60, 57, 62, 59, 63, 60, 64, 61] },
+  { sym: "PEPE", name: "Pepe", price: "$0.00000269", c24: "−3.24%", up24: false, c7: "+14.47%", up7: true, mcap: "$1.13B", rank: "#64", v: "neg", vt: "NEGATIVE", conf: "41%", spark: [62, 60, 57, 59, 54, 56, 52, 50, 53, 49, 51, 47, 49, 45, 47, 44, 46, 42] },
+];
+
+const TAPE = [
+  ["BTC", "$62,578", "+5.2%", 1], ["ETH", "$1,770", "+12.8%", 1], ["SOL", "$80.98", "+13.6%", 1],
+  ["ARB", "$0.078", "−2.5%", 0], ["LINK", "$11.42", "+4.1%", 1], ["JUP", "$0.24", "+14.1%", 1],
+  ["DOGE", "$0.061", "−1.8%", 0], ["AVAX", "$18.7", "+6.9%", 1], ["PEPE", "$0.0000027", "−3.2%", 0],
+  ["UNI", "$7.31", "+2.4%", 1], ["TIA", "$5.02", "+9.7%", 1], ["SEI", "$0.31", "−1.1%", 0],
+] as const;
+
+function sparkPath(spark: number[]) {
+  const W = 300, H = 44, max = Math.max(...spark), min = Math.min(...spark);
+  return spark.map((val, i) => {
+    const x = (i / (spark.length - 1)) * W;
+    const y = H - 4 - ((val - min) / (max - min || 1)) * (H - 8);
+    return `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`;
+  }).join(" ");
+}
+function sigColor(v: string) {
+  return v === "neg" ? "var(--neg)" : v === "mix" ? "var(--warn)" : "var(--pos)";
+}
 
 const READ = [
   ["0.1", "Snapshot", "Price, market cap, 24h/7d, volume and supply — the state of the asset."],
@@ -29,6 +56,65 @@ const ACCESS = [
   ["A.2", "The address is the account", "No email, no password, no PII. Just your wallet — and two free reads to begin."],
   ["A.3", "Erased on request", "One action removes your account and every session. Crypto-native by default."],
 ];
+
+/** The hero read — the instrument scans across tokens live (its heartbeat). */
+function LiveRead() {
+  const reduce = useReducedMotion();
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (reduce) return;
+    const id = setInterval(() => setI((x) => (x + 1) % TOKENS.length), 4200);
+    return () => clearInterval(id);
+  }, [reduce]);
+  const t = TOKENS[i];
+
+  return (
+    <motion.div className="read" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.85, delay: 0.6, ease: EASE }}>
+      <div className="rt">
+        <span className="lbl">Reading · Lens/0{i + 1}</span>
+        <span className="live">◉ LIVE</span>
+      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={t.sym}
+          initial={{ opacity: 0, filter: "blur(8px)", y: 8 }}
+          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          exit={{ opacity: 0, filter: "blur(8px)", y: -6 }}
+          transition={{ duration: 0.45, ease: EASE }}
+        >
+          <div className="px">{t.price}</div>
+          <div className="nm">{t.name} · {t.sym}</div>
+          <svg className="rsig" viewBox="0 0 300 44" preserveAspectRatio="none">
+            <path className="line" d={sparkPath(t.spark)} fill="none" stroke={sigColor(t.v)} strokeWidth="1.4" pathLength={1} vectorEffect="non-scaling-stroke" />
+          </svg>
+          <div className="kv"><span>24H</span><span className={t.up24 ? "up" : "dn"}>{t.c24}</span></div>
+          <div className="kv"><span>7D</span><span className={t.up7 ? "up" : "dn"}>{t.c7}</span></div>
+          <div className="kv"><span>MARKET CAP</span><span>{t.mcap}</span></div>
+          <div className="kv"><span>RANK</span><span>{t.rank}</span></div>
+          <div className="verdict">
+            <span className={`stamp ${t.v}`}>ASSESSMENT · {t.vt}</span>
+            <span className="mono" style={{ fontSize: 11, color: "var(--mut)" }}>conf {t.conf}</span>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+      <div className="dots">
+        {TOKENS.map((tk, k) => <span key={tk.sym} className={k === i ? "on" : ""} />)}
+      </div>
+    </motion.div>
+  );
+}
+
+/** Live market tape — ambient motion, real content. */
+function Tape() {
+  const seg = [...TAPE, ...TAPE].map((t, k) => (
+    <span className="seg" key={k}><b>{t[0]}</b> {t[1]} <span className={t[3] ? "up" : "dn"}>{t[2]}</span></span>
+  ));
+  return (
+    <div className="tape" aria-hidden>
+      <div className="trow">{seg}</div>
+    </div>
+  );
+}
 
 export default function Landing() {
   return (
@@ -83,26 +169,11 @@ function Inner() {
             </div>
           </motion.div>
 
-          <motion.div className="read" {...load(0.65)}>
-            <div className="rt">
-              <span className="lbl">Reading · Lens/01</span>
-              <span className="live">◉ LIVE</span>
-            </div>
-            <div className="px">$62,578.74</div>
-            <div className="nm">Bitcoin · BTC</div>
-            <div style={{ marginTop: 16 }}>
-              <div className="kv"><span>24H</span><span className="dn">−0.46%</span></div>
-              <div className="kv"><span>7D</span><span className="up">+5.22%</span></div>
-              <div className="kv"><span>MARKET CAP</span><span>$1.25T</span></div>
-              <div className="kv"><span>RANK</span><span>#01</span></div>
-            </div>
-            <div className="verdict">
-              <span className="stamp">ASSESSMENT · POSITIVE</span>
-              <span className="mono" style={{ fontSize: 11, color: "var(--mut)" }}>conf 78%</span>
-            </div>
-          </motion.div>
+          <LiveRead />
         </div>
       </header>
+
+      <Tape />
 
       {/* §01 THE READ */}
       <section className="lp-wrap sec" id="read">

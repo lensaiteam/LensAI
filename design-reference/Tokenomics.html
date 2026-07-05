@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Tokenomics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="icon" type="image/png" href="Ai logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --bg:#080808;--bg2:#0e0e0e;--bg3:#141414;
+  --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --w:#f0f0f0;--w2:#aaaaaa;--m:#666;--dim:#333;
+  --gold:#c8a84b;--gold2:#e8c96a;--gold-d:rgba(200,168,75,0.08);
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;
+  --bnb:#F0B90B;
+  --font:'Inter',-apple-system,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --nav:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--w);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav);display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(8,8,8,0.6);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-box{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#a07830);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000}
+.nav-logo-text{font-size:15px;font-weight:600;color:var(--w);letter-spacing:-.3px}
+.nav-links{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.nav-links a{font-size:13px;color:var(--m);text-decoration:none;padding:6px 14px;border-radius:6px;transition:all .18s}
+.nav-links a:hover,.nav-links a.on{color:var(--w);background:rgba(255,255,255,0.06)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-ghost{font-size:13px;color:var(--m);background:none;border:1px solid var(--border);padding:7px 18px;border-radius:100px;cursor:pointer;text-decoration:none;transition:all .18s;font-family:var(--font)}
+.nav-ghost:hover{color:var(--w);border-color:var(--border2)}
+.nav-solid{font-size:13px;font-weight:500;color:#000;background:var(--w);padding:7px 18px;border-radius:100px;text-decoration:none;transition:opacity .18s}
+.nav-solid:hover{opacity:.85}
+#navOut{display:flex;align-items:center;gap:10px}
+#navIn{display:none}
+.nav-user{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:4px 12px 4px 4px;cursor:pointer}
+.nav-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#7a5a18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;flex-shrink:0}
+.nav-uname{font-size:12px;font-weight:500;color:var(--w)}
+.nav-drop-wrap{position:relative}
+.nav-drop{display:none;position:absolute;top:calc(100% + 8px);right:0;background:#0d0d0d;border:1px solid var(--border2);border-radius:12px;padding:6px;min-width:180px;box-shadow:0 16px 40px rgba(0,0,0,0.6);z-index:200}
+.nav-drop-hd{padding:9px 12px 8px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.nav-drop-name{font-size:13px;font-weight:600;color:var(--w)}
+.nav-drop-email{font-size:11px;color:var(--m);margin-top:1px}
+.nav-drop-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;font-size:13px;color:var(--m);cursor:pointer;transition:all .15s;margin-top:2px}
+.nav-drop-item:hover{background:rgba(255,255,255,0.04);color:var(--w)}
+.nav-drop-item.danger:hover{background:rgba(239,68,68,0.08);color:var(--red)}
+
+/* WRAP */
+.wrap{max-width:1100px;margin:0 auto;padding:0 40px;position:relative;z-index:1}
+.section{padding:100px 0;position:relative;z-index:1}
+.divider{height:1px;background:var(--border);position:relative;z-index:1}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.tag::before{content:'';width:16px;height:1px;background:var(--gold);opacity:.5}
+.g-up{opacity:0;transform:translateY(24px)}
+
+/* HERO */
+.hero{position:relative;z-index:1;padding:calc(var(--nav) + 80px) 40px 0;text-align:center}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:12px;color:var(--m);margin-bottom:28px}
+.kicker-dot{width:6px;height:6px;border-radius:50%;background:var(--bnb);animation:kblink 2s ease-in-out infinite}
+@keyframes kblink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-h1{font-size:clamp(48px,7vw,88px);font-weight:800;letter-spacing:-4px;line-height:.92;color:var(--w);margin-bottom:20px}
+.hero-h1 .gold{color:var(--gold)}
+.hero-h1 .outline{color:transparent;-webkit-text-stroke:1px rgba(200,168,75,0.4)}
+.hero-sub{font-size:16px;font-weight:300;color:var(--m);line-height:1.75;max-width:500px;margin:0 auto 52px}
+
+/* SUPPLY TICKER — BIG NUMBER */
+.supply-ticker{display:inline-flex;align-items:center;gap:16px;background:rgba(200,168,75,0.06);border:1px solid rgba(200,168,75,0.2);border-radius:16px;padding:20px 36px;margin-bottom:60px}
+.st-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);opacity:.7}
+.st-number{font-size:48px;font-weight:800;letter-spacing:-2px;color:var(--gold);font-family:var(--mono)}
+.st-unit{font-size:18px;font-weight:600;color:var(--gold);opacity:.6;margin-top:4px}
+.st-divider{width:1px;height:50px;background:rgba(200,168,75,0.2)}
+.st-chain{display:flex;align-items:center;gap:8px}
+.st-chain-icon{width:32px;height:32px;border-radius:50%;background:var(--bnb);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#000}
+.st-chain-name{font-size:14px;font-weight:600;color:var(--w2)}
+.st-chain-sub{font-size:11px;color:var(--m)}
+
+/* STATS BAND */
+.stats-band{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:0}
+.stat-item{background:var(--bg2);padding:28px 24px;text-align:center;transition:background .2s}
+.stat-item:hover{background:var(--bg3)}
+.stat-num{font-size:30px;font-weight:800;letter-spacing:-1.5px;margin-bottom:4px;font-family:var(--mono)}
+.stat-lbl{font-size:12px;color:var(--m);line-height:1.4}
+
+/* DONUT CHART */
+.tokenomics-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-top:48px}
+.donut-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.donut-svg{width:320px;height:320px;transform:rotate(-90deg)}
+.donut-center{position:absolute;text-align:center}
+.donut-center-num{font-size:38px;font-weight:800;letter-spacing:-2px;color:var(--gold);font-family:var(--mono);line-height:1}
+.donut-center-lbl{font-size:11px;color:var(--m);margin-top:4px;letter-spacing:.06em;text-transform:uppercase}
+
+/* ALLOCATION LIST */
+.alloc-list{display:flex;flex-direction:column;gap:12px}
+.alloc-item{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:12px;transition:all .2s;cursor:default}
+.alloc-item:hover{border-color:var(--border2);background:var(--card2)}
+.alloc-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.alloc-name{font-size:13px;font-weight:600;color:var(--w);flex:1}
+.alloc-pct{font-size:18px;font-weight:800;letter-spacing:-1px;font-family:var(--mono)}
+.alloc-supply{font-size:11px;color:var(--m);margin-top:1px;font-family:var(--mono)}
+.alloc-bar-track{flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;max-width:80px}
+.alloc-bar{height:100%;border-radius:2px;width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+
+/* VESTING TABLE */
+.vesting-table{width:100%;border-collapse:collapse;margin-top:32px}
+.vt-head{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1fr;background:rgba(0,0,0,0.3);border-bottom:1px solid var(--border)}
+.vt-h{padding:11px 16px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--m)}
+.vt-row{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--border);transition:background .15s}
+.vt-row:last-child{border-bottom:none}
+.vt-row:hover{background:rgba(255,255,255,0.02)}
+.vt-cell{padding:13px 16px;font-size:13px;color:var(--w2);display:flex;align-items:center}
+.vt-cell:first-child{font-weight:500;color:var(--w)}
+.vt-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:100px;font-family:var(--mono)}
+
+/* EMISSION CHART — SVG BAR CHART */
+.emission-wrap{margin-top:40px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;overflow:hidden}
+.emission-title{font-size:14px;font-weight:600;color:var(--w);margin-bottom:6px;letter-spacing:-.2px}
+.emission-sub{font-size:12px;color:var(--m);margin-bottom:24px}
+.bar-chart-wrap{position:relative}
+.bar-chart{width:100%;height:180px}
+.bar-labels{display:flex;justify-content:space-between;margin-top:8px;padding:0 4px}
+.bar-label{font-size:10px;color:var(--m);font-family:var(--mono);text-align:center;flex:1}
+.chart-legend{display:flex;align-items:center;gap:20px;margin-top:16px;flex-wrap:wrap}
+.cl-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--m)}
+.cl-dot{width:10px;height:10px;border-radius:2px}
+
+/* ROADMAP */
+.roadmap-wrap{position:relative;margin-top:48px}
+.rm-line{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border);transform:translateX(-50%)}
+.rm-phases{display:flex;flex-direction:column;gap:0}
+.rm-phase{display:grid;grid-template-columns:1fr 60px 1fr;align-items:start;gap:0;margin-bottom:0}
+.rm-left{padding:0 32px 48px 0;text-align:right}
+.rm-right{padding:0 0 48px 32px}
+.rm-center{display:flex;flex-direction:column;align-items:center;gap:0;padding-top:4px;position:relative;z-index:1}
+.rm-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border2);background:var(--bg);flex-shrink:0;transition:all .3s}
+.rm-dot.done{background:var(--gold);border-color:var(--gold);box-shadow:0 0 16px rgba(200,168,75,0.4)}
+.rm-dot.active{background:var(--bg);border-color:var(--gold);box-shadow:0 0 12px rgba(200,168,75,0.3)}
+.rm-dot.upcoming{background:var(--bg);border-color:var(--dim)}
+.rm-connector{flex:1;width:1px;background:var(--border);min-height:48px}
+.rm-connector.done{background:var(--gold);opacity:.4}
+.rm-quarter{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:var(--mono);margin-bottom:6px}
+.rm-phase-name{font-size:16px;font-weight:700;letter-spacing:-.3px;color:var(--w);margin-bottom:10px}
+.rm-items{display:flex;flex-direction:column;gap:5px}
+.rm-item{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--m);line-height:1.5}
+.rm-item-dot{width:5px;height:5px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.rm-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:100px;margin-bottom:10px;font-family:var(--mono)}
+.status-done{color:var(--green);background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2)}
+.status-live{color:var(--gold);background:var(--gold-d);border:1px solid rgba(200,168,75,0.2)}
+.status-upcoming{color:var(--m);background:rgba(255,255,255,0.04);border:1px solid var(--border)}
+
+/* TOKEN INFO CARDS */
+.info-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;transition:all .2s}
+.info-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.ic-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.ic-label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--m);margin-bottom:6px}
+.ic-value{font-size:20px;font-weight:700;letter-spacing:-.5px;color:var(--w);margin-bottom:4px;font-family:var(--mono)}
+.ic-sub{font-size:11px;color:var(--m);line-height:1.5}
+
+/* CTA */
+.cta-box{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:20px;padding:72px 52px;text-align:center;position:relative;overflow:hidden;margin-top:64px}
+.cta-box::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:500px;height:350px;background:radial-gradient(ellipse,rgba(200,168,75,0.07) 0%,transparent 65%);pointer-events:none}
+.cta-h{font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-2px;color:var(--w);margin-bottom:14px}
+.cta-p{font-size:15px;color:var(--m);max-width:420px;margin:0 auto 32px;line-height:1.7}
+.cta-btns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.btn-gold{font-family:var(--font);font-size:14px;font-weight:600;color:#000;background:var(--gold);padding:13px 28px;border-radius:100px;text-decoration:none;border:none;cursor:pointer;transition:background .18s}
+.btn-gold:hover{background:var(--gold2)}
+.btn-ghost{font-family:var(--font);font-size:14px;color:var(--m);background:transparent;padding:13px 28px;border-radius:100px;text-decoration:none;border:1px solid var(--border);transition:all .18s}
+.btn-ghost:hover{color:var(--w);border-color:var(--border2)}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:36px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.flogo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.flinks{display:flex;gap:24px}
+.flinks a{font-size:13px;color:var(--m);text-decoration:none;transition:color .18s}
+.flinks a:hover{color:var(--w)}
+.fcopy{font-size:12px;color:var(--dim)}
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(20,20,20,0.96);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--w);max-width:280px;transform:translateY(14px);opacity:0;transition:all .28s ease;pointer-events:none;backdrop-filter:blur(20px)}
+#toast.on{transform:translateY(0);opacity:1}
+
+@media(max-width:900px){
+  .nav-links{display:none}.wrap{padding:0 20px}
+  .stats-band{grid-template-columns:1fr 1fr}
+  .tokenomics-grid{grid-template-columns:1fr}
+  .info-cards{grid-template-columns:1fr}
+  .rm-line{display:none}
+  .rm-phase{grid-template-columns:1fr;gap:8px}
+  .rm-center{display:none}
+  .rm-left{text-align:left;padding:0 0 0 16px;border-left:2px solid var(--border)}
+  .rm-right{padding:0 0 0 16px;border-left:2px solid var(--border)}
+  .cta-box{padding:40px 24px}
+  footer{padding:24px}
+}
+@media(max-width:768px){
+  :root{--nav:56px}
+
+  /* Nav */
+  .nav{padding:0 16px}
+  .nav-links{display:none}
+  .nav-logo-text{font-size:14px}
+  .nav-ghost{padding:6px 13px;font-size:12px}
+  .nav-solid{padding:6px 13px;font-size:12px}
+  .nav-uname{display:none}
+
+  /* Wrap */
+  .wrap{padding:0 16px}
+
+  /* Hero */
+  .hero{padding:calc(var(--nav) + 48px) 16px 0}
+  .hero-h1{font-size:clamp(36px,10vw,56px);letter-spacing:-2.5px}
+  .hero-sub{font-size:14px;margin-bottom:32px}
+  .hero-kicker{font-size:11px;padding:5px 13px;margin-bottom:20px}
+
+  /* Supply ticker */
+  .supply-ticker{padding:14px 20px;gap:12px;flex-direction:column;align-items:flex-start}
+  .st-number{font-size:32px;letter-spacing:-1.5px}
+  .st-unit{font-size:14px}
+  .st-divider{display:none}
+
+  /* Stats band */
+  .stats-band{grid-template-columns:1fr 1fr;margin-bottom:0}
+  .stat-item{padding:18px 14px}
+  .stat-num{font-size:22px;letter-spacing:-1px}
+  .stat-lbl{font-size:11px}
+
+  /* Section */
+  .section{padding:60px 0}
+
+  /* Tokenomics grid */
+  .tokenomics-grid{grid-template-columns:1fr;gap:24px;margin-top:32px}
+  .donut-svg{width:240px;height:240px}
+
+  /* Vesting table — scrollable */
+  #vest-body{overflow-x:auto}
+  .vt-head,.vt-row{grid-template-columns:1.4fr .7fr .7fr .8fr 1fr;min-width:560px}
+  .vt-h{padding:9px 10px;font-size:9px}
+  .vt-cell{padding:10px 10px;font-size:11px}
+
+  /* Emission chart */
+  .emission-wrap{padding:18px}
+  .emission-title{font-size:13px}
+  .emission-sub{font-size:11px}
+  .bar-label{font-size:9px}
+
+  /* Info cards */
+  .info-cards{grid-template-columns:1fr 1fr;gap:10px;margin-top:28px}
+  .info-card{padding:16px}
+  .ic-value{font-size:16px}
+  .ic-sub{font-size:10px}
+
+  /* Roadmap */
+  .rm-line{display:none}
+  .rm-phase{grid-template-columns:1fr;gap:6px}
+  .rm-center{display:none}
+  .rm-left,.rm-right{text-align:left;padding:0 0 28px 16px;border-left:2px solid var(--border)}
+  .rm-left{border-color:rgba(200,168,75,0.3)}
+  .rm-phase-name{font-size:15px}
+  .rm-quarter{font-size:10px}
+  .rm-item{font-size:11px}
+
+  /* Flywheel */
+  #fly-body > div:last-child{grid-template-columns:1fr 1fr !important;gap:8px}
+  #fly-body > div:last-child > div{padding:14px}
+  #fly-body > div:last-child > div > div:nth-child(2){font-size:12px}
+  #fly-body > div:last-child > div > div:nth-child(3){font-size:11px}
+
+  /* Burn + supply grid */
+  .section > .wrap > div[style*="grid-template-columns:1fr 1fr"]{
+    display:flex !important;flex-direction:column !important;gap:32px !important
+  }
+
+  /* Holder tiers */
+  #holder-body > div{
+    display:flex !important;flex-direction:column !important;gap:24px !important
+  }
+  #holder-body > div > div:first-child{justify-content:center}
+  #holder-body > div > div:first-child svg{max-width:260px}
+
+  /* CTA */
+  .cta-box{padding:36px 20px;border-radius:16px}
+  .cta-h{font-size:clamp(24px,7vw,32px);letter-spacing:-1.5px}
+  .cta-p{font-size:13px}
+  .cta-btns{flex-direction:column;align-items:center;gap:10px}
+  .btn-gold,.btn-ghost{width:100%;max-width:280px;text-align:center;padding:13px 20px}
+
+  /* Footer */
+  footer{padding:24px 16px;flex-direction:column;align-items:flex-start;gap:16px}
+  .flinks{flex-wrap:wrap;gap:14px}
+  .flinks a{font-size:12px}
+  .fcopy{font-size:11px}
+}
+@media(max-width:480px){
+  .info-cards{grid-template-columns:1fr}
+  .stats-band{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:20px}
+  .hero-h1{font-size:32px;letter-spacing:-2px}
+  .supply-ticker{padding:12px 16px}
+  .st-number{font-size:28px}
+}
+
+/* LIVE ANIMATIONS */
+@keyframes dashFlow{to{stroke-dashoffset:-20px}}
+@keyframes counterPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+@keyframes burnPulse{0%,100%{filter:drop-shadow(0 0 3px rgba(239,68,68,0.2))}50%{filter:drop-shadow(0 0 10px rgba(239,68,68,0.6))}}
+@keyframes goldPulse{0%,100%{filter:drop-shadow(0 0 3px rgba(200,168,75,0.2))}50%{filter:drop-shadow(0 0 12px rgba(200,168,75,0.5))}}
+@keyframes dotBlink{0%,100%{opacity:1}50%{opacity:.4}}
+.fly-arrow{animation:dashFlow 2s linear infinite}
+.fly-arrow-1{animation-delay:0s}
+.fly-arrow-2{animation-delay:.4s}
+.fly-arrow-3{animation-delay:.8s}
+.fly-arrow-4{animation-delay:1.2s}
+.fly-arrow-5{animation-delay:1.6s}
+.burn-line{animation:burnPulse 2.5s ease-in-out infinite}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="nav-logo-text">CryptoLens AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="app.html">Research</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="tokenomics.html" class="on">Tokenomics</a>
+  </div>
+  <div class="nav-right">
+    <div id="navOut">
+      <a href="app.html" class="nav-ghost">Sign in</a>
+      <a href="app.html" class="nav-solid">Start free &rarr;</a>
+    </div>
+    <div id="navIn">
+      <div class="nav-drop-wrap" id="navWrap">
+        <div class="nav-user" onclick="toggleDrop()">
+          <div class="nav-av" id="navAv">U</div>
+          <span class="nav-uname" id="navName">User</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="nav-drop" id="navDrop">
+          <div class="nav-drop-hd"><div class="nav-drop-name" id="navDN"></div><div class="nav-drop-email" id="navDE"></div></div>
+          <div class="nav-drop-item" onclick="location.href='app.html'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Research Terminal</div>
+          <div class="nav-drop-item danger" onclick="doSignOut()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div style="position:relative;z-index:2">
+    <div class="hero-kicker"><span class="kicker-dot"></span>CryptoLens AI &bull; BNB Smart Chain</div>
+    <h1 class="hero-h1 g-up" id="hh">Built to<br><span class="gold">last</span> <span class="outline">forever.</span></h1>
+    <p class="hero-sub g-up" id="hs">A transparent, community-first token economy powering the future of AI-driven crypto research.</p>
+
+    <!-- SUPPLY TICKER -->
+    <div class="supply-ticker g-up" id="ht">
+      <div>
+        <div class="st-label">Total Supply</div>
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <div class="st-number" id="supplyNum" style="animation:counterPulse 3s ease-in-out infinite">200,000,000,000</div>
+          <div class="st-unit">$CL</div>
+        </div>
+      </div>
+      <div class="st-divider"></div>
+      <div class="st-chain">
+        <div class="st-chain-icon">B</div>
+        <div>
+          <div class="st-chain-name">BNB Smart Chain</div>
+          <div class="st-chain-sub">BEP-20 Token</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAND -->
+<div class="wrap" style="margin-top:64px">
+  <div class="stats-band g-up" id="sb">
+    <div class="stat-item">
+      <div class="stat-num" style="color:var(--gold)">200B</div>
+      <div class="stat-lbl">Total Supply<br>Fixed forever</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:var(--green)">0%</div>
+      <div class="stat-lbl">Team allocation<br>at launch</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:var(--blue)">4 yr</div>
+      <div class="stat-lbl">Full vesting<br>schedule</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:var(--bnb)">BNB</div>
+      <div class="stat-lbl">Smart Chain<br>BEP-20 standard</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<!-- DISTRIBUTION -->
+<section class="section">
+  <div class="wrap">
+    <div class="g-up" id="dist-hd">
+      <div class="tag" style="margin-bottom:16px">Token Distribution</div>
+      <h2 style="font-size:clamp(30px,4vw,48px);font-weight:800;letter-spacing:-2px;color:var(--w);margin-bottom:12px">200,000,000,000 <span style="color:var(--gold)">$CL</span></h2>
+      <p style="font-size:15px;color:var(--m);max-width:500px;line-height:1.7">Carefully allocated to ensure long-term project sustainability, community rewards, and ecosystem growth with zero team tokens at launch.</p>
+    </div>
+
+    <div class="tokenomics-grid g-up" id="dist-body">
+      <!-- DONUT -->
+      <div class="donut-wrap">
+        <svg class="donut-svg" viewBox="0 0 200 200" id="donutSvg">
+          <!-- segments drawn by JS -->
+        </svg>
+        <div class="donut-center">
+          <div class="donut-center-num">200B</div>
+          <div class="donut-center-lbl">$CL Supply</div>
+        </div>
+      </div>
+
+      <!-- ALLOCATION LIST -->
+      <div class="alloc-list" id="allocList">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- VESTING TABLE -->
+    <div class="g-up" id="vest-hd" style="margin-top:56px">
+      <div class="tag" style="margin-bottom:16px">Vesting Schedule</div>
+      <h3 style="font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--w);margin-bottom:24px">Token release timeline</h3>
+    </div>
+    <div class="g-up" id="vest-body" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+      <div class="vt-head">
+        <div class="vt-h">Allocation</div>
+        <div class="vt-h">% Supply</div>
+        <div class="vt-h">Tokens</div>
+        <div class="vt-h">Cliff</div>
+        <div class="vt-h">Vesting</div>
+      </div>
+      <div id="vestingRows"></div>
+    </div>
+
+    <!-- EMISSION BAR CHART -->
+    <div class="emission-wrap g-up" id="emis" style="margin-top:40px">
+      <div class="emission-title">Token Emission Schedule</div>
+      <div class="emission-sub">Cumulative % of supply unlocked over 48 months</div>
+      <div class="bar-chart-wrap">
+        <svg class="bar-chart" id="barChart" viewBox="0 0 900 180" preserveAspectRatio="none"></svg>
+        <div class="bar-labels" id="barLabels"></div>
+      </div>
+      <div class="chart-legend">
+        <div class="cl-item"><div class="cl-dot" style="background:var(--gold)"></div>Community & Rewards</div>
+        <div class="cl-item"><div class="cl-dot" style="background:var(--blue)"></div>Ecosystem & Dev</div>
+        <div class="cl-item"><div class="cl-dot" style="background:var(--green)"></div>Public Sale</div>
+        <div class="cl-item"><div class="cl-dot" style="background:var(--purple)"></div>Team & Advisors</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TOKEN INFO -->
+<section class="section">
+  <div class="wrap">
+    <div class="g-up" id="info-hd">
+      <div class="tag" style="margin-bottom:16px">Token Details</div>
+      <h2 style="font-size:clamp(28px,3.5vw,44px);font-weight:800;letter-spacing:-1.8px;color:var(--w);margin-bottom:12px">Everything on-chain,<br>nothing hidden.</h2>
+      <p style="font-size:15px;color:var(--m);max-width:480px;line-height:1.7">All token parameters are fixed at launch. No minting, no admin keys, no surprises.</p>
+    </div>
+    <div class="info-cards g-up" id="info-cards">
+      <div class="info-card">
+        <div class="ic-icon" style="background:var(--gold-d);border:1px solid rgba(200,168,75,0.2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <div class="ic-label">Token Name</div>
+        <div class="ic-value">$CL</div>
+        <div class="ic-sub">CryptoLens AI Token<br>BEP-20 Standard</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-icon" style="background:rgba(240,185,11,0.08);border:1px solid rgba(240,185,11,0.2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--bnb)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div class="ic-label">Blockchain</div>
+        <div class="ic-value" style="color:var(--bnb)">BNB Chain</div>
+        <div class="ic-sub">BNB Smart Chain<br>Chain ID: 56</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-icon" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="ic-label">Total Supply</div>
+        <div class="ic-value" style="color:var(--green);font-size:16px">200,000,000,000</div>
+        <div class="ic-sub">Fixed forever<br>No minting possible</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-icon" style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="ic-label">Contract</div>
+        <div class="ic-value" style="font-size:13px;font-family:var(--mono);color:var(--blue)">TBA</div>
+        <div class="ic-sub">Launching soon<br>Verified &amp; audited</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-icon" style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div>
+        <div class="ic-label">Transaction Tax</div>
+        <div class="ic-value" style="color:var(--purple)">0%</div>
+        <div class="ic-sub">No buy/sell tax<br>No hidden fees</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-icon" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="ic-label">Deflation</div>
+        <div class="ic-value" style="color:var(--red)">Burn</div>
+        <div class="ic-sub">% of platform fees<br>used to burn $CL</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ROADMAP -->
+<section class="section">
+  <div class="wrap">
+    <div class="g-up" id="rm-hd" style="text-align:center;margin-bottom:64px">
+      <div class="tag" style="justify-content:center;margin-bottom:16px">Roadmap</div>
+      <h2 style="font-size:clamp(30px,4vw,48px);font-weight:800;letter-spacing:-2px;color:var(--w);margin-bottom:12px">The path forward.</h2>
+      <p style="font-size:15px;color:var(--m);max-width:480px;margin:0 auto;line-height:1.7">From platform launch to full decentralized AI research protocol every milestone, every quarter.</p>
+    </div>
+
+    <div class="roadmap-wrap g-up" id="rm-body">
+      <div class="rm-line"></div>
+      <div class="rm-phases">
+
+        <!-- Q1 2026 -->
+        <div class="rm-phase">
+          <div class="rm-left">
+            <div class="rm-quarter" style="color:var(--green)">Q1 2026</div>
+            <span class="rm-status status-done">&#10003; Completed</span>
+            <div class="rm-phase-name">Foundation</div>
+            <div class="rm-items">
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--green)"></div>CryptoLens AI concept &amp; market research</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--green)"></div>Core team assembled</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--green)"></div>DexScreener + Groq API integration POC</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--green)"></div>MVP Research Terminal built &amp; tested</div>
+            </div>
+          </div>
+          <div class="rm-center">
+            <div class="rm-dot done"></div>
+            <div class="rm-connector done"></div>
+          </div>
+          <div class="rm-right"></div>
+        </div>
+
+        <!-- Q2 2026 -->
+        <div class="rm-phase">
+          <div class="rm-left"></div>
+          <div class="rm-center">
+            <div class="rm-dot done"></div>
+            <div class="rm-connector done"></div>
+          </div>
+          <div class="rm-right">
+            <div class="rm-quarter" style="color:var(--gold)">Q2 2026</div>
+           <span class="rm-status status-live">&#9679; In Progress</span>
+            <div class="rm-phase-name">Token Launch</div>
+            <div class="rm-items">
+               <div class="rm-item"><div class="rm-item-dot" style="background:var(--gold)"></div>$CL token deployed on BNB Smart Chain</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--gold)"></div>CEX listing</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--gold)"></div>Community airdrop 10B $CL</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--gold)"></div>Smart contract audit by CertiK</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--gold)"></div>$CL staking for Pro subscription discount</div>
+            </div>
+          </div>
+        </div>
+
+        
+        <!-- Q3 2026 -->
+        <div class="rm-phase">
+          <div class="rm-left">
+            <div class="rm-quarter" style="color:var(--m)">Q3 2026</div>
+           <span class="rm-status status-upcoming">Upcoming</span>
+            <div class="rm-phase-name">Platform Launch</div>
+            <div class="rm-items">
+               <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>Public beta launch Research Terminal live</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>5 free analyses / day for all users</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>Multi-chain support (SOL, ETH, BNB, Base)</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>Pro &amp; Elite subscription tiers</div>
+            </div>
+          </div>
+          <div class="rm-center">
+            <div class="rm-dot upcoming"></div>
+            <div class="rm-connector"></div>
+          </div>
+          <div class="rm-right"></div>
+        </div>
+
+        <!-- Q4 2026 -->
+        <div class="rm-phase">
+          <div class="rm-left"></div>
+          <div class="rm-center">
+            <div class="rm-dot upcoming"></div>
+            <div class="rm-connector"></div>
+          </div>
+          <div class="rm-right">
+            <div class="rm-quarter" style="color:var(--m)">Q4 2026</div>
+            <span class="rm-status status-upcoming">Upcoming</span>
+            <div class="rm-phase-name">Ecosystem Growth</div>
+            <div class="rm-items">
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>Elite API pay with $CL tokens</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>DAO governance vote on AI model updates</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>Portfolio tracking with $CL rewards</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q1-Q2 2026 -->
+        <div class="rm-phase">
+          <div class="rm-left">
+            <div class="rm-quarter" style="color:var(--m)">Q1–Q2 2027</div>
+            <span class="rm-status status-upcoming">Upcoming</span>
+            <div class="rm-phase-name">Protocol Expansion</div>
+            <div class="rm-items">
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>On-chain AI inference fully decentralized</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>Tier 1 CEX listing</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>Cross-chain bridge (ETH, SOL, BNB)</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>100,000+ active users milestone</div>
+              <div class="rm-item"><div class="rm-item-dot" style="background:var(--dim)"></div>$CL burn mechanism 10% of platform revenue</div>
+            </div>
+          </div>
+          <div class="rm-center">
+            <div class="rm-dot upcoming"></div>
+          </div>
+          <div class="rm-right"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- UTILITY FLYWHEEL -->
+<div class="divider"></div>
+<section class="section">
+  <div class="wrap">
+    <div class="g-up" id="fly-hd" style="text-align:center;margin-bottom:56px">
+      <div class="tag" style="justify-content:center;margin-bottom:16px">Token Utility</div>
+      <h2 style="font-size:clamp(28px,3.5vw,46px);font-weight:800;letter-spacing:-2px;color:var(--w);margin-bottom:12px">The $CL Flywheel</h2>
+      <p style="font-size:15px;color:var(--m);max-width:460px;margin:0 auto;line-height:1.7">Every action on CryptoLens creates demand for $CL a self-reinforcing growth loop.</p>
+    </div>
+    <div class="g-up" id="fly-body">
+      <div style="display:flex;justify-content:center;margin-bottom:48px">
+        <svg viewBox="0 0 700 500" style="width:100%;max-width:700px;height:auto">
+          <defs>
+            <radialGradient id="cg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#c8a84b" stop-opacity="0.15"/><stop offset="100%" stop-color="#c8a84b" stop-opacity="0"/></radialGradient>
+            <marker id="arG" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#c8a84b" opacity="0.6"/></marker>
+          </defs>
+          <circle cx="350" cy="250" r="80" fill="url(#cg)" stroke="rgba(200,168,75,0.2)" stroke-width="1"/>
+          <circle cx="350" cy="250" r="60" fill="rgba(200,168,75,0.06)" stroke="rgba(200,168,75,0.4)" stroke-width="1.5"/>
+          <text x="350" y="244" text-anchor="middle" font-family="Inter" font-size="20" font-weight="800" fill="#c8a84b">$CL</text>
+          <text x="350" y="264" text-anchor="middle" font-family="Inter" font-size="11" fill="#888">Token</text>
+          <!-- Nodes -->
+          <circle cx="350" cy="80" r="44" fill="rgba(200,168,75,0.08)" stroke="rgba(200,168,75,0.3)" stroke-width="1.5"/>
+          <text x="350" y="74" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#f0f0f0">Platform</text>
+          <text x="350" y="90" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#f0f0f0">Revenue</text>
+          <circle cx="580" cy="250" r="44" fill="rgba(239,68,68,0.08)" stroke="rgba(239,68,68,0.3)" stroke-width="1.5"/>
+          <text x="580" y="244" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#f0f0f0">Buy &amp;</text>
+          <text x="580" y="260" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#ef4444">Burn</text>
+          <circle cx="490" cy="400" r="44" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1.5"/>
+          <text x="490" y="394" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#f0f0f0">Staking</text>
+          <text x="490" y="410" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#22c55e">Rewards</text>
+          <circle cx="210" cy="400" r="44" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.3)" stroke-width="1.5"/>
+          <text x="210" y="394" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#f0f0f0">More</text>
+          <text x="210" y="410" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#3b82f6">Users</text>
+          <circle cx="120" cy="250" r="44" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+          <text x="120" y="244" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#f0f0f0">API &amp;</text>
+          <text x="120" y="260" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#8b5cf6">Access</text>
+          <!-- Arrows -->
+          <path d="M388,100 Q490,80 540,218" fill="none" stroke="#c8a84b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arG)" opacity="0.6" class="fly-arrow fly-arrow-1"/>
+          <path d="M563,290 Q560,360 524,378" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arG)" opacity="0.6" class="fly-arrow fly-arrow-2"/>
+          <path d="M446,405 Q350,430 254,405" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arG)" opacity="0.6" class="fly-arrow fly-arrow-3"/>
+          <path d="M176,378 Q140,360 136,290" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arG)" opacity="0.6" class="fly-arrow fly-arrow-4"/>
+          <path d="M160,218 Q210,80 312,100" fill="none" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arG)" opacity="0.6" class="fly-arrow fly-arrow-5"/>
+          <text x="490" y="72" text-anchor="middle" font-family="Inter" font-size="10" fill="#555">10% fees burned</text>
+          <text x="574" y="340" text-anchor="middle" font-family="Inter" font-size="10" fill="#555">supply down</text>
+          <text x="350" y="440" text-anchor="middle" font-family="Inter" font-size="10" fill="#555">rewards attract holders</text>
+          <text x="128" y="340" text-anchor="middle" font-family="Inter" font-size="10" fill="#555">pay with $CL</text>
+          <text x="200" y="72" text-anchor="middle" font-family="Inter" font-size="10" fill="#555">more subscriptions</text>
+        </svg>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;border-top:2px solid var(--gold)">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Pay for Pro</div>
+          <div style="font-size:13px;color:var(--w);font-weight:600;margin-bottom:4px">Subscription Discount</div>
+          <div style="font-size:12px;color:var(--m);line-height:1.6">Stake $CL to unlock Pro at 30% off vs fiat pricing</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;border-top:2px solid #ef4444">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#ef4444;margin-bottom:8px">Deflation</div>
+          <div style="font-size:13px;color:var(--w);font-weight:600;margin-bottom:4px">Fee Burn Mechanism</div>
+          <div style="font-size:12px;color:var(--m);line-height:1.6">10% of all revenue buys &amp; burns $CL permanently</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;border-top:2px solid #22c55e">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#22c55e;margin-bottom:8px">Staking</div>
+          <div style="font-size:13px;color:var(--w);font-weight:600;margin-bottom:4px">Earn Research Credits</div>
+          <div style="font-size:12px;color:var(--m);line-height:1.6">Stake $CL to earn daily analysis credits beyond free tier</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;border-top:2px solid #8b5cf6">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8b5cf6;margin-bottom:8px">Governance</div>
+          <div style="font-size:13px;color:var(--w);font-weight:600;margin-bottom:4px">Vote on AI Updates</div>
+          <div style="font-size:12px;color:var(--m);line-height:1.6">$CL holders vote on model updates &amp; fee parameters</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BURN + SUPPLY/DEMAND -->
+<div class="divider"></div>
+<section class="section">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start">
+      <div class="g-up" id="burn-l">
+        <div class="tag" style="margin-bottom:16px">Burn Mechanism</div>
+        <h2 style="font-size:clamp(22px,2.8vw,36px);font-weight:800;letter-spacing:-1.5px;color:var(--w);margin-bottom:12px">Deflationary by design.</h2>
+        <p style="font-size:13px;color:var(--m);line-height:1.75;margin-bottom:24px">10% of all platform revenue is used to buy $CL from the open market and burn it permanently reducing supply every month.</p>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:14px">
+          <div style="font-size:12px;color:var(--m);margin-bottom:14px;font-weight:500">Projected Burn 4 Year Simulation</div>
+          <svg viewBox="0 0 500 150" style="width:100%;height:auto">
+            <defs><linearGradient id="bG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.3"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0"/></linearGradient></defs>
+            <line x1="0" y1="37" x2="500" y2="37" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="112" x2="500" y2="112" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <path d="M0,138 C60,128 100,108 150,93 S240,70 300,55 S390,35 500,18 L500,150 L0,150 Z" fill="url(#bG)"/>
+            <path d="M0,138 C60,128 100,108 150,93 S240,70 300,55 S390,35 500,18" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" class="burn-line"/>
+            <circle cx="0" cy="138" r="4" fill="#ef4444" style="animation:dotBlink 2s ease-in-out infinite 0s"/>
+            <circle cx="150" cy="93" r="4" fill="#ef4444" style="animation:dotBlink 2s ease-in-out infinite 0.5s"/>
+            <circle cx="300" cy="55" r="4" fill="#ef4444" style="animation:dotBlink 2s ease-in-out infinite 1s"/>
+            <circle cx="500" cy="18" r="4" fill="#ef4444" style="animation:dotBlink 2s ease-in-out infinite 1.5s"/>
+            <text x="6" y="148" font-family="JetBrains Mono" font-size="9" fill="#555">Y1</text>
+            <text x="155" y="107" font-family="JetBrains Mono" font-size="9" fill="#555">Y2</text>
+            <text x="305" y="69" font-family="JetBrains Mono" font-size="9" fill="#555">Y3</text>
+            <text x="478" y="32" font-family="JetBrains Mono" font-size="9" fill="#555">Y4</text>
+          </svg>
+          <div style="display:flex;justify-content:space-between;margin-top:12px">
+            <div style="text-align:center"><div style="font-size:15px;font-weight:800;color:#ef4444;font-family:var(--mono)">2B</div><div style="font-size:10px;color:var(--m)">Y1</div></div>
+            <div style="text-align:center"><div style="font-size:15px;font-weight:800;color:#ef4444;font-family:var(--mono)">6B</div><div style="font-size:10px;color:var(--m)">Y2</div></div>
+            <div style="text-align:center"><div style="font-size:15px;font-weight:800;color:#ef4444;font-family:var(--mono)">14B</div><div style="font-size:10px;color:var(--m)">Y3</div></div>
+            <div style="text-align:center"><div style="font-size:15px;font-weight:800;color:#ef4444;font-family:var(--mono)">28B</div><div style="font-size:10px;color:var(--m)">Y4</div></div>
+          </div>
+        </div>
+        <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c0 0-4 6-4 10a4 4 0 0 0 8 0c0-4-4-10-4-10z"/></svg>
+          <div style="font-size:12px;color:var(--w2)">Projected <strong style="color:#ef4444">50B $CL burned</strong> over 4 years 25% of total supply permanently gone.</div>
+        </div>
+      </div>
+      <div class="g-up" id="burn-r">
+        <div class="tag" style="margin-bottom:16px">Supply &amp; Demand</div>
+        <h2 style="font-size:clamp(22px,2.8vw,36px);font-weight:800;letter-spacing:-1.5px;color:var(--w);margin-bottom:12px">Built for price appreciation.</h2>
+        <p style="font-size:13px;color:var(--m);line-height:1.75;margin-bottom:24px">Fixed supply + growing demand + continuous burn = sustained upward price pressure on $CL.</p>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px">
+          <div style="font-size:12px;color:var(--m);margin-bottom:16px;font-weight:500">Supply vs Demand Dynamics</div>
+          <svg viewBox="0 0 400 190" style="width:100%;height:auto">
+            <defs>
+              <linearGradient id="dG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#22c55e" stop-opacity="0.1"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0.4"/></linearGradient>
+              <linearGradient id="sG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.4"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0.1"/></linearGradient>
+            </defs>
+            <line x1="40" y1="10" x2="40" y2="168" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <line x1="40" y1="168" x2="390" y2="168" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <text x="18" y="94" font-family="Inter" font-size="9" fill="#555" transform="rotate(-90,18,94)">Price</text>
+            <text x="215" y="184" font-family="Inter" font-size="9" fill="#555" text-anchor="middle">Time / Adoption</text>
+            <path d="M50,162 C100,148 160,115 220,86 S300,45 380,20" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M50,162 C100,148 160,115 220,86 S300,45 380,20 L380,168 L50,168 Z" fill="url(#dG)"/>
+            <text x="364" y="17" font-family="Inter" font-size="10" font-weight="600" fill="#22c55e">Demand</text>
+            <path d="M50,55 C100,62 160,72 220,86 S300,106 380,136" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6,3"/>
+            <text x="358" y="150" font-family="Inter" font-size="10" font-weight="600" fill="#ef4444">Supply</text>
+            <circle cx="220" cy="86" r="7" fill="var(--gold)" stroke="rgba(200,168,75,0.5)" stroke-width="3" style="animation:goldPulse 2s ease-in-out infinite"/>
+            <text x="232" y="74" font-family="Inter" font-size="10" fill="var(--gold)" font-weight="600">Price Zone</text>
+          </svg>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+            <div style="background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.15);border-radius:8px;padding:11px">
+              <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#22c55e;margin-bottom:5px">Demand Drivers</div>
+              <div style="font-size:11px;color:var(--m);line-height:1.6">User growth &bull; Staking &bull; DAO &bull; API payments</div>
+            </div>
+            <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:11px">
+              <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#ef4444;margin-bottom:5px">Supply Reducers</div>
+              <div style="font-size:11px;color:var(--m);line-height:1.6">Monthly burn &bull; Vesting locks &bull; Fixed supply</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOLDER TIERS -->
+<div class="divider"></div>
+<section class="section">
+  <div class="wrap">
+    <div class="g-up" id="holder-hd" style="text-align:center;margin-bottom:52px">
+      <div class="tag" style="justify-content:center;margin-bottom:16px">Holder Tiers</div>
+      <h2 style="font-size:clamp(28px,3.5vw,46px);font-weight:800;letter-spacing:-2px;color:var(--w);margin-bottom:12px">Reward every tier.</h2>
+      <p style="font-size:15px;color:var(--m);max-width:460px;margin:0 auto;line-height:1.7">Different holder levels unlock different benefits from basic access to full governance power.</p>
+    </div>
+    <div class="g-up" id="holder-body">
+      <div style="display:grid;grid-template-columns:360px 1fr;gap:48px;align-items:start">
+        <div style="display:flex;justify-content:center">
+          <svg viewBox="0 0 380 420" style="width:100%;max-width:360px">
+            <polygon points="190,20 100,100 280,100" fill="rgba(200,168,75,0.15)" stroke="rgba(200,168,75,0.5)" stroke-width="1.5"/>
+            <text x="190" y="56" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="#c8a84b">WHALE</text>
+            <text x="190" y="74" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#888">100M+ $CL</text>
+            <polygon points="100,104 60,180 320,180 280,104" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+            <text x="190" y="142" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="#8b5cf6">SHARK</text>
+            <text x="190" y="160" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#888">10M+ $CL</text>
+            <polygon points="60,184 28,260 362,260 320,184" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.35)" stroke-width="1.5"/>
+            <text x="190" y="222" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="#3b82f6">BULL</text>
+            <text x="190" y="240" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#888">1M+ $CL</text>
+            <polygon points="28,264 8,340 382,340 362,264" fill="rgba(34,197,94,0.07)" stroke="rgba(34,197,94,0.3)" stroke-width="1.5"/>
+            <text x="190" y="302" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="#22c55e">HOLDER</text>
+            <text x="190" y="320" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#888">100K+ $CL</text>
+            <polygon points="8,344 0,420 390,420 382,344" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.09)" stroke-width="1.5"/>
+            <text x="190" y="382" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600" fill="#555">BASIC</text>
+            <text x="190" y="400" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#444">Any amount</text>
+          </svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding-top:8px">
+          <div style="background:rgba(200,168,75,0.06);border:1px solid rgba(200,168,75,0.3);border-radius:12px;padding:14px 18px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <span style="font-size:13px;font-weight:700;color:var(--gold)">Whale &mdash; 100M+ $CL</span>
+              <span style="font-size:9px;font-weight:700;color:#000;background:var(--gold);padding:2px 9px;border-radius:100px">MAX TIER</span>
+            </div>
+            <div style="font-size:12px;color:var(--m);line-height:1.65">Elite API free &bull; Full governance voting &bull; Revenue sharing &bull; Early feature access &bull; Private Discord channel</div>
+          </div>
+          <div style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.25);border-radius:12px;padding:14px 18px">
+            <div style="margin-bottom:6px"><span style="font-size:13px;font-weight:700;color:#8b5cf6">Shark &mdash; 10M+ $CL</span></div>
+            <div style="font-size:12px;color:var(--m);line-height:1.65">Pro subscription free &bull; Governance voting &bull; Priority support &bull; Beta features</div>
+          </div>
+          <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:14px 18px">
+            <div style="margin-bottom:6px"><span style="font-size:13px;font-weight:700;color:#3b82f6">Bull &mdash; 1M+ $CL</span></div>
+            <div style="font-size:12px;color:var(--m);line-height:1.65">40% Pro discount &bull; Extra daily analyses &bull; Community badge</div>
+          </div>
+          <div style="background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:14px 18px">
+            <div style="margin-bottom:6px"><span style="font-size:13px;font-weight:700;color:#22c55e">Holder &mdash; 100K+ $CL</span></div>
+            <div style="font-size:12px;color:var(--m);line-height:1.65">20% Pro discount &bull; Staking rewards &bull; Airdrop eligibility</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px">
+            <div style="margin-bottom:6px"><span style="font-size:13px;font-weight:600;color:var(--m)">Basic &mdash; Any amount</span></div>
+            <div style="font-size:12px;color:var(--m);line-height:1.65">5 free analyses/day &bull; Research Terminal access &bull; Community membership</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+
+<footer>
+  <a href="index.html" class="flogo">
+    <span style="font-size:14px;font-weight:600;color:var(--w);letter-spacing:-.3px">CryptoLens AI</span>
+  </a>
+  <div class="flinks">
+    <a href="index.html">Home</a><a href="app.html">Research</a><a href="pricing.html">Pricing</a><a href="docs.html">Docs</a><a href="use-cases.html">Use Cases</a>
+  </div>
+  <span class="fcopy">&copy; 2025 CryptoLens AI &middot; BNB Smart Chain</span>
+</footer>
+<div id="toast"></div>
+
+<script>
+/* ── ALLOCATION DATA ── */
+var SUPPLY = 200000000000;
+var allocs = [
+  {name:'Community & Rewards', pct:35, color:'#c8a84b'},
+  {name:'Ecosystem & Dev',     pct:25, color:'#3b82f6'},
+  {name:'Public Sale',         pct:20, color:'#22c55e'},
+  {name:'Team & Advisors',     pct:12, color:'#8b5cf6'},
+  {name:'Reserve',             pct:5,  color:'#ef4444'},
+  {name:'Liquidity Pool',      pct:3,  color:'#F0B90B'},
+];
+var vestData = [
+  {name:'Community & Rewards', pct:'35%', tokens:'70B', cliff:'None', vesting:'48 months linear'},
+  {name:'Ecosystem & Dev',     pct:'25%', tokens:'50B', cliff:'6 months', vesting:'36 months linear'},
+  {name:'Public Sale',         pct:'20%', tokens:'40B', cliff:'None', vesting:'25% TGE, 9 months'},
+  {name:'Team & Advisors',     pct:'12%', tokens:'24B', cliff:'12 months', vesting:'36 months linear'},
+  {name:'Reserve',             pct:'5%',  tokens:'10B', cliff:'6 months', vesting:'Lock 2 years'},
+  {name:'Liquidity Pool',      pct:'3%',  tokens:'6B',  cliff:'None', vesting:'Locked 1 year'},
+];
+
+/* ── DONUT CHART ── */
+function buildDonut(){
+  var svg=document.getElementById('donutSvg');
+  var cx=100,cy=100,r=78,strokeW=22;
+  var circumference=2*Math.PI*r;
+  var offset=0;
+  var paths='';
+  allocs.forEach(function(a,i){
+    var dash=(a.pct/100)*circumference;
+    var gap=circumference-dash;
+    var gapSize=3;
+    // Start all segments invisible (dash=0, gap=full) then animate
+    paths+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+a.color+'" stroke-width="'+strokeW+'"'
+      +' stroke-dasharray="0 '+circumference+'"'
+      +' stroke-dashoffset="'+(-offset)+'"'
+      +' stroke-linecap="butt"'
+      +' data-dash="'+(dash-gapSize)+'" data-gap="'+(gap+gapSize)+'"'
+      +' style="transition:stroke-dasharray 0.8s cubic-bezier(.4,0,.2,1) '+( i*0.12)+'s, opacity .3s; cursor:pointer"'
+      +' onmouseover="this.style.strokeWidth=28;this.style.opacity=1"'
+      +' onmouseout="this.style.strokeWidth=22;this.style.opacity=1"'
+      +'/>';
+    offset+=dash;
+  });
+  svg.innerHTML=paths;
+  // Animate after slight delay
+  setTimeout(function(){
+    svg.querySelectorAll('circle').forEach(function(c){
+      c.setAttribute('stroke-dasharray', c.getAttribute('data-dash')+' '+c.getAttribute('data-gap'));
+    });
+  }, 300);
+}
+
+/* ── ALLOCATION LIST ── */
+function buildAllocList(){
+  var list=document.getElementById('allocList');
+  list.innerHTML='';
+  allocs.forEach(function(a){
+    var tokens=(SUPPLY*a.pct/100/1e9).toFixed(0)+'B';
+    var div=document.createElement('div');
+    div.className='alloc-item';
+    div.innerHTML=
+      '<div class="alloc-dot" style="background:'+a.color+'"></div>'+
+      '<div style="flex:1"><div class="alloc-name">'+a.name+'</div><div class="alloc-supply">'+tokens+' tokens</div></div>'+
+      '<div style="text-align:right"><div class="alloc-pct" style="color:'+a.color+'">'+a.pct+'%</div></div>'+
+      '<div class="alloc-bar-track"><div class="alloc-bar" style="background:'+a.color+'" data-w="'+a.pct+'"></div></div>';
+    list.appendChild(div);
+  });
+}
+
+/* ── VESTING TABLE ── */
+function buildVesting(){
+  var container=document.getElementById('vestingRows');
+  container.innerHTML='';
+  vestData.forEach(function(v,i){
+    var color=allocs[i]?allocs[i].color:'var(--gold)';
+    var div=document.createElement('div');
+    div.className='vt-row';
+    div.innerHTML=
+      '<div class="vt-cell"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+color+';margin-right:8px;flex-shrink:0"></span>'+v.name+'</div>'+
+      '<div class="vt-cell" style="color:'+color+';font-weight:700;font-family:var(--mono)">'+v.pct+'</div>'+
+      '<div class="vt-cell" style="font-family:var(--mono);color:var(--w2)">'+v.tokens+'</div>'+
+      '<div class="vt-cell" style="color:var(--m);font-size:12px">'+v.cliff+'</div>'+
+      '<div class="vt-cell" style="font-size:12px;color:var(--m)">'+v.vesting+'</div>';
+    container.appendChild(div);
+  });
+}
+
+/* ── EMISSION BAR CHART ── */
+function buildBarChart(){
+  var svg=document.getElementById('barChart');
+  var labels=document.getElementById('barLabels');
+  // Months: 0,6,12,18,24,30,36,48
+  var months=[0,6,12,18,24,30,36,42,48];
+  // Cumulative unlock % at each month
+  var emission=[20,28,38,52,65,76,86,93,100];
+  var W=900,H=160,pad=20,barW=Math.floor((W-pad*2)/months.length)-6;
+  var svgStr='';
+  // Grid lines
+  [25,50,75,100].forEach(function(pct){
+    var y=H-(pct/100)*H;
+    svgStr+='<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>';
+    svgStr+='<text x="4" y="'+(y-3)+'" font-size="10" fill="#333" font-family="JetBrains Mono">'+pct+'%</text>';
+  });
+  // Bars - animate from bottom
+  months.forEach(function(m,i){
+    var pct=emission[i];
+    var barH=(pct/100)*(H-20);
+    var x=pad+i*((W-pad*2)/months.length);
+    var y=H-barH;
+    var barColors=['#c8a84b','#3b82f6','#22c55e','#8b5cf6','#c8a84b','#ef4444','#3b82f6','#8b5cf6','#22c55e'];
+    var color=barColors[i];
+    // Start at bottom (height=0, y=H) then animate
+    svgStr+='<rect x="'+x+'" y="'+H+'" width="'+barW+'" height="0" rx="3" fill="'+color+'" opacity="0.8"'
+      +' data-y="'+y+'" data-h="'+barH+'"'
+      +' style="transition: y 0.7s cubic-bezier(.4,0,.2,1) '+(i*0.07)+'s, height 0.7s cubic-bezier(.4,0,.2,1) '+(i*0.07)+'s"'
+      +' onmouseover="this.style.opacity=1"'
+      +' onmouseout="this.style.opacity=0.8"'
+      +'/>';
+    svgStr+='<text x="'+(x+barW/2)+'" y="'+(y-5)+'" font-size="10" fill="#555" text-anchor="middle" font-family="JetBrains Mono" opacity="0">'+pct+'%'
+      +'<animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="'+(0.5+i*0.07)+'s" fill="freeze"/></text>';
+  });
+  svg.innerHTML=svgStr;
+  // Trigger bar animations
+  setTimeout(function(){
+    svg.querySelectorAll('rect[data-y]').forEach(function(r){
+      r.setAttribute('y', r.getAttribute('data-y'));
+      r.setAttribute('height', r.getAttribute('data-h'));
+    });
+  }, 400);
+  labels.innerHTML='';
+  months.forEach(function(m){
+    var span=document.createElement('span');
+    span.className='bar-label';
+    span.textContent=m===0?'TGE':m+'mo';
+    labels.appendChild(span);
+  });
+}
+
+/* ── THREE.JS BG ── */
+function initBg(){
+  var canvas=document.getElementById('bg-canvas');
+  if(!canvas||typeof THREE==='undefined')return;
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:false,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setClearColor(0x080808,1);
+  var scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x080808,0.025);
+  var cam=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,0.1,300);
+  cam.position.set(0,14,28);cam.lookAt(0,0,-10);
+  var geo=new THREE.PlaneGeometry(120,120,80,80);geo.rotateX(-Math.PI/2);
+  var pa=geo.attributes.position.array,bh=[];
+  for(var i=0;i<pa.length;i+=3){var x=pa[i],z=pa[i+2];var h=Math.sin(x*.18)*1.8+Math.sin(z*.12)*2.2+Math.cos(x*.09+z*.14)*1.4+Math.sin((x+z)*.06)*3.2;bh.push(h);pa[i+1]=h}
+  geo.computeVertexNormals();
+  scene.add(new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x1a1a1a,roughness:.95,metalness:.05})));
+  var wire=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x1e1e1e,wireframe:true,transparent:true,opacity:.2}));wire.position.y=.02;scene.add(wire);
+  var pg=new THREE.BufferGeometry(),pp=new Float32Array(800*3),pc=new Float32Array(800*3);
+  var cG=new THREE.Color('#c8a84b'),cW=new THREE.Color('#fff'),cD=new THREE.Color('#1a1a1a');
+  for(var i=0;i<800;i++){pp[i*3]=(Math.random()-.5)*100;pp[i*3+1]=Math.random()*28-2;pp[i*3+2]=(Math.random()-.5)*80-20;var t=Math.random(),c=t>.9?cG:t>.78?cW:cD;pc[i*3]=c.r;pc[i*3+1]=c.g;pc[i*3+2]=c.b}
+  pg.setAttribute('position',new THREE.BufferAttribute(pp,3));pg.setAttribute('color',new THREE.BufferAttribute(pc,3));
+  var pts=new THREE.Points(pg,new THREE.PointsMaterial({size:.25,vertexColors:true,transparent:true,opacity:.55,sizeAttenuation:true}));scene.add(pts);
+  scene.add(new THREE.AmbientLight(0xffffff,.12));
+  var kl=new THREE.DirectionalLight(0xffffff,.4);kl.position.set(10,20,10);scene.add(kl);
+  var gl=new THREE.PointLight(0xc8a84b,2.2,55);gl.position.set(0,8,-5);scene.add(gl);
+  window.addEventListener('resize',function(){renderer.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()});
+  var t=0,sy=0;window.addEventListener('scroll',function(){sy=window.scrollY});
+  (function loop(){requestAnimationFrame(loop);t+=.003;var pos=geo.attributes.position;for(var i=0;i<pos.count;i++)pos.setY(i,bh[i]+Math.sin(t+i*.08)*.2);pos.needsUpdate=true;geo.computeVertexNormals();pts.rotation.y=t*.012;cam.position.y+=(14-sy*.006-cam.position.y)*.04;gl.intensity=2.2+Math.sin(t*1.8)*.7;renderer.render(scene,cam)})();
+}
+
+/* ── SCROLL ANIMATIONS ── */
+var revealed=[];
+function reveal(){
+  document.querySelectorAll('.g-up').forEach(function(el){
+    if(revealed.indexOf(el)>-1)return;
+    if(el.getBoundingClientRect().top<window.innerHeight-80){
+      revealed.push(el);
+      el.style.transition='opacity .7s ease, transform .7s ease';
+      el.style.opacity='1';el.style.transform='none';
+    }
+  });
+  // Animate alloc bars when visible
+  var list=document.getElementById('allocList');
+  if(list&&list.getBoundingClientRect().top<window.innerHeight-80){
+    document.querySelectorAll('.alloc-bar').forEach(function(b){
+      if(!b.animated){b.animated=true;setTimeout(function(){b.style.width=b.getAttribute('data-w')+'%'},100)}
+    });
+  }
+}
+window.addEventListener('scroll',reveal);
+
+/* ── SUPPLY COUNTER ANIMATION ── */
+function animateCounter(){
+  var el=document.getElementById('supplyNum');
+  if(!el)return;
+  var target=200000000000;
+  var start=0,dur=1800,startTime=null;
+  function step(ts){
+    if(!startTime)startTime=ts;
+    var prog=Math.min((ts-startTime)/dur,1);
+    var ease=1-Math.pow(1-prog,4);
+    var val=Math.floor(start+ease*target);
+    el.textContent=val.toLocaleString();
+    if(prog<1)requestAnimationFrame(step);
+    else el.textContent=target.toLocaleString();
+  }
+  requestAnimationFrame(step);
+}
+
+/* ── AUTH ── */
+function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('on')},3000)}
+var _cu=null;
+try{_cu=JSON.parse(localStorage.getItem('cl_user')||'null')}catch(e){_cu=null}
+function updNav(){
+  var o=document.getElementById('navOut'),i=document.getElementById('navIn');if(!o||!i)return;
+  if(_cu){o.style.display='none';i.style.display='block';var av=document.getElementById('navAv');if(av)av.textContent=(_cu.name||'U')[0].toUpperCase();var nm=document.getElementById('navName');if(nm)nm.textContent=_cu.name?_cu.name.split(' ')[0]:'User';var dn=document.getElementById('navDN');if(dn)dn.textContent=_cu.name||'';var de=document.getElementById('navDE');if(de)de.textContent=_cu.email||'';}
+  else{o.style.display='flex';i.style.display='none'}
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',updNav)}else{updNav()}
+function toggleDrop(){var d=document.getElementById('navDrop');if(d)d.style.display=d.style.display==='block'?'none':'block'}
+document.addEventListener('click',function(e){var w=document.getElementById('navWrap');if(w&&!w.contains(e.target)){var d=document.getElementById('navDrop');if(d)d.style.display='none'}})
+function doSignOut(){_cu=null;localStorage.removeItem('cl_user');updNav();toast('Signed out')}
+
+/* ── INIT ── */
+window.addEventListener('load',function(){
+  buildDonut();
+  buildAllocList();
+  buildVesting();
+  buildBarChart();
+  initBg();
+  setTimeout(animateCounter,400);
+  reveal();
+
+  // Intersection Observer for bar chart animations
+  if(window.IntersectionObserver){
+    var barObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          var svg=document.getElementById('barChart');
+          if(svg){
+            svg.querySelectorAll('rect[data-y]').forEach(function(r){
+              r.setAttribute('y',r.getAttribute('data-y'));
+              r.setAttribute('height',r.getAttribute('data-h'));
+            });
+          }
+          barObs.disconnect();
+        }
+      });
+    },{threshold:0.3});
+    var bc=document.getElementById('barChart');
+    if(bc)barObs.observe(bc);
+
+    // Donut observer
+    var donutObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          var svg=document.getElementById('donutSvg');
+          if(svg){
+            svg.querySelectorAll('circle[data-dash]').forEach(function(c){
+              c.setAttribute('stroke-dasharray',c.getAttribute('data-dash')+' '+c.getAttribute('data-gap'));
+            });
+          }
+          donutObs.disconnect();
+        }
+      });
+    },{threshold:0.3});
+    var dSvg=document.getElementById('donutSvg');
+    if(dSvg)donutObs.observe(dSvg);
+
+    // Alloc bars observer
+    var allocObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          document.querySelectorAll('.alloc-bar').forEach(function(b,i){
+            setTimeout(function(){b.style.width=b.getAttribute('data-w')+'%'},i*80);
+          });
+          allocObs.disconnect();
+        }
+      });
+    },{threshold:0.2});
+    var al=document.getElementById('allocList');
+    if(al)allocObs.observe(al);
+  }
+});
+</script>
+</body>
+</html>

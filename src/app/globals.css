@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens ported from the prototype (design-reference/app.html). */
+:root {
+  --bg: #07070f;
+  --bg2: #0b0b18;
+  --bg3: #0f0f20;
+  --panel: #13131f;
+  --card: #181828;
+  --card2: #1d1d30;
+  --border: rgba(255, 255, 255, 0.07);
+  --border2: rgba(255, 255, 255, 0.13);
+  --gold: #c8a84b;
+  --gold2: #e8c96a;
+  --green: #22c55e;
+  --red: #ef4444;
+  --orange: #f59e0b;
+  --purple: #a78bfa;
+  --w: #eef0ff;
+  --w2: #9999b5;
+  --m: #555570;
+  --dim: #252538;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--w);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Thin gold-ish scrollbars to match the terminal aesthetic. */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--dim);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Rendered markdown inside analysis/chat bubbles. */
+.md h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold);
+  margin: 20px 0 8px;
+  letter-spacing: -0.2px;
+}
+.md h2:first-child {
+  margin-top: 0;
+}
+.md p {
+  color: var(--w2);
+  line-height: 1.65;
+  margin: 8px 0;
+  font-size: 14px;
+}
+.md strong {
+  color: var(--w);
+  font-weight: 600;
+}
+.md ul {
+  margin: 8px 0;
+  padding-left: 18px;
+}
+.md li {
+  color: var(--w2);
+  line-height: 1.6;
+  font-size: 14px;
+  margin: 4px 0;
+}
+.md a {
+  color: var(--gold2);
+  text-decoration: underline;
+  word-break: break-all;
+}
+.md code {
+  background: var(--card);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+}

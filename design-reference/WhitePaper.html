@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CryptoLens AI Whitepaper</title>
+<link rel="icon" type="image/png" href="Ai logo.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#f2edd8;
+  --ink2:#c8c4a8;
+  --ink3:#8a8468;
+  --ink4:#585040;
+  --bg:#0c0b08;
+  --bg2:#100f0c;
+  --bg3:#161410;
+  --gold:#c8a84a;
+  --gold2:#e8c870;
+  --green:#4a9a5a;
+  --red:#b84040;
+  --rule:rgba(200,168,74,.18);
+  --rule2:rgba(242,237,216,.07);
+  --serif:'DM Serif Display',Georgia,serif;
+  --mono:'DM Mono',monospace;
+  --cond:'DM Sans',sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--serif);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+/* ── PAPER TEXTURE ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:.6;
+}
+
+/* ── MASTHEAD ── */
+.masthead{
+  border-bottom:3px double var(--gold);
+  padding:24px 60px 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  position:relative;
+  background:var(--bg);
+}
+
+.mh-top{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+
+.mh-meta{
+  font-family:var(--mono);
+  font-size:10px;
+  color:#8a8468;
+  letter-spacing:.06em;
+}
+
+.mh-logo-pill{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(200,168,74,.08);
+  border:1px solid rgba(200,168,74,.2);
+  border-radius:100px;
+  padding:5px 14px;
+}
+
+.mh-logo-icon{
+  width:18px;height:18px;
+  border-radius:50%;
+  border:1px solid rgba(200,168,74,.4);
+  display:flex;align-items:center;justify-content:center;
+}
+
+.mh-logo-name{
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  color:var(--gold);letter-spacing:.06em;
+}
+
+/* Giant masthead title */
+.mh-title{
+  font-family:var(--cond);
+  font-size:clamp(72px,10vw,136px);
+  font-weight:700;
+  letter-spacing:-.02em;
+  line-height:.88;
+  text-align:center;
+  color:var(--ink);
+  text-transform:uppercase;
+}
+
+.mh-title .gold-word{
+  color:var(--gold);
+  font-weight:300;
+  font-style:italic;
+  font-family:var(--serif);
+  text-transform:none;
+  font-size:.72em;
+  letter-spacing:-.01em;
+  display:block;
+}
+
+.mh-subtitle{
+  font-family:var(--serif);
+  font-size:15px;
+  font-style:italic;
+  color:var(--ink);
+  text-align:center;
+  margin-top:10px;
+  letter-spacing:.02em;
+}
+
+.mh-rule{
+  width:100%;
+  height:1px;
+  background:var(--rule);
+  margin:14px 0;
+}
+
+.mh-bottom{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.mh-edition{
+  font-family:var(--mono);font-size:10px;
+  color:#888470;letter-spacing:.08em;
+}
+
+.mh-tags{display:flex;gap:10px}
+
+.mh-tag{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  border:1px solid var(--rule);
+  padding:3px 10px;
+  color:#888470;letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.mh-tag.gold{color:var(--gold);border-color:rgba(200,168,74,.3)}
+
+/* ── MAIN BODY ── */
+.paper-body{
+  padding:0 60px;
+  max-width:1400px;
+  margin:0 auto;
+}
+
+/* ── SECTION DIVIDER ── */
+.section-rule{
+  display:flex;align-items:center;gap:16px;
+  margin:36px 0 28px;
+}
+
+.sr-line{flex:1;height:1px;background:var(--rule2)}
+
+.sr-label{
+  font-family:var(--mono);
+  font-size:9px;font-weight:700;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--gold);
+  white-space:nowrap;
+}
+
+/* ── COLUMN LAYOUTS ── */
+.col-2{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.col-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px}
+.col-4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.col-2-3{display:grid;grid-template-columns:2fr 3fr;gap:48px}
+.col-3-2{display:grid;grid-template-columns:3fr 2fr;gap:48px}
+
+/* column dividers */
+.col-2 > *:not(:last-child),
+.col-3 > *:not(:last-child),
+.col-4 > *:not(:last-child){
+  border-right:1px solid var(--rule2);
+  padding-right:inherit;
+}
+
+/* ── HEADLINES ── */
+.hed-xl{
+  font-family:var(--cond);
+  font-size:clamp(44px,5vw,76px);
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:-.02em;
+  line-height:.9;
+  color:var(--ink);
+}
+.hed-xl em{
+  font-family:var(--serif);
+  font-style:italic;
+  font-weight:400;
+  color:var(--gold);
+  text-transform:none;
+  font-size:.85em;
+}
+
+.hed-lg{
+  font-family:var(--cond);
+  font-size:clamp(32px,4vw,52px);
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:-.01em;
+  line-height:.95;
+  color:var(--ink);
+}
+.hed-lg em{
+  font-family:var(--serif);
+  font-style:italic;
+  color:var(--gold);
+  text-transform:none;
+  font-weight:400;
+}
+
+.hed-md{
+  font-family:var(--cond);
+  font-size:24px;font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.02em;
+  color:var(--ink);
+  margin-bottom:12px;
+}
+
+/* ── BODY COPY ── */
+.copy{
+  font-family:var(--serif);
+  font-size:15px;
+  line-height:1.85;
+  color:var(--ink);
+  font-weight:400;
+}
+.copy strong{color:var(--ink);font-weight:700}
+.copy em{color:var(--gold);font-style:italic}
+
+.copy + .copy{margin-top:14px}
+
+/* ── DROPCAP ── */
+.dropcap::first-letter{}
+
+/* ── PULL QUOTE ── */
+.pull{
+  padding:20px 0;
+  border-top:2px solid var(--gold);
+  border-bottom:1px solid rgba(200,168,74,.2);
+  margin:24px 0;
+}
+
+.pull-text{
+  font-family:var(--serif);
+  font-size:22px;
+  font-style:italic;
+  font-weight:400;
+  color:var(--ink);
+  line-height:1.5;
+}
+
+.pull-attr{
+  font-family:var(--mono);
+  font-size:9px;
+  color:var(--gold);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  margin-top:10px;
+}
+
+/* ── DATA TABLE — newspaper style ── */
+.data-table{
+  width:100%;
+  border-collapse:collapse;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--ink);
+}
+
+.data-table th{
+  font-family:var(--cond);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ink3);
+  padding:8px 12px;
+  border-top:2px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  text-align:left;
+}
+
+.data-table td{
+  padding:10px 12px;
+  border-bottom:1px solid var(--rule2);
+  color:var(--ink);
+  vertical-align:top;
+}
+
+.data-table tr:hover td{background:rgba(200,168,74,.03)}
+
+.td-bold{color:var(--ink);font-weight:700}
+.td-gold{color:var(--gold)}
+.td-green{color:var(--green)}
+.td-red{color:var(--red)}
+
+/* ── INLINE STAT ── */
+.inline-stat{
+  display:inline-flex;
+  flex-direction:column;
+  gap:2px;
+  margin:0 4px;
+  vertical-align:middle;
+}
+.is-val{
+  font-family:var(--cond);
+  font-size:36px;font-weight:700;
+  color:var(--gold);letter-spacing:-1px;line-height:1;
+}
+.is-label{
+  font-family:var(--mono);font-size:8px;
+  color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;
+}
+
+/* ── STAT ROW ── */
+.stat-row{
+  display:flex;gap:0;
+  border-top:2px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  padding:20px 0;
+  margin:24px 0;
+}
+
+.stat-item{
+  flex:1;
+  padding:0 28px;
+  border-right:1px solid var(--rule2);
+}
+.stat-item:first-child{padding-left:0}
+.stat-item:last-child{border-right:none;padding-right:0}
+
+.si-val{
+  font-family:var(--cond);font-size:42px;font-weight:700;
+  color:var(--gold);letter-spacing:-2px;line-height:1;
+  display:block;margin-bottom:4px;
+}
+
+.si-label{
+  font-family:var(--mono);font-size:9px;
+  color:#888470;letter-spacing:.1em;text-transform:uppercase;
+}
+
+/* ── SCAN TERMINAL — newspaper code box ── */
+.code-box{
+  background:var(--bg2);
+  border:1px solid var(--rule);
+  border-radius:0;
+  padding:0;
+  overflow:hidden;
+  margin:20px 0;
+}
+
+.cb-header{
+  background:var(--bg3);
+  padding:8px 16px;
+  border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:space-between;
+}
+
+.cbh-label{
+  font-family:var(--mono);font-size:9px;
+  color:#888470;letter-spacing:.12em;text-transform:uppercase;
+}
+
+.cbh-badge{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.06em;
+}
+
+.cb-body{
+  padding:18px;
+  font-family:var(--mono);
+  font-size:12px;
+  line-height:1.9;
+}
+
+.cl{color:var(--ink3)}       /* comment */
+.ck{color:var(--gold)}        /* key */
+.cs{color:#7ab8a8}            /* string */
+.cn-r{color:var(--red)}       /* num red */
+.cn-g{color:var(--green)}     /* num green */
+.cn-a{color:#c8982a}          /* num amber */
+.cp{color:var(--ink3)}        /* punct */
+
+/* ── ARCHITECTURE FLOW ── */
+.arch-flow{
+  display:flex;align-items:center;gap:0;
+  margin:20px 0;
+  overflow-x:auto;
+}
+
+.arch-node{
+  flex:1;
+  border:1px solid var(--rule);
+  padding:16px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  text-align:center;
+  border-right:none;
+  transition:background .2s;
+  cursor:default;
+}
+.arch-node:last-child{border-right:1px solid var(--rule)}
+.arch-node:hover{background:rgba(200,168,74,.04)}
+.arch-node.hl{background:rgba(200,168,74,.07);border-color:rgba(200,168,74,.3)}
+.arch-node.hl:hover{background:rgba(200,168,74,.1)}
+
+.an-icon{display:flex;align-items:center;justify-content:center;width:36px;height:36px}
+.an-title{font-family:var(--cond);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.an-sub{font-family:var(--mono);font-size:9px;color:#7a7460;letter-spacing:.04em}
+
+/* ── ROADMAP TABLE — timeline ── */
+.rm-table{
+  display:flex;flex-direction:column;gap:0;
+  border:1px solid var(--rule);
+  margin:20px 0;
+}
+
+.rm-row{
+  display:flex;align-items:stretch;
+  border-bottom:1px solid var(--rule2);
+}
+.rm-row:last-child{border-bottom:none}
+
+.rm-phase-col{
+  width:100px;flex-shrink:0;
+  padding:16px 14px;
+  border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  background:var(--bg2);
+}
+
+.rm-q{font-family:var(--cond);font-size:20px;font-weight:700;color:var(--gold)}
+.rm-year{font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:.06em}
+.rm-status-dot{
+  width:8px;height:8px;border-radius:50%;
+  margin-top:8px;
+}
+
+.rm-content-col{
+  flex:1;padding:16px 20px;
+  display:flex;align-items:center;gap:20px;
+}
+
+.rm-title-col{min-width:180px}
+.rm-title-text{font-family:var(--cond);font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);margin-bottom:3px}
+.rm-phase-name{font-family:var(--mono);font-size:9px;color:#888470;letter-spacing:.06em}
+
+.rm-tags{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.rm-tag{
+  font-family:var(--mono);font-size:9px;
+  border:1px solid var(--rule2);
+  padding:2px 8px;color:#888470;
+}
+.rm-tag.active{color:var(--gold);border-color:rgba(200,168,74,.3)}
+.rm-tag.done{color:var(--green);border-color:rgba(74,154,90,.3)}
+
+/* ── TOKEN ALLOC BARS ── */
+.alloc-bars{margin:20px 0;display:flex;flex-direction:column;gap:10px}
+
+.ab-row{display:flex;align-items:center;gap:14px}
+
+.ab-label{
+  font-family:var(--mono);font-size:10px;
+  color:var(--ink);width:160px;flex-shrink:0;
+}
+
+.ab-bar{
+  flex:1;height:6px;background:rgba(255,255,255,.04);
+  border-radius:0;overflow:hidden;
+}
+.ab-fill{height:100%;border-radius:0}
+
+.ab-pct{
+  font-family:var(--cond);font-size:18px;font-weight:700;
+  color:var(--gold);width:52px;text-align:right;flex-shrink:0;
+  letter-spacing:-1px;
+}
+
+/* ── SCAN VERDICT BOX ── */
+.verdict{
+  border:1px solid var(--red);
+  padding:16px 20px;
+  margin:20px 0;
+  display:flex;align-items:center;gap:16px;
+}
+
+.vd-label{
+  font-family:var(--cond);font-size:11px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:var(--red);flex-shrink:0;
+}
+
+.vd-text{
+  font-family:var(--mono);font-size:12px;
+  color:var(--ink);flex:1;
+}
+
+.vd-score{
+  font-family:var(--cond);font-size:48px;font-weight:700;
+  color:var(--red);line-height:1;letter-spacing:-3px;flex-shrink:0;
+}
+
+/* ── FOOTER ── */
+.footer{
+  border-top:3px double var(--gold);
+  padding:24px 60px;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:40px;
+  margin-top:60px;
+}
+
+.ft-col{flex:1}
+.ft-label{font-family:var(--cond);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
+.ft-text{font-family:var(--mono);font-size:10px;color:#888470;line-height:1.8;letter-spacing:.02em}
+.ft-text a{color:var(--gold);text-decoration:none}
+
+.ft-disclaimer{
+  margin-top:20px;
+  padding:16px;
+  border:1px solid var(--rule);
+  font-family:var(--mono);font-size:10px;
+  color:var(--ink4);line-height:1.8;
+}
+
+/* ── SECTION PADDING ── */
+.section{padding:40px 0}
+.section + .section{border-top:1px solid var(--rule2)}
+</style>
+</head>
+<body>
+
+<!-- ═══════ MASTHEAD ═══════ -->
+<header class="masthead">
+  <div class="mh-top">
+    <span class="mh-meta">VOL. I &nbsp;·&nbsp; NO. 1 &nbsp;·&nbsp; 2025</span>
+    <div class="mh-logo-pill">
+      <div class="mh-logo-icon">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#c8a84a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <span class="mh-logo-name">CryptoLens AI</span>
+    </div>
+    <span class="mh-meta">MULTI-CHAIN &nbsp;·&nbsp; AI INTELLIGENCE</span>
+  </div>
+
+  <div class="mh-title">
+    Crypto<span class="gold-word">Intelligence</span>Lens
+  </div>
+
+  <p class="mh-subtitle">AI-Powered Token Analysis, Whale Tracking & On-Chain Risk Intelligence Technical Whitepaper</p>
+
+  <div class="mh-rule"></div>
+
+  <div class="mh-bottom">
+    <span class="mh-edition">First Edition &nbsp;·&nbsp; Technical Whitepaper &nbsp;·&nbsp;</span>
+    <div class="mh-tags">
+      <span class="mh-tag">Ethereum</span>
+      <span class="mh-tag">Solana</span>
+      <span class="mh-tag">BNB Chain</span>
+      <span class="mh-tag">Base</span>
+      <span class="mh-tag gold">$CL Token</span>
+    </div>
+    <span class="mh-edition">cryptolens &nbsp;·&nbsp; @ScanByLens</span>
+  </div>
+</header>
+
+<div class="paper-body">
+
+  <!-- ═══════ SECTION 0 — ABSTRACT ═══════ -->
+  <div class="section">
+    <div class="col-2-3">
+
+      <!-- Left: abstract headline -->
+      <div style="border-right:1px solid var(--rule2);padding-right:48px">
+        <div class="section-rule">
+          <div class="sr-line"></div>
+          <div class="sr-label">Abstract</div>
+          <div class="sr-line"></div>
+        </div>
+        <h1 class="hed-xl" style="margin-bottom:20px">
+          Scan<br>
+          before<br>
+          you<br>
+          <em>ape.</em>
+        </h1>
+        <div class="stat-row" style="margin-top:28px">
+          <div class="stat-item">
+            <span class="si-val">30s</span>
+            <span class="si-label">Full scan</span>
+          </div>
+          <div class="stat-item">
+            <span class="si-val">94%</span>
+            <span class="si-label">Accuracy</span>
+          </div>
+          <div class="stat-item">
+            <span class="si-val">4+</span>
+            <span class="si-label">Chains</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: abstract body -->
+      <div>
+        <div class="section-rule">
+          <div class="sr-line"></div>
+          <div class="sr-label">Executive Summary</div>
+          <div class="sr-line"></div>
+        </div>
+        <p class="copy dropcap">
+          CryptoLens AI is a real-time token intelligence platform powered by artificial intelligence, designed to give every crypto participant from retail traders to institutional desks the same informational edge that sophisticated on-chain analysts have spent years building manually.
+        </p>
+        <p class="copy" style="margin-top:14px">
+          Every day, billions of dollars move through crypto markets on the basis of <strong>information asymmetry</strong>. Sophisticated players consistently front-run retail participants by minutes, hours, or days using custom infrastructure and proprietary data feeds unavailable to 99% of traders.
+        </p>
+        <div class="pull">
+          <p class="pull-text">"The average retail investor spends 20–30 minutes manually verifying a single token before buying and still misses critical red flags."</p>
+          <div class="pull-attr">CryptoLens Research, 2025</div>
+        </div>
+        <p class="copy">
+          This document outlines the problem we solve, our technical architecture, core product features, token distribution model, and the roadmap to a fully decentralised intelligence layer for crypto markets. CryptoLens AI is built on four pillars: <strong>speed</strong>, <strong>accuracy</strong>, <strong>accessibility</strong>, and <strong>reward</strong>.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════ SECTION 1 — PROBLEM ═══════ -->
+  <div class="section">
+    <div class="section-rule">
+      <div class="sr-line"></div>
+      <div class="sr-label">§ 01 The Problem</div>
+      <div class="sr-line"></div>
+    </div>
+
+    <div class="col-3-2" style="margin-bottom:32px">
+      <div>
+        <h2 class="hed-lg" style="margin-bottom:20px">
+          Retail always<br>
+          finds out<br>
+          <em>too late.</em>
+        </h2>
+        <p class="copy">The crypto market is structurally unfair to retail participants. Not because of malice but because of <strong>infrastructure gaps</strong> that compound over time. Those with access to on-chain scanners, whale wallet trackers, and real-time contract auditing tools consistently act before prices reflect new information.</p>
+        <p class="copy" style="margin-top:12px">The result is predictable: retail buys after the pump, sells into whale distribution, and falls into honeypot traps that more sophisticated analysis would have flagged in seconds.</p>
+      </div>
+      <div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Problem</th>
+              <th>Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-bold">Information Asymmetry</td>
+              <td>Smart money acts 48h early on average</td>
+            </tr>
+            <tr>
+              <td class="td-bold">Speed Gap</td>
+              <td>Manual research: 20–30 min per token</td>
+            </tr>
+            <tr>
+              <td class="td-bold">Rug Vectors</td>
+              <td>$4.6B lost to rugs & exploits in 2024</td>
+            </tr>
+            <tr>
+              <td class="td-bold">Whale Opacity</td>
+              <td>99% of retail miss accumulation signals</td>
+            </tr>
+            <tr>
+              <td class="td-bold">Tool Costs</td>
+              <td>Pro tools cost $200–500/month</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div>
+        <div class="hed-md">01</div>
+        <div class="mh-rule" style="margin:10px 0"></div>
+        <p class="copy" style="font-size:13px">On-chain scanners and proprietary data feeds are accessible only to players with engineering resources and capital to deploy custom infrastructure.</p>
+      </div>
+      <div>
+        <div class="hed-md">02</div>
+        <div class="mh-rule" style="margin:10px 0"></div>
+        <p class="copy" style="font-size:13px">Manual research per token takes 20–30 minutes. By the time retail completes due diligence, the entry window for most opportunities has already closed.</p>
+      </div>
+      <div>
+        <div class="hed-md">03</div>
+        <div class="mh-rule" style="margin:10px 0"></div>
+        <p class="copy" style="font-size:13px">Honeypot functions, unlocked liquidity pools, and concentrated dev wallets are invisible to naked-eye inspection but detectable with AI contract analysis.</p>
+      </div>
+      <div>
+        <div class="hed-md">04</div>
+        <div class="mh-rule" style="margin:10px 0"></div>
+        <p class="copy" style="font-size:13px">Whale accumulation and distribution patterns are silently broadcast on-chain 48 hours before price movements but only to those with the tools to read them.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SECTION 2 — SOLUTION ═══════ -->
+  <div class="section">
+    <div class="section-rule">
+      <div class="sr-line"></div>
+      <div class="sr-label">§ 02 Our Solution</div>
+      <div class="sr-line"></div>
+    </div>
+
+    <div class="col-2" style="margin-bottom:32px">
+      <div>
+        <h2 class="hed-lg" style="margin-bottom:20px">
+          Every flag.<br>
+          Every risk.<br>
+          <em>One scan.</em>
+        </h2>
+        <p class="copy">CryptoLens AI collapses the 20-minute manual research process into a single 30-second AI scan. Our proprietary models ingest on-chain data across multiple networks simultaneously, scoring each token across dozens of risk and opportunity vectors.</p>
+        <p class="copy" style="margin-top:12px">The result is a <strong>0–100 safety score</strong> with fully explained components not a black box. Every flag is traceable to a specific on-chain condition, giving users actionable intelligence rather than just a verdict.</p>
+
+        <div class="verdict">
+          <div class="vd-label">Sample Verdict</div>
+          <div class="vd-text">
+            Honeypot detected · Dev holds 68% · LP unlocked<br>
+            <span style="color:#888470">3 critical flags · Do not buy</span>
+          </div>
+          <div class="vd-score">14</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="code-box">
+          <div class="cb-header">
+            <span class="cbh-label">Output · $TOKEN · BNB Chain · 28,400ms</span>
+            <span class="cbh-badge" style="color:var(--red)">⚠ RUG_RISK</span>
+          </div>
+          <div class="cb-body">
+            <div><span class="cp">{</span></div>
+            <div>&nbsp;&nbsp;<span class="ck">"token"</span><span class="cp">: </span><span class="cs">"$TOKEN"</span><span class="cp">,</span></div>
+            <div>&nbsp;&nbsp;<span class="ck">"chain"</span><span class="cp">: </span><span class="cs">"bnb"</span><span class="cp">,</span></div>
+            <div>&nbsp;&nbsp;<span class="ck">"scan_ms"</span><span class="cp">: </span><span class="cn-g">28400</span><span class="cp">,</span></div>
+            <div>&nbsp;&nbsp;<span class="ck">"safety_score"</span><span class="cp">: </span><span class="cn-r">14</span><span class="cp">,</span></div>
+            <div>&nbsp;&nbsp;<span class="ck">"verdict"</span><span class="cp">: </span><span class="cn-r">"RUG_RISK"</span><span class="cp">,</span></div>
+            <div>&nbsp;&nbsp;<span class="ck">"confidence"</span><span class="cp">: </span><span class="cn-a">0.94</span><span class="cp">,</span></div>
+            <div>&nbsp;&nbsp;<span class="ck">"flags"</span><span class="cp">: {</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="ck">"honeypot"</span><span class="cp">: </span><span class="cn-r">true</span><span class="cp">,</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="ck">"lp_locked"</span><span class="cp">: </span><span class="cn-r">false</span><span class="cp">,</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="ck">"dev_pct"</span><span class="cp">: </span><span class="cn-r">68.2</span><span class="cp">,</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="ck">"contract_verified"</span><span class="cp">: </span><span class="cn-g">true</span><span class="cp">,</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="ck">"blacklist_fn"</span><span class="cp">: </span><span class="cn-r">true</span></div>
+            <div>&nbsp;&nbsp;<span class="cp">}</span></div>
+            <div><span class="cp">}</span></div>
+          </div>
+        </div>
+
+        <p class="copy" style="font-size:13px;margin-top:12px">The scan above ran in <strong>28.4 seconds</strong> detecting a honeypot, unlocked LP, and 68% dev wallet concentration. A manual equivalent would take 25–35 minutes and likely miss the blacklist function.</p>
+      </div>
+    </div>
+
+    <!-- Architecture flow -->
+    <div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px">Intelligence Stack · Data Flow</div>
+      <div class="arch-flow">
+        <div class="arch-node">
+          <div class="an-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8a84a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+          <div class="an-title">Chain Layer</div>
+          <div class="an-sub">ETH · SOL · BNB · Base</div>
+        </div>
+        <div class="arch-node">
+          <div class="an-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8a84a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div class="an-title">Indexer</div>
+          <div class="an-sub">Real-time nodes</div>
+        </div>
+        <div class="arch-node hl">
+          <div class="an-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8a84a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg></div>
+          <div class="an-title">AI Engine</div>
+          <div class="an-sub">Proprietary models</div>
+        </div>
+        <div class="arch-node">
+          <div class="an-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8a84a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          <div class="an-title">Scoring API</div>
+          <div class="an-sub">0–100 · Explained</div>
+        </div>
+        <div class="arch-node">
+          <div class="an-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8a84a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div class="an-title">Alerts</div>
+          <div class="an-sub">Web · API · Email</div>
+        </div>
+        <div class="arch-node">
+          <div class="an-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8a84a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="an-title">User</div>
+          <div class="an-sub">30s · Free to start</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SECTION 3 — TOKENOMICS ═══════ -->
+  <div class="section">
+    <div class="section-rule">
+      <div class="sr-line"></div>
+      <div class="sr-label">§ 03 Tokenomics</div>
+      <div class="sr-line"></div>
+    </div>
+
+    <div class="col-2">
+      <div>
+        <h2 class="hed-lg" style="margin-bottom:16px">
+          Earn by<br>
+          <em>using.</em>
+        </h2>
+        <p class="copy">The <strong>$CL</strong> token is the utility and governance layer of the CryptoLens ecosystem. It is designed for long-term sustainability not speculation with a zero-tax policy and community-first distribution structure.</p>
+        <p class="copy" style="margin-top:12px">Users earn $CL by actively using the platform acting on signals, referring users, and contributing data quality feedback. This creates a virtuous cycle where the most engaged users are the most rewarded.</p>
+
+        <div class="stat-row" style="margin-top:24px">
+          <div class="stat-item">
+            <span class="si-val">200B</span>
+            <span class="si-label">Total supply</span>
+          </div>
+          <div class="stat-item">
+            <span class="si-val">0%</span>
+            <span class="si-label">Tax rate</span>
+          </div>
+          <div class="stat-item">
+            <span class="si-val">35%</span>
+            <span class="si-label">Community</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px">Token Distribution</div>
+        <div class="alloc-bars">
+          <div class="ab-row">
+            <div class="ab-label">Community &amp; Rewards</div>
+            <div class="ab-bar"><div class="ab-fill" style="width:35%;background:var(--gold)"></div></div>
+            <div class="ab-pct">35%</div>
+          </div>
+          <div class="ab-row">
+            <div class="ab-label">Ecosystem &amp; Dev</div>
+            <div class="ab-bar"><div class="ab-fill" style="width:25%;background:rgba(59,130,246,.8)"></div></div>
+            <div class="ab-pct">25%</div>
+          </div>
+          <div class="ab-row">
+            <div class="ab-label">Public Sale</div>
+            <div class="ab-bar"><div class="ab-fill" style="width:20%;background:var(--green)"></div></div>
+            <div class="ab-pct">20%</div>
+          </div>
+          <div class="ab-row">
+            <div class="ab-label">Team &amp; Advisors</div>
+            <div class="ab-bar"><div class="ab-fill" style="width:12%;background:rgba(139,92,246,.7)"></div></div>
+            <div class="ab-pct">12%</div>
+          </div>
+          <div class="ab-row">
+            <div class="ab-label">Reserve</div>
+            <div class="ab-bar"><div class="ab-fill" style="width:5%;background:rgba(239,68,68,.7)"></div></div>
+            <div class="ab-pct">5%</div>
+          </div>
+          <div class="ab-row">
+            <div class="ab-label">Liquidity Pool</div>
+            <div class="ab-bar"><div class="ab-fill" style="width:3%;background:rgba(240,185,11,.8)"></div></div>
+            <div class="ab-pct">3%</div>
+          </div>
+        </div>
+
+        <table class="data-table" style="margin-top:16px">
+          <thead>
+            <tr><th>Allocation</th><th>Amount</th><th>Vesting</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="td-bold">Community &amp; Rewards</td><td class="td-gold">70B</td><td>48m linear</td></tr>
+            <tr><td class="td-bold">Ecosystem &amp; Dev</td><td class="td-gold">50B</td><td>6m cliff, 36m linear</td></tr>
+            <tr><td class="td-bold">Public Sale</td><td class="td-gold">40B</td><td>25% TGE, 9m</td></tr>
+            <tr><td class="td-bold">Team &amp; Advisors</td><td class="td-gold">24B</td><td>12m cliff, 36m linear</td></tr>
+            <tr><td class="td-bold">Reserve</td><td class="td-gold">10B</td><td>6m cliff, locked 2yr</td></tr>
+            <tr><td class="td-bold">Liquidity Pool</td><td class="td-gold">6B</td><td>Locked 1 year</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+ 
+
+</body>
+</html>

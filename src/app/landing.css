@@ -178,3 +178,66 @@
 .lp-footer { border-top: 1px solid var(--edge); padding: 30px 0; }
 .lp-footer .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .lp-footer .meta { font-family: var(--font-mono-stack); font-size: 11px; color: var(--mut); letter-spacing: 0.05em; }
+
+/* ══════════════ CRAFT / POLISH LAYER ══════════════ */
+
+/* Frame registration marks + coordinate labels (instrument authenticity) */
+.reg { position: absolute; font-family: var(--font-mono-stack); font-size: 9px; letter-spacing: 0.16em; color: var(--mut); opacity: 0.65; text-transform: uppercase; z-index: 4; }
+.reg.tl { top: 5px; left: 9px; } .reg.tr { top: 5px; right: 9px; } .reg.bl { bottom: 5px; left: 9px; } .reg.br { bottom: 5px; right: 9px; }
+.plus { position: absolute; width: 8px; height: 8px; z-index: 4; opacity: 0.55; }
+.plus::before, .plus::after { content: ""; position: absolute; background: var(--edge-2); }
+.plus::before { left: 50%; top: 0; bottom: 0; width: 1px; margin-left: -0.5px; }
+.plus::after { top: 50%; left: 0; right: 0; height: 1px; margin-top: -0.5px; }
+.plus.p1 { top: -4px; left: -4px; } .plus.p2 { top: -4px; right: -4px; } .plus.p3 { bottom: -4px; left: -4px; } .plus.p4 { bottom: -4px; right: -4px; }
+
+/* Readout: reticle corners converge on load (focus lock) */
+.readout .rc.tl { animation: rcTL 0.85s var(--ease) both 0.55s; }
+.readout .rc.tr { animation: rcTR 0.85s var(--ease) both 0.6s; }
+.readout .rc.bl { animation: rcBL 0.85s var(--ease) both 0.6s; }
+.readout .rc.br { animation: rcBR 0.85s var(--ease) both 0.65s; }
+@keyframes rcTL { from { transform: translate(-13px, -13px); opacity: 0; } to { transform: none; opacity: 0.85; } }
+@keyframes rcTR { from { transform: translate(13px, -13px); opacity: 0; } to { transform: none; opacity: 0.85; } }
+@keyframes rcBL { from { transform: translate(-13px, 13px); opacity: 0; } to { transform: none; opacity: 0.85; } }
+@keyframes rcBR { from { transform: translate(13px, 13px); opacity: 0; } to { transform: none; opacity: 0.85; } }
+
+/* Readout: status line + focusing → locked */
+.readout .status { font-family: var(--font-mono-stack); font-size: 10px; letter-spacing: 0.14em; color: var(--gold); overflow: hidden; }
+.readout .status .fx { display: inline-block; animation: statusfx 2s steps(1) forwards 0.6s; }
+@keyframes statusfx { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+
+/* Signal draw + area fade + focal dot pulse */
+.sig .line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: sdraw 1.5s var(--ease) forwards 0.75s; }
+@keyframes sdraw { to { stroke-dashoffset: 0; } }
+.sig .fill { opacity: 0; animation: sfill 0.9s ease forwards 1.7s; }
+@keyframes sfill { to { opacity: 1; } }
+.sig .dot { opacity: 0; animation: sdot 0.4s var(--ease) forwards 2.05s; }
+@keyframes sdot { to { opacity: 1; } }
+.sig .ring { transform-origin: center; transform-box: fill-box; opacity: 0; animation: sring 1.8s ease-out infinite 2.2s; }
+@keyframes sring { 0% { opacity: 0.5; transform: scale(0.6); } 100% { opacity: 0; transform: scale(2.6); } }
+
+/* Confidence meter */
+.conf { margin-top: 16px; }
+.conf .cl { display: flex; justify-content: space-between; font-family: var(--font-mono-stack); font-size: 10.5px; letter-spacing: 0.08em; color: var(--mut); margin-bottom: 7px; }
+.conf .cl b { color: var(--sec); }
+.conf .bar { height: 2px; background: var(--ink-3); position: relative; overflow: hidden; }
+.conf .bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, var(--pos), var(--gold)); animation: cfill 1.3s var(--ease) forwards 1.9s; }
+@keyframes cfill { to { width: 78%; } }
+
+/* Read rows: the instrument focuses on hover */
+.read-row { position: relative; }
+.read-row::before { content: ""; position: absolute; left: -1px; top: 22px; bottom: 22px; width: 2px; background: var(--gold); transform: scaleY(0); transform-origin: top; transition: transform 0.35s var(--ease); }
+.read-row:hover::before { transform: scaleY(1); }
+.read-row h3, .read-row p { transition: color 0.3s; }
+.read-row p { opacity: 0.82; transition: opacity 0.3s; }
+.read-row:hover p { opacity: 1; }
+.read-row .idx { transition: color 0.3s; }
+.read-row:hover .idx { color: var(--gold); }
+
+/* Section ref sticks while its section scrolls (briefing spine) */
+@media (min-width: 761px) { .sec-ref { position: sticky; top: 96px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .readout .rc, .sig .line, .sig .fill, .sig .dot, .sig .ring, .conf .bar i, .readout .status .fx { animation: none !important; }
+  .sig .line { stroke-dashoffset: 0 !important; } .sig .fill, .sig .dot { opacity: 1 !important; }
+  .conf .bar i { width: 78% !important; } .readout .rc { opacity: 0.85 !important; }
+}

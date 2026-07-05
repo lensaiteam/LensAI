@@ -9,12 +9,32 @@
 .lp {
   --hair: rgba(255, 255, 255, 0.1);
   --hair-soft: rgba(255, 255, 255, 0.06);
+  --nav-bg: rgba(7, 7, 15, 0.7);
   position: relative;
   background: var(--void);
   color: var(--txt);
   overflow-x: hidden;
   font-family: var(--font-sans-stack);
+  transition: background 0.4s ease, color 0.4s ease;
 }
+
+/* Light theme (clean neutral paper — not warm cream). Scoped to the landing. */
+.lp.light {
+  --void: #f3f3f1;
+  --txt: #16161a;
+  --sec: #55555f;
+  --mut: #8b8b94;
+  --ink-3: #e7e7e2;
+  --hair: rgba(0, 0, 0, 0.13);
+  --hair-soft: rgba(0, 0, 0, 0.07);
+  --nav-bg: rgba(243, 243, 241, 0.72);
+  --gold: #9a7a2e;
+  --gold-l: #b8922f;
+  --pos: #1f9d63;
+  --neg: #d8404c;
+  --warn: #bd8420;
+}
+.lp.light ::selection { background: rgba(154, 122, 46, 0.24); color: #000; }
 .lp-wrap { max-width: 1280px; margin: 0 auto; padding: 0 clamp(24px, 6vw, 88px); }
 
 /* ── Atoms ── */
@@ -36,7 +56,9 @@
   transition: background 0.35s, border-color 0.35s, backdrop-filter 0.35s;
   border-bottom: 1px solid transparent;
 }
-.lp-nav.stuck { background: rgba(7, 7, 15, 0.7); backdrop-filter: blur(16px); border-color: var(--hair-soft); }
+.lp-nav.stuck { background: var(--nav-bg); backdrop-filter: blur(16px); border-color: var(--hair-soft); }
+.tgl { font-family: var(--font-mono-stack); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sec); background: none; border: 1px solid var(--hair); padding: 6px 12px; border-radius: 100px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+.tgl:hover { color: var(--txt); border-color: var(--sec); }
 .brand { display: flex; align-items: center; gap: 12px; color: var(--txt); font-weight: 600; font-size: 16px; letter-spacing: -0.02em; }
 .brand .glyph { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--gold); position: relative; }
 .brand .glyph::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: var(--gold); }

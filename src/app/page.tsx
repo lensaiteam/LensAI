@@ -69,7 +69,13 @@ function Inner() {
 
   return (
     <div className="lp">
-      <div className="lp-frame" aria-hidden />
+      <div className="lp-frame" aria-hidden>
+        <span className="plus p1" /><span className="plus p2" /><span className="plus p3" /><span className="plus p4" />
+        <span className="reg tl">LENSAI · DESK</span>
+        <span className="reg tr">OPTICS · v1</span>
+        <span className="reg bl">NON-ADVISORY</span>
+        <span className="reg br">FOCUS · LOCKED</span>
+      </div>
       <motion.div
         aria-hidden
         style={{
@@ -159,13 +165,17 @@ function Inner() {
                   <stop offset="1" stopColor="var(--pos)" stopOpacity="0" />
                 </linearGradient>
               </defs>
-              <path d={sparkPath(true)} fill="url(#sg)" />
-              <path d={sparkPath(false)} fill="none" stroke="var(--pos)" strokeWidth="1.4" />
+              <path className="fill" d={sparkPath(true)} fill="url(#sg)" />
+              <path className="line" d={sparkPath(false)} fill="none" stroke="var(--pos)" strokeWidth="1.4" pathLength={1} vectorEffect="non-scaling-stroke" />
             </svg>
             <div className="row"><span>MARKET CAP</span><span>$1.25T</span></div>
             <div className="row"><span>24H VOLUME</span><span>$28.4B</span></div>
             <div className="row"><span>SUPPLY</span><span>19.7M / 21M</span></div>
             <div className="row"><span>RANK</span><span>#01</span></div>
+            <div className="conf">
+              <div className="cl"><span>SIGNAL CONFIDENCE</span><b>78% · HIGH</b></div>
+              <div className="bar"><i /></div>
+            </div>
             <div className="verdict-row">
               <span className="stamp pos"><b>ASSESSMENT — POSITIVE</b></span>
               <span className="mono" style={{ fontSize: 11, color: "var(--mut)" }}>as of 22:19</span>

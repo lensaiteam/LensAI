@@ -1,5 +1,5 @@
 import "server-only";
-import { anthropic, WEB_SEARCH_TOOL } from "./anthropic";
+import { getProvider } from "./provider";
 import { splitTrailer, inferSignal } from "./trailer";
 import {
   ANALYSIS_SYSTEM_PROMPT,
@@ -57,46 +57,24 @@ export async function streamAnalysis(
   const contextBlock =
     buildMarketBlock(opts.marketData) + (hasNews ? "\n\n" + buildNewsBlock(opts.newsDigest!) : "");
 
-  const client = anthropic();
-  const stream = client.messages.stream({
-    model,
-    max_tokens: 2000, // §4.5 output cap
-    system: [
-      {
-        type: "text",
-        text: ANALYSIS_SYSTEM_PROMPT,
-        cache_control: { type: "ephemeral" }, // shared across all analyses — biggest cache lever
-      },
-    ],
-    // Only attach web search for the long tail (no pre-fetched news).
-    ...(hasNews ? {} : { tools: [WEB_SEARCH_TOOL] }),
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: contextBlock },
-          { type: "text", text: buildAnalysisInstruction(opts.ticker, hasNews) },
-        ],
-      },
-    ],
-  });
+  // Provider-neutral: the selected adapter handles streaming, prompt caching,
+  // and web search / grounding. Long-tail tokens search the web; popular tokens
+  // with pre-fetched news do not (§4.3).
+  const provider = getProvider();
+  const result = await provider.streamMessage(
+    {
+      model,
+      system: ANALYSIS_SYSTEM_PROMPT,
+      messages: [
+        { role: "user", content: `${contextBlock}\n\n${buildAnalysisInstruction(opts.ticker, hasNews)}` },
+      ],
+      maxTokens: 2000, // §4.5 output cap
+      webSearch: !hasNews,
+    },
+    onText,
+  );
 
-  stream.on("text", (delta) => onText(delta));
-
-  const final = await stream.finalMessage();
-
-  // Collect the full assistant text across text blocks.
-  const fullText = final.content
-    .filter((b): b is Extract<typeof b, { type: "text" }> => b.type === "text")
-    .map((b) => b.text)
-    .join("");
-
-  const { prose, trailer } = splitTrailer(fullText);
-  const usage = final.usage;
-  const webSearches =
-    (usage as { server_tool_use?: { web_search_requests?: number } }).server_tool_use
-      ?.web_search_requests ?? 0;
-
+  const { prose, trailer } = splitTrailer(result.text);
   const signal: Signal = trailer?.signal ?? inferSignal(prose);
 
   const analysis: Analysis = {
@@ -121,9 +99,9 @@ export async function streamAnalysis(
       },
     riskFlags: trailer?.risk_flags ?? [],
     news: trailer?.news ?? opts.newsDigest?.items ?? [],
-    model,
-    inputTokens: usage.input_tokens ?? 0,
-    outputTokens: usage.output_tokens ?? 0,
-    webSearches,
+    model: `${provider.name}/${model}`,
+    inputTokens: result.inputTokens,
+    outputTokens: result.outputTokens,
+    webSearches: result.webSearches,
   };
 }

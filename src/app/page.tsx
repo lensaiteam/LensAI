@@ -1,11 +1,30 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent, useReducedMotion } from "framer-motion";
 import { Reveal, SmoothScroll } from "@/components/motion";
 import "./landing.css";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+// Popular assets — real brand colours bring the page to life.
+const COINS = [
+  { s: "BTC", n: "Bitcoin", c: "#f7931a", g: "₿", d: false, price: "$62,578.74", chg: "+5.22%", up: true, v: "pos", vt: "POSITIVE", mcap: "$1.25T", rank: "#01" },
+  { s: "ETH", n: "Ethereum", c: "#627eea", g: "Ξ", d: false, price: "$1,770.52", chg: "+12.81%", up: true, v: "pos", vt: "POSITIVE", mcap: "$214B", rank: "#02" },
+  { s: "SOL", n: "Solana", c: "linear-gradient(135deg,#14f195,#9945ff)", g: "◎", d: false, price: "$80.98", chg: "+13.61%", up: true, v: "mix", vt: "MIXED", mcap: "$47B", rank: "#07" },
+  { s: "BNB", n: "BNB", c: "#f3ba2f", g: "◆", d: true, price: "$584.20", chg: "+2.10%", up: true, v: "pos", vt: "POSITIVE", mcap: "$85B", rank: "#04" },
+  { s: "XRP", n: "XRP", c: "#3b4b57", g: "✕", d: false, price: "$0.5240", chg: "−1.20%", up: false, v: "mix", vt: "MIXED", mcap: "$29B", rank: "#06" },
+  { s: "DOGE", n: "Dogecoin", c: "#c2a633", g: "Ð", d: true, price: "$0.0612", chg: "−1.80%", up: false, v: "neg", vt: "NEGATIVE", mcap: "$8.8B", rank: "#09" },
+  { s: "LINK", n: "Chainlink", c: "#2a5ada", g: "⬡", d: false, price: "$11.42", chg: "+4.10%", up: true, v: "pos", vt: "POSITIVE", mcap: "$7.1B", rank: "#14" },
+  { s: "AVAX", n: "Avalanche", c: "#e84142", g: "▲", d: false, price: "$18.70", chg: "+6.90%", up: true, v: "pos", vt: "POSITIVE", mcap: "$7.4B", rank: "#12" },
+] as const;
+type Coin = (typeof COINS)[number];
+
+const SPK: Record<string, number[]> = {
+  pos: [40, 42, 41, 44, 43, 47, 45, 44, 49, 48, 52, 50, 55, 53, 58, 57, 61, 64],
+  mix: [50, 48, 52, 49, 54, 51, 56, 53, 58, 55, 60, 57, 62, 59, 63, 60, 64, 61],
+  neg: [62, 60, 57, 59, 54, 56, 52, 50, 53, 49, 51, 47, 49, 45, 47, 44, 46, 42],
+};
 
 // The instrument scans across these live (hero read cycles through them).
 const TOKENS = [
@@ -116,6 +135,73 @@ function Tape() {
   );
 }
 
+function CoinBadge({ coin, cls }: { coin: Coin; cls?: string }) {
+  return (
+    <span className={`coin ${cls ?? ""}`} style={{ background: coin.c, color: coin.d ? "#0b0b12" : "#fff" }}>
+      <span>{coin.g}</span>
+    </span>
+  );
+}
+
+/** Scroll to bring each asset into focus — the instrument scanning the market. */
+function Spotlight() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+  const [i, setI] = useState(0);
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    setI(Math.min(COINS.length - 1, Math.max(0, Math.floor(v * COINS.length))));
+  });
+  const t = COINS[i];
+  const glow = t.c.startsWith("#") ? `${t.c}80` : "#9945ff80";
+
+  return (
+    <section className="spotlight" ref={ref}>
+      <div className="sp-sticky lp-wrap">
+        <div className="sp-head">
+          <h2 className="display">The desk is <span className="dim">always watching.</span></h2>
+          <span className="cnt">{String(i + 1).padStart(2, "0")} / {String(COINS.length).padStart(2, "0")}</span>
+        </div>
+        <div className="sp-stage">
+          <AnimatePresence mode="wait">
+            <motion.div key={t.s}
+              initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
+              transition={{ duration: 0.4, ease: EASE }}
+            >
+              <span className="coin sp-coin" style={{ background: t.c, color: t.d ? "#0b0b12" : "#fff", boxShadow: `0 30px 80px -34px ${glow}` }}>
+                <span>{t.g}</span>
+              </span>
+            </motion.div>
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
+            <motion.div key={`${t.s}i`} className="sp-info"
+              initial={{ opacity: 0, x: 24, filter: "blur(8px)" }}
+              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, x: -16, filter: "blur(8px)" }}
+              transition={{ duration: 0.4, ease: EASE }}
+            >
+              <div className="nm">{t.n} · {t.s}</div>
+              <div className="px">{t.price}</div>
+              <div className={`chg ${t.up ? "up" : "dn"}`}>{t.chg} · 7D</div>
+              <svg className="sig" viewBox="0 0 300 44" preserveAspectRatio="none">
+                <path d={sparkPath(SPK[t.v])} fill="none" stroke={sigColor(t.v)} strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
+              </svg>
+              <div className="kv"><span>MARKET CAP</span><span>{t.mcap}</span></div>
+              <div className="kv"><span>RANK</span><span>{t.rank}</span></div>
+              <span className={`stamp ${t.v}`}>ASSESSMENT · {t.vt}</span>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+        <div className="sp-rail">
+          {COINS.map((c, k) => <CoinBadge key={c.s} coin={c} cls={k === i ? "on" : ""} />)}
+        </div>
+        <div className="sp-progress"><motion.i style={{ scaleX: scrollYProgress, transformOrigin: "0 0", position: "absolute", inset: 0, background: "var(--gold)" }} /></div>
+      </div>
+    </section>
+  );
+}
+
 export default function Landing() {
   return (
     <SmoothScroll>
@@ -161,6 +247,11 @@ function Inner() {
           Read the signal,<br /><span className="dim">not the noise.</span>
         </motion.h1>
 
+        <motion.div className="hero-rail" {...load(0.42)}>
+          <span className="lbl">Tracking 200+ assets ↓</span>
+          <div className="coins">{COINS.map((c) => <CoinBadge key={c.s} coin={c} />)}</div>
+        </motion.div>
+
         <div className="hero-lower">
           <motion.div className="col" {...load(0.5)}>
             <p>A research instrument for crypto. Point it at any token and get a decision-grade read from live data and current news — the assessment, the reasoning, both sides. Never a buy button.</p>
@@ -173,6 +264,7 @@ function Inner() {
         </div>
       </header>
 
+      <Spotlight />
       <Tape />
 
       {/* §01 THE READ */}

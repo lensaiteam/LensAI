@@ -5,17 +5,24 @@ import { supabaseAdmin } from "@/lib/supabase";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// DELETE /api/account -> full account deletion (§10). Cascades to sessions,
-// messages, watchlist, free_tier_usage, rate_limits; usage_log de-links.
+// DELETE /api/account -> full account deletion (§10).
+//
+// Deleting the users row triggers the schema's FK cascades: analysis_sessions ->
+// messages, watchlist, free_tier_usage, rate_limits are removed; usage_log
+// de-links (wallet_address set null) so aggregate cost accounting survives.
+//
+// NOTE: we delete the users row directly rather than calling app.delete_account.
+// Supabase's REST layer (PostgREST) only exposes the `public` schema, so the
+// `app`-schema function isn't callable over the API — and the direct delete
+// produces the exact same cascade.
 export async function DELETE() {
   const auth = await requireUser();
   if (auth instanceof NextResponse) return auth;
 
-  const { error } = await supabaseAdmin().rpc("delete_account", { target_wallet: auth.walletAddress });
-  // `app.delete_account` lives in the `app` schema; if rpc routing to `app` isn't
-  // configured, fall back to a direct delete on the users table (same cascade).
+  const { error } = await supabaseAdmin().from("users").delete().eq("wallet_address", auth.walletAddress);
   if (error) {
-    await supabaseAdmin().from("users").delete().eq("wallet_address", auth.walletAddress);
+    console.error("[account] delete failed", error);
+    return NextResponse.json({ error: "Failed to delete account" }, { status: 500 });
   }
 
   const res = NextResponse.json({ ok: true });

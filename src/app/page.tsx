@@ -125,7 +125,7 @@ function LandingInner() {
           {HEADLINE.map((w, i) => (
             <span key={i}>
               <span className="word">
-                <motion.span variants={wordVar} style={{ display: "inline-block", fontStyle: w.em ? "italic" : "normal", color: w.em ? "var(--gold-l)" : undefined }}>
+                <motion.span variants={wordVar} style={{ display: "inline-block", fontStyle: w.em ? "italic" : "normal" }}>
                   {w.t}&nbsp;
                 </motion.span>
               </span>
@@ -221,7 +221,7 @@ function LandingInner() {
               <div className="feat"><span className="fi">04</span><div><b>Overall read.</b> An honest synthesis with the reasoning — and follow-ups answered from the same gathered data.</div></div>
               <div style={{ marginTop: 26 }}>
                 <Link href="/app" style={{ textDecoration: "none" }}>
-                  <MagneticButton className="btn btn-solid"><span>Analyze BTC</span><span className="arw">→</span></MagneticButton>
+                  <MagneticButton className="btn btn-ghost"><span>Analyze BTC</span><span className="arw">→</span></MagneticButton>
                 </Link>
               </div>
             </div>

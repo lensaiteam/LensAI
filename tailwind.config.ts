@@ -33,7 +33,8 @@ const config: Config = {
         mut: "var(--mut)",
       },
       fontFamily: {
-        serif: ["var(--font-serif)", "Iowan Old Style", "Palatino", "Georgia", "serif"],
+        // No serif in the system — display uses the grotesk sans.
+        serif: ["var(--font-sans)", "system-ui", "sans-serif"],
         sans: ["var(--font-sans)", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "SF Mono", "Menlo", "monospace"],
       },

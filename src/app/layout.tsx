@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Brand type system (see brand/foundation.html): editorial serif display +
-// data-legible UI sans + data mono.
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  display: "swap",
-  style: ["normal", "italic"],
-});
+// Type system: a single refined grotesk (Geist, via Vercel's official package)
+// for display + UI, JetBrains Mono for data. No serif — clean and restrained.
 const jbmono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
@@ -23,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable} ${jbmono.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${jbmono.variable}`}>
       <body>
         <Providers>{children}</Providers>
       </body>

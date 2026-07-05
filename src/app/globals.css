@@ -37,10 +37,14 @@
   --glow-aqua: rgba(51, 224, 196, 0.32);
   --glow-iris: rgba(155, 140, 255, 0.3);
 
-  /* Type (next/font injects the *-font vars) */
-  --font-serif-stack: var(--font-serif), "Iowan Old Style", Palatino, Georgia, serif;
+  /* Type. Geist (via the `geist` package) exposes --font-geist-sans; JetBrains
+     Mono (next/font) exposes --font-mono. One grotesk for display + UI. */
+  --font-sans: var(--font-geist-sans);
   --font-sans-stack: var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono-stack: var(--font-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* "serif" is retained as the display alias (now the grotesk) so heading
+     classes don't need renaming — there is no serif in this system. */
+  --font-serif-stack: var(--font-sans-stack);
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -139,10 +143,10 @@ html.lenis body {
 
 /* Rendered markdown (analysis / chat) — brand-aligned */
 .md h2 {
-  font-family: var(--font-serif-stack);
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--gold-l);
+  font-family: var(--font-sans-stack);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--txt);
   letter-spacing: -0.01em;
   margin: 22px 0 8px;
 }

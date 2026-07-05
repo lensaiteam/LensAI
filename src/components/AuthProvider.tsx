@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useAccount, useSignMessage, useDisconnect } from "wagmi";
 import {
   fetchMe,
@@ -24,7 +24,7 @@ interface AuthState {
 const AuthCtx = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { address, chainId, isConnected } = useAccount();
+  const { address, chainId, isConnected, status } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
 
@@ -72,12 +72,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     disconnect();
   }, [disconnect]);
 
-  // If the wallet disconnects, drop the local session view.
+  // Sign out only on a genuine connected -> disconnected transition. We must NOT
+  // log out during the initial mount/reconnect window (wagmi reports
+  // status "connecting"/"reconnecting" with isConnected=false there) — otherwise
+  // a valid cookie session would be destroyed on every page refresh. The cookie
+  // is the source of truth; the wallet connection is a separate concern.
+  const wasConnected = useRef(false);
   useEffect(() => {
-    if (!isConnected && user) {
+    if (isConnected) {
+      wasConnected.current = true;
+      return;
+    }
+    if (status === "disconnected" && wasConnected.current && user) {
+      wasConnected.current = false;
       apiLogout().finally(() => setUser(null));
     }
-  }, [isConnected, user]);
+  }, [isConnected, status, user]);
 
   return (
     <AuthCtx.Provider

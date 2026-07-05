@@ -30,12 +30,23 @@ export interface VerifyResult {
   error?: string;
 }
 
+// Chains accepted for sign-in. MUST stay in sync with the wagmi/RainbowKit
+// config (src/lib/wagmi.ts). Login only proves address ownership, but we still
+// verify chainId per CLAUDE.md §5.1/§13 so a message scoped to an unexpected
+// chain is rejected.
+const ALLOWED_CHAIN_IDS = new Set<number>([1]); // mainnet
+
 export async function verifySiwe(message: string, signature: string): Promise<VerifyResult> {
   let siwe: SiweMessage;
   try {
     siwe = new SiweMessage(message);
   } catch {
     return { ok: false, error: "Malformed SIWE message" };
+  }
+
+  // Fail fast on an unsupported chain BEFORE consuming the nonce.
+  if (!ALLOWED_CHAIN_IDS.has(siwe.chainId)) {
+    return { ok: false, error: `Unsupported chain ${siwe.chainId}` };
   }
 
   const db = supabaseAdmin();

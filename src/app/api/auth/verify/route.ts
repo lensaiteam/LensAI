@@ -3,6 +3,7 @@ import { z } from "zod";
 import { verifySiwe } from "@/lib/auth/siwe";
 import { setSessionCookie } from "@/lib/auth/session";
 import { upsertUserOnLogin } from "@/lib/users";
+import { env } from "@/lib/env";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,6 +15,12 @@ const Body = z.object({
 
 // POST /api/auth/verify -> verify SIWE, set session cookie
 export async function POST(req: NextRequest) {
+  if (!env.dbConfigured()) {
+    return NextResponse.json(
+      { error: "LensAI backend isn't configured yet. Add Supabase credentials to .env.local (see README)." },
+      { status: 503 },
+    );
+  }
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });

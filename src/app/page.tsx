@@ -1,300 +1,277 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useSpring,
-  useMotionValueEvent,
-  useReducedMotion,
-} from "framer-motion";
-import { Reveal, Stagger, Item, MagneticButton, TiltCard, SmoothScroll } from "@/components/motion";
+import { motion, useScroll, useSpring, useMotionValueEvent } from "framer-motion";
+import { Reveal, Stagger, Item, SmoothScroll } from "@/components/motion";
 import "./landing.css";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const HEADLINE: { t: string; em?: boolean; br?: boolean }[] = [
-  { t: "Decision-grade" },
-  { t: "intelligence,", em: true, br: true },
-  { t: "never", br: true },
-  { t: "advice." },
-];
-
-const TICKER = [
-  ["BTC", "$62,578", "+5.2%", 1], ["ETH", "$1,770", "+12.8%", 1], ["SOL", "$80.98", "+13.6%", 1],
-  ["ARB", "$0.078", "-2.5%", 0], ["JUP", "$0.24", "+14.1%", 1], ["PEPE", "$0.0000027", "-3.2%", 0],
-  ["LINK", "$11.42", "+4.1%", 1], ["DOGE", "$0.061", "-1.8%", 0], ["AVAX", "$18.7", "+6.9%", 1],
-] as const;
-
-const STEPS = [
-  { no: "01", h: "Enter a ticker", p: "Type any token — BTC, a mid-cap, or a long-tail address. We resolve it across Coinbase and CoinGecko." },
-  { no: "02", h: "We gather the signal", p: "Live price, volume, supply, and current news are pulled and read in real time — the pipeline is the product, not the model's memory." },
-  { no: "03", h: "You get a read", p: "A decision-grade, six-section analysis with an honest POSITIVE / MIXED / NEGATIVE call — the reasoning, both sides, no buy button." },
-];
-
-const SIGNALS = [
-  { c: "pos", tag: "POSITIVE", p: "Strong fundamentals, healthy liquidity, constructive news flow — with the bear case still named." },
-  { c: "mix", tag: "MIXED", p: "Real strengths against real risks. We show the tension instead of resolving it for you." },
-  { c: "neg", tag: "NEGATIVE", p: "Thin liquidity, concentration, or red flags. If a token is unverifiable, we say so plainly." },
-];
-
-// Precomputed sparkline (representative).
-function sparkPath(pts: number[], fill: boolean) {
-  const W = 300, H = 58, max = Math.max(...pts), min = Math.min(...pts);
-  const d = pts
-    .map((v, i) => {
-      const x = (i / (pts.length - 1)) * W;
-      const y = H - 6 - ((v - min) / (max - min)) * (H - 14);
-      return `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`;
-    })
-    .join(" ");
-  return fill ? `${d} L300 58 L0 58 Z` : d;
+function Reticle() {
+  return (
+    <>
+      <span className="rc tl" /><span className="rc tr" /><span className="rc bl" /><span className="rc br" />
+    </>
+  );
 }
-const SPARK = [42, 40, 44, 38, 36, 45, 41, 48, 44, 52, 49, 56, 53, 60, 58, 63];
+
+const READ = [
+  { i: "R·01", h: "Snapshot", p: "Price, market cap, 24h/7d, volume and supply — the state of the asset in tabular precision." },
+  { i: "R·02", h: "Tokenomics", p: "Supply model, holder concentration and unlock risk — what the token's structure actually means." },
+  { i: "R·03", h: "Developments & sentiment", p: "Recent catalysts and the tone of coverage, each attributed to its source — not vibes." },
+  { i: "R·04", h: "Risk flags", p: "Liquidity, volatility and security signals surfaced plainly: green, amber, red." },
+  { i: "R·05", h: "Overall read", p: "An honest synthesis with the reasoning — and follow-ups answered from the same gathered data." },
+];
+
+const METHOD = [
+  { k: "01 · RESOLVE", h: "Point the instrument", p: "Type any ticker or address. LensAI resolves it across Coinbase and CoinGecko — or tells you plainly if it can't." },
+  { k: "02 · GATHER", h: "Pull the signal", p: "Live price, volume, supply and current news are read in real time. The pipeline is the product, not the model's memory." },
+  { k: "03 · ASSESS", h: "Return the read", p: "A decision-grade briefing with an honest POSITIVE / MIXED / NEGATIVE assessment — both cases, no buy button." },
+];
+
+const STANCE = [
+  { c: "pos", t: "POSITIVE", p: "Strong fundamentals, healthy liquidity, constructive flow — with the bear case still named." },
+  { c: "mix", t: "MIXED", p: "Real strengths against real risks. We hold the tension rather than resolve it for you." },
+  { c: "neg", t: "NEGATIVE", p: "Thin liquidity, concentration, red flags — or a token we simply can't verify, said plainly." },
+];
+
+const RECORD = [
+  { k: "AUTH", h: "A signature, nothing more", p: "Prove you own your wallet by signing a message. No transaction, no gas, no keys on our servers." },
+  { k: "DATA", h: "The address is the account", p: "No email, no password, no PII. Just your wallet — and two free reads to begin." },
+  { k: "CONTROL", h: "Erased on request", p: "One action removes your account and every session. Crypto-native by default." },
+];
+
+const SPARK = [40, 41, 39, 43, 42, 46, 44, 43, 48, 47, 51, 49, 54, 52, 57, 56, 60, 63];
+function sparkPath(fill: boolean) {
+  const W = 300, H = 64, max = Math.max(...SPARK), min = Math.min(...SPARK);
+  const d = SPARK.map((v, i) => {
+    const x = (i / (SPARK.length - 1)) * W;
+    const y = H - 6 - ((v - min) / (max - min)) * (H - 12);
+    return `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`;
+  }).join(" ");
+  return fill ? `${d} L300 64 L0 64 Z` : d;
+}
 
 export default function Landing() {
   return (
     <SmoothScroll>
-      <LandingInner />
+      <Inner />
     </SmoothScroll>
   );
 }
 
-function LandingInner() {
-  const reduce = useReducedMotion();
+function Inner() {
   const [stuck, setStuck] = useState(false);
-  const { scrollY, scrollYProgress } = useScroll();
+  const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 });
-
-  useMotionValueEvent(scrollY, "change", (v) => setStuck(v > 40));
-
-  // Parallax orbs (disabled under reduced motion).
-  const yA = useTransform(scrollY, [0, 2400], [0, reduce ? 0 : 320]);
-  const yB = useTransform(scrollY, [0, 2400], [0, reduce ? 0 : -260]);
-  const yC = useTransform(scrollY, [0, 3000], [0, reduce ? 0 : 200]);
-
-  const heroContainer = { hidden: {}, show: { transition: { staggerChildren: 0.09, delayChildren: 0.15 } } };
-  const wordVar = { hidden: { y: "110%" }, show: { y: 0, transition: { duration: 0.9, ease: EASE } } };
-  const fade = (delay: number) => ({
-    initial: { opacity: 0, y: 22 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.9, delay, ease: EASE },
-  });
+  useMotionValueEvent(scrollYProgress, "change", (v) => setStuck(v > 0.02));
 
   return (
     <div className="lp">
-      {/* Ambient background */}
-      <div className="lp-bg">
-        <div className="lp-grid" />
-        <motion.div className="lp-orb a" style={{ y: yA }} />
-        <motion.div className="lp-orb b" style={{ y: yB }} />
-        <motion.div className="lp-orb c" style={{ y: yC }} />
-        <div className="lp-scan" />
-      </div>
-      <motion.div className="lp-progress" style={{ scaleX: progress }} />
+      <div className="lp-frame" aria-hidden />
+      <motion.div
+        aria-hidden
+        style={{
+          position: "fixed", top: 0, left: 0, right: 0, height: 1, zIndex: 60,
+          background: "var(--gold)", transformOrigin: "left", scaleX: progress,
+        }}
+      />
 
-      {/* Nav */}
+      {/* Dossier header */}
       <nav className={`lp-nav${stuck ? " stuck" : ""}`}>
         <Link className="brand" href="/">
-          <span className="mark">L</span>LensAI
+          <span className="glyph" />
+          <span className="wm">LensAI<small>Intelligence Desk</small></span>
         </Link>
-        <div className="lp-nav-links">
-          <a href="#how">How it works</a>
-          <a href="#signal">The read</a>
-          <a href="#preview">Preview</a>
-        </div>
         <div className="lp-nav-right">
+          <a className="navlink" href="#read">The read</a>
+          <a className="navlink" href="#method">Method</a>
+          <a className="navlink" href="#stance">Stance</a>
           <ConnectButton showBalance={false} chainStatus="none" accountStatus="address" />
-          <Link href="/app" className="btn btn-solid btn-sm">
-            <span>Open App</span>
-          </Link>
+          <Link href="/app" className="btn btn-primary btn-sm"><span>Open desk</span></Link>
         </div>
       </nav>
 
-      {/* Hero */}
-      <header className="lp-hero lp-wrap">
-        <motion.div className="boot" {...fade(0.15)}>
-          <span className="dot" /> system online · signal engine calibrated ·{" "}
-          <span style={{ color: "var(--aqua)" }}>non-advisory</span>
-        </motion.div>
+      {/* HERO */}
+      <header className="lp-wrap hero">
+        <div>
+          <motion.div className="hero-head"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}>
+            <span className="code"><b>LENSAI</b> · INTELLIGENCE DESK</span>
+            <span className="line" />
+            <span className="code">NON-ADVISORY</span>
+          </motion.div>
 
-        <motion.h1 className="h-serif hero-h1" variants={heroContainer} initial="hidden" animate="show">
-          {HEADLINE.map((w, i) => (
-            <span key={i}>
-              <span className="word">
-                <motion.span variants={wordVar} style={{ display: "inline-block", fontStyle: w.em ? "italic" : "normal" }}>
-                  {w.t}&nbsp;
-                </motion.span>
-              </span>
-              {w.br && <br />}
-            </span>
-          ))}
-        </motion.h1>
+          <motion.h1 className="display"
+            initial={{ opacity: 0, filter: "blur(12px)", y: 10 }}
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            transition={{ duration: 1.1, ease: EASE, delay: 0.15 }}>
+            Read the <em>signal</em>,<br />not the noise.
+          </motion.h1>
 
-        <motion.p className="hero-sub" {...fade(1.0)}>
-          A private research terminal for crypto. LensAI reads live markets and current news, then tells you
-          whether the signals look <b style={{ color: "var(--pos)" }}>positive</b>,{" "}
-          <b style={{ color: "var(--warn)" }}>mixed</b>, or <b style={{ color: "var(--neg)" }}>negative</b> — with the
-          reasoning, both sides, and no one telling you to buy.
-        </motion.p>
+          <motion.p className="hero-sub"
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.5 }}>
+            A research instrument for crypto. Point it at any token and get a decision-grade read from
+            live data and current news — the assessment, the reasoning, both sides. Never a buy button.
+          </motion.p>
 
-        <motion.div className="hero-cta" {...fade(1.2)}>
-          <Link href="/app" style={{ textDecoration: "none" }}>
-            <MagneticButton className="btn btn-solid">
-              <span>Analyze a token</span>
-              <span className="arw">→</span>
-            </MagneticButton>
-          </Link>
-          <a href="#how" style={{ textDecoration: "none" }}>
-            <MagneticButton className="btn btn-ghost">
-              <span>See how it works</span>
-            </MagneticButton>
-          </a>
-        </motion.div>
+          <motion.div className="hero-cta"
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.65 }}>
+            <Link href="/app" style={{ textDecoration: "none" }}>
+              <button className="btn btn-primary"><span>Analyze a token</span><span className="arw">→</span></button>
+            </Link>
+            <a href="#method" style={{ textDecoration: "none" }}>
+              <button className="btn btn-ghost"><span>How it works</span></button>
+            </a>
+          </motion.div>
 
-        <motion.div className="ticker" {...fade(1.45)}>
-          <div className="ticker-row">
-            {[...TICKER, ...TICKER].map((t, i) => (
-              <span className="tk" key={i}>
-                <b>{t[0]}</b> {t[1]} <span className={t[3] ? "up" : "dn"}>{t[2]}</span>
-              </span>
-            ))}
+          <motion.div className="hero-foot"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.9, ease: EASE, delay: 0.85 }}>
+            <div className="stat"><div className="n mono">02</div><div className="l">free reads</div></div>
+            <div className="stat"><div className="n mono">06</div><div className="l">sections per read</div></div>
+            <div className="stat"><div className="n mono">00</div><div className="l">buy signals</div></div>
+          </motion.div>
+        </div>
+
+        {/* Instrument readout */}
+        <motion.div
+          initial={{ opacity: 0, filter: "blur(14px)", scale: 1.015 }}
+          animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+          transition={{ duration: 1.2, ease: EASE, delay: 0.4 }}>
+          <div className="readout reticle">
+            <Reticle />
+            <div className="rhead">
+              <span className="t">Reading · Lens/01</span>
+              <span className="live">LIVE</span>
+            </div>
+            <div className="asset">
+              <div>
+                <div className="nm">BTC · Bitcoin</div>
+                <div className="px">$62,578.74</div>
+              </div>
+              <div className="chg up">+5.22%<br /><span style={{ color: "var(--mut)" }}>7D</span></div>
+            </div>
+            <svg className="sig" viewBox="0 0 300 64" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="sg" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stopColor="var(--pos)" stopOpacity="0.22" />
+                  <stop offset="1" stopColor="var(--pos)" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path d={sparkPath(true)} fill="url(#sg)" />
+              <path d={sparkPath(false)} fill="none" stroke="var(--pos)" strokeWidth="1.4" />
+            </svg>
+            <div className="row"><span>MARKET CAP</span><span>$1.25T</span></div>
+            <div className="row"><span>24H VOLUME</span><span>$28.4B</span></div>
+            <div className="row"><span>SUPPLY</span><span>19.7M / 21M</span></div>
+            <div className="row"><span>RANK</span><span>#01</span></div>
+            <div className="verdict-row">
+              <span className="stamp pos"><b>ASSESSMENT — POSITIVE</b></span>
+              <span className="mono" style={{ fontSize: 11, color: "var(--mut)" }}>as of 22:19</span>
+            </div>
+            <div className="disc mono">Information, not advice. Do your own research.</div>
           </div>
         </motion.div>
 
-        <motion.div className="scrollcue" {...fade(1.6)}>
-          <span className="ln" /> Scroll
-        </motion.div>
+        <div className="scrollcue">↓ Scroll · brief begins</div>
       </header>
 
-      {/* How it works */}
-      <section className="lp-section lp-wrap" id="how">
-        <Reveal><span className="eyebrow">How it works</span></Reveal>
-        <Reveal delay={0.05}><h2 className="h-serif h2">From ticker to a read in <em>one pass</em>.</h2></Reveal>
-        <Reveal delay={0.1}>
-          <p className="lead">The expensive part — gathering live data and news — happens once and is cached. Popular tokens are pre-computed and served instantly; only genuinely obscure ones hit a fresh pipeline.</p>
-        </Reveal>
-        <Stagger className="steps" gap={0.1}>
-          {STEPS.map((s) => (
-            <Item key={s.no} className="step">
-              <div className="no">{s.no}</div>
-              <h3>{s.h}</h3>
+      {/* §01 THE READ */}
+      <section className="lp-wrap lp-section" id="read">
+        <div className="sec-head">
+          <Reveal variant="rise"><div className="sec-ref"><span className="n">§01</span>The read</div></Reveal>
+          <Reveal variant="focus" delay={0.05}>
+            <h2 className="display h2">Every read is a briefing — <em style={{ fontStyle: "normal", color: "var(--gold)" }}>not a number.</em></h2>
+            <p className="lead" style={{ marginTop: 14 }}>One pass produces six attributed sections. The expensive part — gathering live data and news — happens once and is cached, so popular tokens return instantly.</p>
+          </Reveal>
+        </div>
+        <Stagger className="read-list" gap={0.06}>
+          {READ.map((r) => (
+            <Item key={r.i} className="read-row" variant="rise">
+              <div className="idx">{r.i}</div>
+              <div><h3>{r.h}</h3><p>{r.p}</p></div>
+            </Item>
+          ))}
+        </Stagger>
+      </section>
+
+      {/* §02 THE METHOD */}
+      <section className="lp-wrap lp-section" id="method">
+        <div className="sec-head">
+          <Reveal variant="rise"><div className="sec-ref"><span className="n">§02</span>The method</div></Reveal>
+          <Reveal variant="focus" delay={0.05}>
+            <h2 className="display h2">Point the instrument. <em style={{ fontStyle: "normal", color: "var(--gold)" }}>Get a read.</em></h2>
+          </Reveal>
+        </div>
+        <Stagger className="method" gap={0.09}>
+          {METHOD.map((m) => (
+            <Item key={m.k} className="step" variant="focus">
+              <div className="k">{m.k}</div>
+              <h3>{m.h}</h3>
+              <p>{m.p}</p>
+            </Item>
+          ))}
+        </Stagger>
+      </section>
+
+      {/* §03 THE STANCE */}
+      <section className="lp-wrap lp-section" id="stance">
+        <div className="sec-head">
+          <Reveal variant="rise"><div className="sec-ref"><span className="n">§03</span>The stance</div></Reveal>
+          <Reveal variant="focus" delay={0.05}>
+            <h2 className="display h2">We assess. <em style={{ fontStyle: "normal", color: "var(--gold)" }}>You decide.</em></h2>
+            <p className="lead" style={{ marginTop: 14 }}>Telling you to buy or sell is unlicensed advice — so LensAI never does. Every read lands on one of three stances, with both cases on the table.</p>
+          </Reveal>
+        </div>
+        <Stagger className="stances" gap={0.08}>
+          {STANCE.map((s) => (
+            <Item key={s.t} className="stance" variant="rise">
+              <span className={`stamp ${s.c}`}><b>{s.t}</b></span>
               <p>{s.p}</p>
             </Item>
           ))}
         </Stagger>
       </section>
 
-      {/* The read / non-advisory */}
-      <section className="lp-section lp-wrap" id="signal">
-        <Reveal><span className="eyebrow aq">Non-advisory by design</span></Reveal>
-        <Reveal delay={0.05}><h2 className="h-serif h2">We assess the signal — <em>you</em> make the call.</h2></Reveal>
-        <Reveal delay={0.1}>
-          <p className="lead">Telling you to buy or sell is unlicensed advice. So LensAI never does. It reads current signals as positive, mixed, or negative, and always presents both the bullish and bearish case.</p>
-        </Reveal>
-        <Stagger className="signals" gap={0.09}>
-          {SIGNALS.map((s) => (
-            <Item key={s.tag} variant="blur">
-              <div className={`sigcard ${s.c}`}>
-                <span className="tag">{s.tag}</span>
-                <p>{s.p}</p>
-                <div className="bar"><i /></div>
-              </div>
+      {/* §04 ON THE RECORD */}
+      <section className="lp-wrap lp-section" id="record">
+        <div className="sec-head">
+          <Reveal variant="rise"><div className="sec-ref"><span className="n">§04</span>On the record</div></Reveal>
+          <Reveal variant="focus" delay={0.05}>
+            <h2 className="display h2">Your keys. Your data. <em style={{ fontStyle: "normal", color: "var(--gold)" }}>Your call.</em></h2>
+          </Reveal>
+        </div>
+        <Stagger className="record" gap={0.09}>
+          {RECORD.map((r) => (
+            <Item key={r.k} className="rec" variant="focus">
+              <div className="k">{r.k}</div>
+              <h4>{r.h}</h4>
+              <p>{r.p}</p>
             </Item>
           ))}
         </Stagger>
       </section>
 
-      {/* Applied preview */}
-      <section className="lp-section lp-wrap" id="preview">
-        <Reveal><span className="eyebrow">A real read</span></Reveal>
-        <Reveal delay={0.05}><h2 className="h-serif h2">Everything you need, <em>nothing you don't</em>.</h2></Reveal>
-        <div className="applied">
-          <Reveal variant="rise" delay={0.05}>
-            <div>
-              <div className="feat"><span className="fi">01</span><div><b>Snapshot & tokenomics.</b> Price, market cap, volume, supply model, unlock and concentration risk — in tabular mono.</div></div>
-              <div className="feat"><span className="fi">02</span><div><b>Developments & sentiment.</b> Recent catalysts and the tone of coverage, each attributed to its source.</div></div>
-              <div className="feat"><span className="fi">03</span><div><b>Risk flags.</b> Liquidity, volatility, and security signals surfaced as green / amber / red.</div></div>
-              <div className="feat"><span className="fi">04</span><div><b>Overall read.</b> An honest synthesis with the reasoning — and follow-ups answered from the same gathered data.</div></div>
-              <div style={{ marginTop: 26 }}>
-                <Link href="/app" style={{ textDecoration: "none" }}>
-                  <MagneticButton className="btn btn-ghost"><span>Analyze BTC</span><span className="arw">→</span></MagneticButton>
-                </Link>
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal variant="blur" delay={0.1}>
-            <TiltCard className="acard">
-              <div className="top">
-                <div>
-                  <div className="price">$62,578.74</div>
-                  <div className="nm">Bitcoin · BTC</div>
-                </div>
-                <div className="sym">₿</div>
-              </div>
-              <svg className="spark" viewBox="0 0 300 58" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="sg" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0" stopColor="var(--pos)" stopOpacity="0.35" />
-                    <stop offset="1" stopColor="var(--pos)" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <path d={sparkPath(SPARK, true)} fill="url(#sg)" />
-                <path d={sparkPath(SPARK, false)} fill="none" stroke="var(--pos)" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span className="vchip">SIGNAL · POSITIVE</span>
-                <span className="font-mono" style={{ fontSize: 12, color: "var(--mut)" }}>as of 22:19</span>
-              </div>
-              <div className="grid2">
-                <div className="kv"><span>24H</span><span style={{ color: "var(--neg)" }}>−0.46%</span></div>
-                <div className="kv"><span>7D</span><span style={{ color: "var(--pos)" }}>+5.22%</span></div>
-                <div className="kv"><span>MKT CAP</span><span>$1.25T</span></div>
-                <div className="kv"><span>RANK</span><span>#1</span></div>
-              </div>
-              <div className="flags">
-                <span className="fl g">◆ Deepest liquidity</span>
-                <span className="fl g">◆ Halving supply</span>
-                <span className="fl y">◆ Macro-sensitive</span>
-              </div>
-              <div className="disc">LensAI provides information and analysis, not financial advice.</div>
-            </TiltCard>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Privacy */}
-      <section className="lp-section lp-wrap" id="privacy">
-        <Reveal><span className="eyebrow aq">Your keys, your data</span></Reveal>
-        <Reveal delay={0.05}><h2 className="h-serif h2">Sign in with a signature. <em>Nothing else.</em></h2></Reveal>
-        <Stagger className="privacy" gap={0.09}>
-          <Item className="p"><div className="k">No accounts</div><h4>Connect &amp; sign</h4><p>Prove you own your wallet with a message signature. No transaction, no gas, no private keys ever touch our servers.</p></Item>
-          <Item className="p"><div className="k">No PII</div><h4>Address is the account</h4><p>No email, no password. Identity is just your wallet address — and you can delete everything in one click.</p></Item>
-          <Item className="p"><div className="k">Two free</div><h4>Try before paying</h4><p>Your first two analyses are free. Popular tokens are served from cache and don't spend a credit.</p></Item>
-        </Stagger>
-      </section>
-
-      {/* Final CTA */}
-      <section className="lp-wrap cta-final">
-        <Reveal variant="blur">
-          <div className="big h-serif">Read the market like <em>a decision worth making.</em></div>
+      {/* CLOSE */}
+      <section className="lp-wrap close">
+        <Reveal variant="focus">
+          <div className="big">Bring any token <em>into focus.</em></div>
         </Reveal>
-        <Reveal delay={0.1}>
-          <Link href="/app" style={{ textDecoration: "none", display: "inline-block" }}>
-            <MagneticButton className="btn btn-solid"><span>Open the terminal</span><span className="arw">→</span></MagneticButton>
-          </Link>
+        <Reveal variant="rise" delay={0.1}>
+          <div style={{ marginTop: 30, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <Link href="/app" style={{ textDecoration: "none" }}>
+              <button className="btn btn-primary"><span>Open the desk</span><span className="arw">→</span></button>
+            </Link>
+            <span className="code">2 free reads · no card</span>
+          </div>
         </Reveal>
-        <div className="disclaimer-bar">LensAI provides information and analysis, not financial advice. Crypto is volatile; you can lose money.</div>
       </section>
 
-      <footer className="lp-footer">
-        <div className="lp-wrap row">
-          <Link className="brand" href="/"><span className="mark">L</span>LensAI</Link>
-          <div className="meta">© 2026 LensAI · gold #c8a84b on void #07070f</div>
+      <footer className="lp-footer lp-wrap">
+        <div className="row">
+          <Link className="brand" href="/"><span className="glyph" /><span className="wm">LensAI</span></Link>
+          <div className="meta">© 2026 · Information and analysis, not financial advice.</div>
         </div>
       </footer>
     </div>

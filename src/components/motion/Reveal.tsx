@@ -10,7 +10,12 @@ import type { ReactNode } from "react";
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 const VARIANTS: Record<string, Variants> = {
-  rise: { hidden: { opacity: 0, y: 34 }, show: { opacity: 1, y: 0 } },
+  rise: { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0 } },
+  // Focus-pull — the LensAI signature: content resolves from out-of-focus to sharp.
+  focus: {
+    hidden: { opacity: 0, filter: "blur(12px)", y: 14, scale: 1.012 },
+    show: { opacity: 1, filter: "blur(0px)", y: 0, scale: 1 },
+  },
   blur: {
     hidden: { opacity: 0, y: 24, scale: 1.03, filter: "blur(10px)" },
     show: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" },

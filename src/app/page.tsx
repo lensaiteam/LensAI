@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent, useReducedMotion } from "framer-motion";
-import { Reveal, SmoothScroll } from "@/components/motion";
+import { Reveal } from "@/components/motion";
+import { SiteShell } from "@/components/site/SiteShell";
 import "./landing.css";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -305,34 +306,15 @@ const ACCESS = [
 
 export default function Landing() {
   return (
-    <SmoothScroll>
-      <Inner />
-    </SmoothScroll>
+    <SiteShell>
+      <LandingBody />
+    </SiteShell>
   );
 }
 
-function Inner() {
-  const [stuck, setStuck] = useState(false);
-  const [light, setLight] = useState(true);
-  const { scrollY } = useScroll();
-  useMotionValueEvent(scrollY, "change", (v) => setStuck(v > 40));
-
+function LandingBody() {
   return (
-    <div className={`lp${light ? " light" : ""}`}>
-      {/* Floating morph nav — centered glass pill */}
-      <nav className={`lp-nav${stuck ? " stuck" : ""}`}>
-        <div className="nav-pill">
-          <Link className="brand" href="/"><span className="glyph" />LensAI</Link>
-          <span className="nav-div" />
-          <a className="navlink" href="#read">The read</a>
-          <a className="navlink" href="#method">Method</a>
-          <a className="navlink" href="#stance">Stance</a>
-          <span className="nav-div" />
-          <button className="tgl" onClick={() => setLight(!light)}>{light ? "Dark" : "Light"}</button>
-          <Link className="tlink navcta" href="/app"><span>Open the desk</span><span className="a">→</span></Link>
-        </div>
-      </nav>
-
+    <>
       {/* HERO + character-select stage */}
       <Stage />
       <Tape />
@@ -490,13 +472,6 @@ function Inner() {
           <Link className="tlink" href="/app"><span>Open the desk</span><span className="a">→</span></Link>
         </Reveal>
       </section>
-
-      <footer className="lp-footer lp-wrap">
-        <div className="row">
-          <Link className="brand" href="/"><span className="glyph" />LensAI</Link>
-          <div className="meta">© 2026 · Information and analysis, not financial advice.</div>
-        </div>
-      </footer>
-    </div>
+    </>
   );
 }

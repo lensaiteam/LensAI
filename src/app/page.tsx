@@ -298,6 +298,26 @@ const FLOW_ROWS: [string, number][] = [
   ["Risk Assessment", 37],
 ];
 
+// PCB-style traces radiating from the central report (the "chip") — coords in
+// the same 700×620 space as the connectors, drawn behind everything.
+const FLOW_TRACES = [
+  "M240,185 H162 L140,163 V84",
+  "M240,250 H120",
+  "M240,315 H150 V232 H92",
+  "M240,388 H132 V470 H70",
+  "M580,205 H648 V118",
+  "M580,338 H672",
+  "M580,408 H624 V492 H690",
+  "M332,132 V72 H214",
+  "M432,132 V96 H542 V42",
+  "M330,488 V558 H232",
+  "M452,488 V528 H602 V596",
+];
+const FLOW_VIAS: [number, number, number][] = [
+  [140, 84, 0], [120, 250, 0], [92, 232, 0], [70, 470, 1], [648, 118, 0],
+  [672, 338, 1], [690, 492, 0], [214, 72, 0], [542, 42, 0], [232, 558, 0], [602, 596, 0],
+];
+
 function FlowViz({ kind }: { kind: string }) {
   if (kind === "bars") {
     const bars = [8, 14, 10, 18, 12, 22, 16, 26, 20, 30];
@@ -334,6 +354,15 @@ function DataFlow() {
         </Reveal>
 
         <Reveal className="flow-stage" variant="rise" delay={0.1}>
+          <svg className="flow-circuit" viewBox="0 0 700 620" preserveAspectRatio="xMidYMid meet" aria-hidden>
+            {FLOW_TRACES.map((d, i) => (
+              <path key={i} d={d} fill="none" stroke="rgba(10,10,10,0.10)" strokeWidth="1.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
+            ))}
+            {FLOW_VIAS.map(([x, y, accent], i) => (
+              <circle key={i} cx={x} cy={y} r="3.4" fill="none" stroke={accent ? "var(--accent)" : "rgba(10,10,10,0.16)"} strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
+            ))}
+          </svg>
+
           <svg className="flow-links" viewBox="0 0 700 620" preserveAspectRatio="xMidYMid meet" aria-hidden>
             {FLOW_SOURCES.map((s) => (
               <path key={s.id} id={`fp-${s.id}`} d={s.path} fill="none" stroke="var(--hair)" strokeWidth="1.4" strokeDasharray="3 5" vectorEffect="non-scaling-stroke" />

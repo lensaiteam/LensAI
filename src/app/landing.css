@@ -14,6 +14,7 @@
   --card-brd: rgba(255, 255, 255, 0.09);
   --toast-bg: rgba(255, 255, 255, 0.035);
   --dot: rgba(255, 255, 255, 0.05);
+  --accent: #ff0000; /* Signal Red — the sole chromatic punctuation */
   position: relative;
   /* Depth — soft colour auras + a fine dot grid (intelligence-terminal texture). */
   background-color: var(--void);
@@ -27,36 +28,31 @@
   font-family: var(--font-sans-stack);
   transition: color 0.4s ease;
 }
+/* Light theme — Bécane "bone-white gallery" (the locked reference). */
 .lp.light {
-  --dot: rgba(18, 22, 48, 0.055);
-  background-image:
-    radial-gradient(1100px 680px at 84% -12%, rgba(98, 126, 234, 0.12), transparent 62%),
-    radial-gradient(900px 520px at 6% 112%, rgba(154, 122, 46, 0.08), transparent 60%),
-    radial-gradient(var(--dot) 1px, transparent 1.3px);
-  background-size: auto, auto, 30px 30px;
+  --void: #f6f6f6;        /* bone white canvas */
+  --txt: #0a0a0a;         /* off-black */
+  --sec: #454545;         /* readable secondary */
+  --mut: #b2b2b2;         /* muted-grey placard text */
+  --ink-3: #ffffff;       /* pure-white surface */
+  --hair: #e6e6e6;        /* divider grey hairline */
+  --hair-soft: #ededed;
+  --nav-bg: #ffffff;
+  --card-bg: #ffffff;
+  --card-brd: #e6e6e6;
+  --toast-bg: #ffffff;
+  --gold: #0a0a0a;        /* legacy accent → monochrome off-black */
+  --gold-l: #0a0a0a;
+  --accent: #ff0000;      /* Signal Red — sole punctuation */
+  --pos: #148a4f;
+  --neg: #ff0000;
+  --warn: #9a7a2e;
+  --dot: rgba(10, 10, 10, 0.05);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.3px);
+  background-size: 28px 28px;
 }
-
-/* Light theme (clean cool paper — premium, not warm cream). Scoped to landing. */
-.lp.light {
-  --void: #f5f6f8;
-  --txt: #131520;
-  --sec: #51546a;
-  --mut: #888ca1;
-  --ink-3: #e9eaef;
-  --hair: rgba(18, 22, 48, 0.12);
-  --hair-soft: rgba(18, 22, 48, 0.06);
-  --nav-bg: rgba(245, 246, 248, 0.74);
-  --card-bg: rgba(255, 255, 255, 0.72);
-  --card-brd: rgba(18, 22, 48, 0.1);
-  --toast-bg: rgba(18, 22, 48, 0.035);
-  --gold: #9a7a2e;
-  --gold-l: #b8922f;
-  --pos: #1f9d63;
-  --neg: #d8404c;
-  --warn: #bd8420;
-}
-.lp.light ::selection { background: rgba(154, 122, 46, 0.24); color: #000; }
-.lp-wrap { max-width: 1280px; margin: 0 auto; padding: 0 clamp(24px, 6vw, 88px); }
+.lp.light ::selection { background: #ff0000; color: #fff; }
+.lp-wrap { max-width: 1440px; margin: 0 auto; padding: 0 clamp(24px, 6vw, 88px); }
 
 /* ── Atoms ── */
 .mono { font-family: var(--font-mono-stack); }
@@ -341,3 +337,44 @@
 .sbtn { flex: 1; text-align: center; padding: 11px; border-radius: 10px; font-size: 13px; font-weight: 560; }
 .sbtn.ghost { border: 1px solid var(--card-brd); color: var(--sec); }
 .sbtn.primary { background: var(--txt); color: var(--void); }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Bécane skin — bone-white gallery: flat, sharp (0 radius), hairline-only.
+   Structure comes from 1px #e6e6e6 lines + space, never shadow. Red is the
+   sole chromatic punctuation; the crypto logos carry all other colour.
+   ═══════════════════════════════════════════════════════════════════════ */
+.lp .deck, .lp .brief, .lp .verdict, .lp .pipe, .lp .sign-card,
+.lp .qbubble, .lp .toast, .lp .sbtn, .lp .tgl, .lp .sign-msg code {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+.lp .brief, .lp .verdict, .lp .pipe, .lp .sign-card { background: var(--card-bg); border-color: var(--card-brd); }
+
+/* Nav — slim always-white bar with a single hairline under it. */
+.lp-nav { background: var(--nav-bg); border-bottom: 1px solid var(--hair); backdrop-filter: none; }
+.lp .navlink { font-family: var(--font-mono-stack); font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--txt); }
+.lp .navlink:hover { color: var(--mut); }
+.lp .tgl { border-radius: 0; }
+.lp .brand { text-transform: uppercase; letter-spacing: 0.1em; font-size: 14px; }
+
+/* Ghost links — uppercase tracked placards, red arrow the one accent. */
+.lp .tlink { text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; font-weight: 500; }
+.lp .tlink .a { color: var(--accent); }
+
+/* Red punctuation — used sparingly. */
+.lp .brand .glyph { border-color: var(--accent); }
+.lp .brand .glyph::after { background: var(--accent); }
+.lp .stage-counter { color: var(--accent); }
+.lp .deck-top .live, .lp .read .live { color: var(--accent); }
+
+/* Kill the hero's colour atmosphere — logos are the only colour. */
+.lp .stage-tint { display: none; }
+.lp .stage-sticky::before, .lp .stage-sticky::after { display: none; }
+.lp .stage-rail .coin.on { box-shadow: none !important; }
+/* Active asset marked by a small red placard tick, not a glow. */
+.lp .stage-rail.sel .coin.on { position: relative; }
+.lp .stage-rail.sel .coin.on::after {
+  content: ""; position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%);
+  width: 5px; height: 5px; background: var(--accent);
+}

@@ -184,7 +184,7 @@ function Stage() {
                 exit={{ opacity: 0, y: 360, scale: 0.24, transition: { duration: 0.22, ease: EASE } }}
                 transition={{ type: "spring", stiffness: 260, damping: 22, mass: 0.6 }}
               >
-                <CoinLogo sym={t.s} name={t.n} color={t.c} glyph={t.g} dark={t.d} size={220} glow cls="big" />
+                <CoinLogo sym={t.s} name={t.n} color={t.c} glyph={t.g} dark={t.d} size={220} cls="big" />
               </motion.div>
             </AnimatePresence>
           </div>
@@ -222,7 +222,7 @@ function Stage() {
         </motion.div>
 
         <div className="stage-counter mono">{active ? `${pad(i + 1)} / ${pad(COINS.length)}` : "SELECT AN ASSET"}</div>
-        <div className="stage-progress"><motion.i style={{ scaleX: scrollYProgress, transformOrigin: "0 0", position: "absolute", inset: 0, background: tint }} /></div>
+        <div className="stage-progress"><motion.i style={{ scaleX: scrollYProgress, transformOrigin: "0 0", position: "absolute", inset: 0, background: "var(--txt)" }} /></div>
       </div>
     </section>
   );

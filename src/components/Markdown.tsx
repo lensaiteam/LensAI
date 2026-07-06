@@ -2,19 +2,30 @@
 
 /**
  * Tiny, dependency-free markdown renderer for analysis/chat output. Handles the
- * subset the model emits: ## headings, **bold**, - lists, links, paragraphs.
- * Input is escaped before formatting.
+ * subset the model emits: ## / ### headings, **bold**, - lists, links,
+ * paragraphs. Input is escaped before formatting.
  */
 function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+// Sentinel that cannot appear in user/model text (a NUL char).
+const L = String.fromCharCode(0); // NUL sentinel; cannot appear in model text
+
 function inline(s: string): string {
-  return escapeHtml(s)
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+  // Protect explicit [text](url) links behind sentinel placeholders so the
+  // bare-URL autolinker below can't re-match the href inside a tag we just
+  // built (which produced corrupted, leaking anchor markup).
+  const links: string[] = [];
+  let t = escapeHtml(s).replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_m, txt, url) => {
+    links.push(`<a href="${url}" target="_blank" rel="noopener noreferrer">${txt}</a>`);
+    return `${L}${links.length - 1}${L}`;
+  });
+  t = t
     .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/`([^`]+)`/g, "<code>$1</code>");
+  return t.replace(new RegExp(`${L}(\\d+)${L}`, "g"), (_m, i) => links[Number(i)]);
 }
 
 export function renderMarkdown(md: string): string {
@@ -31,7 +42,10 @@ export function renderMarkdown(md: string): string {
 
   for (const raw of lines) {
     const line = raw.trimEnd();
-    if (/^##\s+/.test(line)) {
+    if (/^###\s+/.test(line)) {
+      closeList();
+      out.push(`<h3>${inline(line.replace(/^###\s+/, ""))}</h3>`);
+    } else if (/^##\s+/.test(line)) {
       closeList();
       out.push(`<h2>${inline(line.replace(/^##\s+/, ""))}</h2>`);
     } else if (/^[-*]\s+/.test(line)) {

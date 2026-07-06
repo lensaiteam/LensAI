@@ -231,6 +231,51 @@
   transition: transform .12s, border-color .12s, color .12s;
 }
 .hero-chip:hover { border-color: #ff0000; color: var(--w); transform: translateY(-2px); }
+
+/* ---- Analysis report styling --------------------------------------
+   The core deliverable. Turn raw markdown into a numbered, ruled,
+   editorial report matching the site's §-placard language rather than
+   a wall of bold-heading text. ------------------------------------- */
+.msg-ai .md { counter-reset: sec; font-size: 14.5px; line-height: 1.65; color: var(--sec); }
+
+/* Section headings become numbered placards with a hairline rule. */
+.msg-ai .md h2 {
+  counter-increment: sec;
+  display: flex; align-items: baseline; gap: 12px;
+  font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--txt);
+  margin: 30px 0 13px; padding-top: 20px; border-top: 1px solid var(--border);
+}
+.msg-ai .md h2::before {
+  content: counter(sec, decimal-leading-zero);
+  font-family: var(--font-mono-stack); font-size: 11px; font-weight: 700;
+  letter-spacing: .08em; color: #ff0000; transform: translateY(-1px); flex-shrink: 0;
+}
+.msg-ai .md h2:first-child { margin-top: 2px; padding-top: 0; border-top: none; }
+.msg-ai .md h3 {
+  font-size: 13.5px; font-weight: 700; color: var(--txt); margin: 18px 0 8px;
+}
+
+.msg-ai .md p { margin: 11px 0; }
+.msg-ai .md p:first-child { margin-top: 0; }
+.msg-ai .md strong { color: var(--txt); font-weight: 700; }
+.msg-ai .md a { color: var(--txt); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--dim); }
+.msg-ai .md a:hover { text-decoration-color: #ff0000; }
+.msg-ai .md code {
+  font-family: var(--font-mono-stack); font-size: 12.5px;
+  background: var(--card2); padding: 1px 5px; color: var(--txt);
+}
+
+/* Lists — custom red markers, roomy rows. */
+.msg-ai .md ul { list-style: none; margin: 12px 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.msg-ai .md li { position: relative; padding-left: 19px; }
+.msg-ai .md li::before {
+  content: ""; position: absolute; left: 2px; top: 9px;
+  width: 5px; height: 5px; background: #ff0000; border-radius: 50%;
+}
+
+/* Follow-up answers are short prose, not a full report — dial the
+   heading rules back so a one-liner doesn't get a giant top border. */
+.msg-ai .md:not(:has(h2)) { color: var(--txt); }
 .composer-hint {
   margin-top: 9px; font-family: var(--font-mono-stack); font-size: 10.5px; letter-spacing: .03em;
   color: var(--m); display: flex; gap: 15px; flex-wrap: wrap;

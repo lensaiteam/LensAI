@@ -168,6 +168,30 @@ function Stage() {
           <h1 className="display">Read the signal,<br /><span className="dim">not the noise.</span></h1>
         </motion.div>
 
+        {/* Flanking glass panels — fill the gutters, fade on scroll */}
+        <motion.div className="stage-aside left" animate={{ opacity: active ? 0 : 1, x: active ? -18 : 0 }} transition={{ duration: 0.5, ease: EASE }}>
+          <div className="aside-card">
+            <div className="aside-h"><span className="adot" />Market · Live</div>
+            <div className="aside-rows">
+              <div><b>BTC</b><span className="up">+5.2%</span></div>
+              <div><b>ETH</b><span className="up">+12.8%</span></div>
+              <div><b>SOL</b><span className="up">+13.6%</span></div>
+            </div>
+            <svg className="aside-sig" viewBox="0 0 200 40" preserveAspectRatio="none"><path d={sparkPath(SPK.pos)} fill="none" stroke="var(--pos)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" /></svg>
+          </div>
+        </motion.div>
+        <motion.div className="stage-aside right" animate={{ opacity: active ? 0 : 1, x: active ? 18 : 0 }} transition={{ duration: 0.5, ease: EASE }}>
+          <div className="aside-card">
+            <div className="aside-h">The desk</div>
+            <div className="aside-stat"><b>212</b><span>assets tracked live</span></div>
+            <div className="aside-split">
+              <span className="pos">▲ 148</span>
+              <span className="mix">◆ 41</span>
+              <span className="neg">▼ 23</span>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Scroll hint — pinned to the bottom, clear of the logo row */}
         <motion.div className="stage-hint mono" animate={{ opacity: active ? 0 : 1 }} transition={{ duration: 0.4, ease: EASE }}>
           Scroll to scan the market ↓

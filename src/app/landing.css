@@ -224,6 +224,33 @@
 .stage-intro h1 .dim { color: var(--mut); }
 .stage-hint { position: absolute; left: 0; right: 0; bottom: clamp(40px, 7vh, 74px); z-index: 3; text-align: center; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mut); pointer-events: none; }
 
+/* Flanking glass panels — fill the hero gutters beside the headline. */
+.stage-aside { position: absolute; top: 34%; z-index: 3; }
+.stage-aside.left { left: clamp(24px, 5vw, 88px); }
+.stage-aside.right { right: clamp(24px, 5vw, 88px); }
+@media (max-width: 1180px) { .stage-aside { display: none; } }
+.aside-card {
+  width: 204px; padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  backdrop-filter: blur(22px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  box-shadow: 0 30px 70px -36px rgba(20, 24, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+.aside-h { font-family: var(--font-mono-stack); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mut); display: flex; align-items: center; gap: 7px; margin-bottom: 13px; }
+.aside-h .adot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.aside-rows { display: flex; flex-direction: column; gap: 9px; }
+.aside-rows div { display: flex; justify-content: space-between; font-family: var(--font-mono-stack); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.aside-rows b { font-weight: 600; }
+.aside-rows .up { color: var(--pos); } .aside-rows .dn { color: var(--neg); }
+.aside-sig { width: 100%; height: 32px; display: block; margin-top: 12px; }
+.aside-stat { display: flex; flex-direction: column; gap: 3px; }
+.aside-stat b { font-size: 36px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+.aside-stat span { font-size: 11.5px; color: var(--sec); }
+.aside-split { display: flex; gap: 13px; margin-top: 15px; font-family: var(--font-mono-stack); font-size: 12px; }
+.aside-split .pos { color: var(--pos); } .aside-split .mix { color: var(--warn); } .aside-split .neg { color: var(--neg); }
+
 /* Focus — the selected asset on a premium glass panel */
 .stage-focus { position: absolute; inset: 0; z-index: 2; }
 .stage-panel {
@@ -384,6 +411,14 @@
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 100px;
   box-shadow: 0 22px 54px -26px rgba(20, 24, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  transition: gap 0.4s var(--ease), padding 0.4s var(--ease), box-shadow 0.4s var(--ease), background 0.4s var(--ease);
+}
+/* Morph on scroll — the pill stays a pill and condenses + elevates. */
+.lp-nav.stuck { background: none !important; border: none !important; backdrop-filter: none !important; }
+.lp-nav.stuck .nav-pill {
+  gap: 13px; padding: 6px 8px 6px 16px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 16px 40px -20px rgba(20, 24, 60, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 .nav-div { width: 1px; height: 18px; background: var(--hair); }
 .nav-pill .brand { text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px; }

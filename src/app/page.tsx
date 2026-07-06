@@ -181,8 +181,8 @@ function Stage() {
                 key={t.s}
                 initial={{ opacity: 0, y: 420, scale: 0.24 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 360, scale: 0.24, transition: { duration: 0.3, ease: EASE } }}
-                transition={{ type: "spring", stiffness: 88, damping: 15, mass: 0.9 }}
+                exit={{ opacity: 0, y: 360, scale: 0.24, transition: { duration: 0.22, ease: EASE } }}
+                transition={{ type: "spring", stiffness: 260, damping: 22, mass: 0.6 }}
               >
                 <CoinLogo sym={t.s} name={t.n} color={t.c} glyph={t.g} dark={t.d} size={220} glow cls="big" />
               </motion.div>

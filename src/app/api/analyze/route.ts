@@ -10,6 +10,26 @@ import { buildDigest } from "@/lib/news/digest";
 import { createSession, addMessage } from "@/lib/sessions";
 import { logUsage } from "@/lib/usage";
 import { env } from "@/lib/env";
+import type { MarketData } from "@/lib/types";
+
+/** Compact, URL-encoded market snapshot for the client stat grid. */
+function marketHeader(m: MarketData | null | undefined): string {
+  if (!m) return "";
+  const snap = {
+    name: m.name,
+    symbol: m.symbol,
+    price: m.priceDisplay,
+    c24: m.change24hPct,
+    c7: m.change7dPct,
+    vol: m.volume24h,
+    mcap: m.marketCap,
+    circ: m.circulatingSupply,
+    rank: m.rank,
+    source: m.source,
+    unresolved: m.unresolved,
+  };
+  return encodeURIComponent(JSON.stringify(snap));
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -61,6 +81,7 @@ export async function POST(req: NextRequest) {
       "x-lensai-cache-hit": "1",
       "x-lensai-as-of": cached.generated_at,
       "x-lensai-signal": cached.analysis.signal,
+      "x-lensai-market": marketHeader(cached.market_data),
     });
   }
 
@@ -131,6 +152,7 @@ export async function POST(req: NextRequest) {
       "x-lensai-session": sessionId,
       "x-lensai-ticker": ticker,
       "x-lensai-cache-hit": "0",
+      "x-lensai-market": marketHeader(marketData),
     },
   });
 }

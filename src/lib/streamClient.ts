@@ -18,6 +18,7 @@ export async function streamPost(
   url: string,
   body: unknown,
   onText: (displayText: string) => void,
+  onHeaders?: (headers: Headers) => void,
 ): Promise<StreamResult> {
   const res = await fetch(url, {
     method: "POST",
@@ -29,6 +30,10 @@ export async function streamPost(
     const err = await res.json().catch(() => ({ error: "Request failed" }));
     throw Object.assign(new Error(err.error || "Request failed"), { status: res.status, data: err });
   }
+
+  // Surface headers as soon as the response arrives, before the body streams —
+  // lets the UI paint the market snapshot while prose is still generating.
+  onHeaders?.(res.headers);
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();

@@ -220,7 +220,7 @@
 /* Intro — centered headline, a little above middle */
 .stage-intro { position: absolute; top: 20%; left: 0; right: 0; z-index: 3; text-align: center; padding: 0 24px; }
 .stage-intro .kicker { display: block; margin-bottom: clamp(16px, 2.4vh, 26px); }
-.stage-intro h1 { font-size: clamp(42px, 7.2vw, 108px); line-height: 0.97; letter-spacing: -0.035em; margin: 0; }
+.stage-intro h1 { font-size: clamp(42px, 7.2vw, 108px); font-weight: 700; line-height: 0.97; letter-spacing: -0.035em; margin: 0; }
 .stage-intro h1 .dim { color: var(--mut); }
 .stage-hint { position: absolute; left: 0; right: 0; bottom: clamp(40px, 7vh, 74px); z-index: 3; text-align: center; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mut); pointer-events: none; }
 

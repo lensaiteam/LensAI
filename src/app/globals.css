@@ -42,8 +42,9 @@
   --font-sans: var(--font-geist-sans);
   --font-sans-stack: var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono-stack: var(--font-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  /* Bricolage Grotesque — the display voice (headlines only). */
-  --font-display-stack: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  /* Display voice — Helvetica-Neue-like (Bécane reference). Prefer real
+     Helvetica Neue where installed, else the Arimo webfont (Helvetica clone). */
+  --font-display-stack: "Helvetica Neue", Helvetica, var(--font-display), Arial, sans-serif;
   /* "serif" is retained as the display alias (now the grotesk) so heading
      classes don't need renaming — there is no serif in this system. */
   --font-serif-stack: var(--font-sans-stack);

@@ -11,8 +11,50 @@ import { streamPost } from "@/lib/streamClient";
 import "./app.css";
 
 const QUICK = ["BTC", "ETH", "SOL", "XRP", "DOGE", "PEPE"];
+
+// Follow-up prompts. Most map to fields the initial pipeline already
+// gathered (spec §5.4), so they resolve cheaply — and they beat a
+// blank box (recognition over recall).
+const FOLLOWUPS: { label: string; prompt: string }[] = [
+  { label: "Sentiment", prompt: "What's the current sentiment on it?" },
+  { label: "Risk flags", prompt: "What are the main risk flags?" },
+  { label: "Tokenomics", prompt: "Break down the tokenomics and supply." },
+  { label: "Recent news", prompt: "What are the most recent developments?" },
+  { label: "Bull vs bear", prompt: "Give me the bull case vs the bear case." },
+];
+
+// Ordered to mirror the real gather pipeline: market data → news →
+// sentiment → risk → synthesis. Sequential concrete steps read as
+// progress (goal-gradient), and showing the work builds trust
+// (the Labor Illusion, Buell & Norton 2011).
+const ANALYZE_STEPS = [
+  "Pulling live price, volume & 24h range…",
+  "Fetching market cap & circulating supply…",
+  "Scanning headlines for catalysts…",
+  "Checking CT sentiment…",
+  "Reading the LARP tweets…",
+  "Sniffing for rug & honeypot signals…",
+  "Sizing up the tokenomics…",
+  "Counting diamond hands vs paper hands…",
+  "Weighing the bull case against the bears…",
+  "Writing it up…",
+];
+const CHAT_STEPS = [
+  "Digging through the notes…",
+  "Re-reading the sentiment…",
+  "Checking what the tape says…",
+  "Connecting the dots…",
+];
+
 type Msg = { role: "user" | "assistant"; content: string };
 type Session = { id: string; ticker: string; created_at: string };
+type Verdict = "POSITIVE" | "MIXED" | "NEGATIVE";
+
+/** Pull the model's overall read for the header payoff (peak-end rule). */
+function extractVerdict(text: string): Verdict | null {
+  const m = text.match(/\b(POSITIVE|MIXED|NEGATIVE)\b/);
+  return (m?.[1] as Verdict) ?? null;
+}
 
 export default function ResearchTerminal() {
   const { user, freeTier, loading, signingIn, signIn, signOut, error: authError, refresh } = useAuth();
@@ -110,6 +152,7 @@ function Terminal({
   const [messages, setMessages] = useState<Msg[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [streamText, setStreamText] = useState("");
+  const [thinkKind, setThinkKind] = useState<"analyze" | "chat" | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [ticker, setTicker] = useState<string | null>(null);
   const [asOf, setAsOf] = useState<string | null>(null);
@@ -128,7 +171,7 @@ function Terminal({
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, streamText]);
+  }, [messages, streamText, thinkKind]);
 
   const analyze = useCallback(
     async (raw: string) => {
@@ -138,6 +181,7 @@ function Terminal({
       setAsOf(null);
       setMessages([{ role: "user", content: `Analyze ${t}` }]);
       setStreamText("");
+      setThinkKind("analyze");
       setStreaming(true);
       setTicker(t);
       try {
@@ -159,29 +203,35 @@ function Terminal({
       } finally {
         setStreaming(false);
         setStreamText("");
+        setThinkKind(null);
       }
     },
     [streaming, onUsed, loadHistory],
   );
 
-  const sendChat = useCallback(async () => {
-    const msg = input.trim();
-    if (!msg || !sessionId || streaming) return;
-    setInput("");
-    setError(null);
-    setMessages((m) => [...m, { role: "user", content: msg }]);
-    setStreamText("");
-    setStreaming(true);
-    try {
-      const r = await streamPost("/api/chat", { sessionId, message: msg }, (txt) => setStreamText(txt));
-      setMessages((m) => [...m, { role: "assistant", content: r.full }]);
-    } catch (e) {
-      setError((e as Error).message || "Chat failed.");
-    } finally {
-      setStreaming(false);
+  const sendChat = useCallback(
+    async (raw?: string) => {
+      const msg = (raw ?? input).trim();
+      if (!msg || !sessionId || streaming) return;
+      setInput("");
+      setError(null);
+      setMessages((m) => [...m, { role: "user", content: msg }]);
       setStreamText("");
-    }
-  }, [input, sessionId, streaming]);
+      setThinkKind("chat");
+      setStreaming(true);
+      try {
+        const r = await streamPost("/api/chat", { sessionId, message: msg }, (txt) => setStreamText(txt));
+        setMessages((m) => [...m, { role: "assistant", content: r.full }]);
+      } catch (e) {
+        setError((e as Error).message || "Chat failed.");
+      } finally {
+        setStreaming(false);
+        setStreamText("");
+        setThinkKind(null);
+      }
+    },
+    [input, sessionId, streaming],
+  );
 
   const openSession = useCallback(async (id: string) => {
     const res = await fetch(`/api/history/${id}`, { cache: "no-store" });
@@ -209,6 +259,8 @@ function Terminal({
   };
 
   const hasThread = messages.length > 0 || streaming;
+  const firstAnalysis = messages.find((m) => m.role === "assistant")?.content;
+  const verdict = firstAnalysis ? extractVerdict(firstAnalysis) : null;
 
   return (
     <div className="flex-1 flex overflow-hidden">
@@ -270,114 +322,222 @@ function Terminal({
         </div>
       </aside>
 
-      {/* Main */}
-      <main ref={scrollRef} className="flex-1 overflow-y-auto">
-        {!hasThread ? (
+      {/* Main column: header · thread · composer */}
+      {!hasThread ? (
+        <main className="flex-1 overflow-y-auto">
           <EmptyState onAnalyze={analyze} error={error} />
-        ) : (
-          <div className="max-w-3xl mx-auto px-6 py-8">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-xl font-bold">{ticker}</h1>
-              {asOf && (
-                <span className="text-[11px]" style={{ color: "var(--m)" }}>
-                  cached · as of {new Date(asOf).toLocaleTimeString()}
-                </span>
-              )}
+        </main>
+      ) : (
+        <div className="chat-col">
+          <header className="chat-head">
+            <div className="chat-head-inner">
+              <span className="tk">{ticker}</span>
+              <div className="flex items-center gap-3">
+                {asOf && (
+                  <span className="asof">cached · as of {new Date(asOf).toLocaleTimeString()}</span>
+                )}
+                {verdict && <VerdictPill verdict={verdict} />}
+              </div>
             </div>
+          </header>
 
-            {messages.map((m, i) => (
-              <Bubble key={i} msg={m} />
-            ))}
-            {streaming && (
-              <Bubble msg={{ role: "assistant", content: streamText || "…" }} />
-            )}
-            {error && <p className="text-xs mt-2" style={{ color: "var(--red)" }}>{error}</p>}
+          <div className="thread" ref={scrollRef}>
+            <div className="thread-inner">
+              {messages.map((m, i) =>
+                m.role === "user" ? (
+                  <div key={i} className="msg-user">{m.content}</div>
+                ) : (
+                  <AssistantMessage key={i} content={m.content} />
+                ),
+              )}
+              {streaming && !streamText && thinkKind && <ThinkingTrace mode={thinkKind} />}
+              {streaming && streamText && <AssistantMessage content={streamText} streaming />}
+              {error && <p className="text-xs" style={{ color: "var(--red)" }}>{error}</p>}
+            </div>
           </div>
-        )}
-      </main>
 
-      {/* Chat bar (only within a thread) */}
-      {hasThread && (
-        <div />
-      )}
-      {hasThread && (
-        <div
-          className="shrink-0 px-6 py-3"
-          style={{ background: "var(--bg2)", borderTop: "1px solid var(--border)" }}
-        >
-          <div className="max-w-3xl mx-auto flex gap-2">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && sendChat()}
-              placeholder="Ask a follow-up — sentiment, tokenomics, risks, news…"
-              disabled={streaming || !sessionId}
-              className="flex-1 px-4 py-2.5 rounded-lg text-sm outline-none"
-              style={{ background: "var(--card)", border: "1px solid var(--border)", color: "var(--w)" }}
-            />
-            <button
-              onClick={sendChat}
-              disabled={streaming || !sessionId}
-              className="px-5 text-sm font-semibold disabled:opacity-50"
-              style={{ background: "var(--w)", color: "var(--bg)" }}
-            >
-              Send
-            </button>
-          </div>
+          <Composer
+            input={input}
+            setInput={setInput}
+            onSend={sendChat}
+            disabled={streaming || !sessionId}
+            showChips={messages.length <= 2 && !streaming}
+          />
         </div>
       )}
     </div>
   );
 }
 
-function Bubble({ msg }: { msg: Msg }) {
-  const isUser = msg.role === "user";
+function VerdictPill({ verdict }: { verdict: Verdict }) {
+  const cls = verdict === "POSITIVE" ? "v-pos" : verdict === "NEGATIVE" ? "v-neg" : "v-mix";
+  return <span className={`verdict-pill ${cls}`}>{verdict}</span>;
+}
+
+function AssistantMessage({ content, streaming }: { content: string; streaming?: boolean }) {
   return (
-    <div className={`mb-5 ${isUser ? "flex justify-end" : ""}`}>
-      <div
-        className={isUser ? "px-4 py-2 rounded-2xl text-sm max-w-[80%]" : "w-full"}
-        style={isUser ? { background: "var(--card2)", color: "var(--w)" } : undefined}
-      >
-        {isUser ? msg.content : <Markdown>{msg.content}</Markdown>}
+    <div className="msg-ai">
+      <div className="msg-ai-head">
+        <span className="mini-mark" />
+        <span className="msg-label">LensAI</span>
+      </div>
+      <div>
+        <Markdown>{content}</Markdown>
+        {streaming && <span className="stream-caret" />}
       </div>
     </div>
   );
 }
 
+function ThinkingTrace({ mode }: { mode: "analyze" | "chat" }) {
+  const steps = mode === "analyze" ? ANALYZE_STEPS : CHAT_STEPS;
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    setI(0);
+    const period = mode === "analyze" ? 1500 : 1050;
+    const id = setInterval(() => setI((p) => (p < steps.length - 1 ? p + 1 : p)), period);
+    return () => clearInterval(id);
+  }, [mode, steps.length]);
+
+  return (
+    <div className="think">
+      <div className="think-row">
+        <span className="think-orb" />
+        <span key={i} className="think-line">{steps[i]}</span>
+      </div>
+      <div className="think-skel">
+        <span className="skel-line" />
+        <span className="skel-line" style={{ width: "94%" }} />
+        <span className="skel-line" style={{ width: "82%" }} />
+        <span className="skel-line" style={{ width: "88%" }} />
+      </div>
+    </div>
+  );
+}
+
+function Composer({
+  input,
+  setInput,
+  onSend,
+  disabled,
+  showChips,
+}: {
+  input: string;
+  setInput: (v: string) => void;
+  onSend: (raw?: string) => void;
+  disabled: boolean;
+  showChips: boolean;
+}) {
+  const taRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-grow the textarea with its content, up to the CSS max-height.
+  useEffect(() => {
+    const ta = taRef.current;
+    if (!ta) return;
+    ta.style.height = "0px";
+    ta.style.height = Math.min(ta.scrollHeight, 168) + "px";
+  }, [input]);
+
+  return (
+    <div className="composer-wrap">
+      <div className="composer-inner">
+        {showChips && (
+          <div className="chips">
+            {FOLLOWUPS.map((f) => (
+              <button key={f.label} className="chip" disabled={disabled} onClick={() => onSend(f.prompt)}>
+                {f.label}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="composer">
+          <textarea
+            ref={taRef}
+            rows={1}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                onSend();
+              }
+            }}
+            placeholder="Ask a follow-up — “is it a rug?”, unlocks, sentiment, news…"
+            disabled={disabled}
+          />
+          <button className="send-btn" onClick={() => onSend()} disabled={disabled || !input.trim()} aria-label="Send">
+            <svg viewBox="0 0 16 16" fill="none">
+              <path d="M8 13V3.5M8 3.5L3.5 8M8 3.5L12.5 8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="square" />
+            </svg>
+          </button>
+        </div>
+        <div className="composer-hint">
+          <span><kbd>↵</kbd>send</span>
+          <span><kbd>⇧↵</kbd>new line</span>
+          <span>Not financial advice.</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Playful openers, re-rolled on every fresh start. [before, accent, after] —
+// the accent word gets the red. Teasing but never advisory.
+const HEADS: [string, string, string][] = [
+  ["What's going ", "under the lens", "?"],
+  ["Point the lens at ", "something", "."],
+  ["Fresh eyes. ", "New token", "."],
+  ["Who are we ", "investigating", " today?"],
+  ["Name a ", "ticker", ". Any ticker."],
+  ["New coin on the ", "slab", "."],
+  ["Let's dig into ", "something new", "."],
+  ["Line up the next ", "suspect", "."],
+];
+
 function EmptyState({ onAnalyze, error }: { onAnalyze: (t: string) => void; error: string | null }) {
   const [v, setV] = useState("");
+  const [head, setHead] = useState<[string, string, string]>(HEADS[0]);
+
+  // Roll a random opener on mount (client-only — no hydration mismatch since
+  // the terminal is gated behind auth).
+  useEffect(() => {
+    setHead(HEADS[Math.floor(Math.random() * HEADS.length)]);
+  }, []);
+
   return (
-    <div className="h-full flex flex-col items-center justify-center px-6 text-center">
-      <span className="app-mark mb-6" />
-      <h1 className="text-2xl font-bold mb-2 tracking-tight">Analyze a token</h1>
-      <p className="text-sm mb-7 max-w-md" style={{ color: "var(--w2)" }}>
-        Enter a ticker for a decision-grade, non-advisory read from live data and current news.
+    <div className="hero">
+      <span className="app-mark hero-mark" />
+      <h1 className="hero-title">
+        {head[0]}
+        <span className="amp">{head[1]}</span>
+        {head[2]}
+      </h1>
+      <p className="hero-sub">
+        Type a ticker and LensAI reads the live market, the news, and the crowd — a decision-grade,
+        non-advisory take in seconds.
       </p>
-      <div className="flex gap-2 w-full max-w-md">
+
+      <div className="hero-input">
+        <span className="hero-dollar">$</span>
         <input
+          className="hero-field"
           value={v}
           onChange={(e) => setV(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && onAnalyze(v)}
-          placeholder="e.g. BTC, ETH, SOL…"
-          className="flex-1 px-4 py-3 rounded-lg text-sm outline-none uppercase"
-          style={{ background: "var(--card)", border: "1px solid var(--border2)", color: "var(--w)" }}
+          placeholder="BTC"
+          autoFocus
+          aria-label="Token ticker"
         />
-        <button
-          onClick={() => onAnalyze(v)}
-          className="px-6 text-sm font-semibold"
-          style={{ background: "var(--w)", color: "var(--bg)" }}
-        >
-          Analyze
+        <button className="hero-go" onClick={() => onAnalyze(v)} aria-label="Analyze">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M4 10h11M10 5l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" />
+          </svg>
         </button>
       </div>
-      <div className="flex gap-2 mt-4 flex-wrap justify-center">
+
+      <div className="hero-chips">
         {QUICK.map((q) => (
-          <button
-            key={q}
-            onClick={() => onAnalyze(q)}
-            className="px-3 py-1.5 rounded-full text-xs"
-            style={{ background: "var(--card)", border: "1px solid var(--border)", color: "var(--w2)" }}
-          >
+          <button key={q} className="hero-chip" onClick={() => onAnalyze(q)}>
             {q}
           </button>
         ))}

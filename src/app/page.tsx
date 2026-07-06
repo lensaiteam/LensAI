@@ -261,6 +261,16 @@ const STANCE = [
   ["mix", "MIXED", "Real strengths against real risks. We hold the tension rather than resolve it for you."],
   ["pos", "POSITIVE", "Strong fundamentals, healthy liquidity, constructive flow — the bear case still named."],
 ];
+const BULL = [
+  "Leads every chain in real DEX volume",
+  "Fees and on-chain activity genuinely high",
+  "Fast and cheap, reliability improving",
+];
+const BEAR = [
+  "Repeated network outages in its history",
+  "A large token unlock cliff ahead",
+  "Valuation already prices in heavy growth",
+];
 const ACCESS = [
   ["A.1", "Sign in with a signature", "Prove you own your wallet by signing a message. No transaction, no gas, no keys on our servers."],
   ["A.2", "The address is the account", "No email, no password, no PII. Just your wallet — and two free reads to begin."],
@@ -361,16 +371,41 @@ function Inner() {
           <div className="sec-body">
             <Reveal variant="rise"><h2 className="display">We assess. <span className="dim">You decide.</span></h2></Reveal>
             <Reveal variant="rise" delay={0.05}><p className="intro">Telling you to buy or sell is unlicensed advice — so LensAI never does. Every read lands on one of three stances, with both cases on the table.</p></Reveal>
-            <Reveal variant="rise" delay={0.1}>
-              <div className="scale">
-                <div className="track"><i style={{ left: "72%" }} /></div>
-                <div className="nodes">
-                  {STANCE.map(([c, t, p]) => (
-                    <div className={`node ${c}`} key={t}><div className="t">{t}</div><p>{p}</p></div>
-                  ))}
+
+            <Reveal variant="rise" delay={0.08} className="verdict-wrap">
+              <div className="verdict">
+                <div className="verdict-top"><span className="mono">ASSESSMENT · SOL</span><span className="stamp mix">MIXED</span></div>
+                <div className="meter">
+                  <div className="meter-track" />
+                  <motion.i
+                    className="meter-needle"
+                    initial={{ left: "0%", opacity: 0 }}
+                    whileInView={{ left: "62%", opacity: 1 }}
+                    viewport={{ once: true, margin: "0px 0px -15% 0px" }}
+                    transition={{ duration: 1.1, ease: EASE }}
+                  />
+                </div>
+                <div className="meter-ticks mono"><span>NEGATIVE</span><span>MIXED</span><span>POSITIVE</span></div>
+                <div className="cases">
+                  <div className="case bull">
+                    <span className="case-h">Bull case</span>
+                    {BULL.map((b) => <div className="case-row" key={b}><span className="ci" />{b}</div>)}
+                  </div>
+                  <div className="case bear">
+                    <span className="case-h">Bear case</span>
+                    {BEAR.map((b) => <div className="case-row" key={b}><span className="ci" />{b}</div>)}
+                  </div>
                 </div>
               </div>
             </Reveal>
+
+            <div className="stance-nodes">
+              {STANCE.map(([c, t, p], i) => (
+                <Reveal key={t} variant="rise" delay={0.03 * i}>
+                  <div className={`snode ${c}`}><div className="t">{t}</div><p>{p}</p></div>
+                </Reveal>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -381,15 +416,38 @@ function Inner() {
           <Reveal className="sec-num" variant="rise">04 / Access<span className="big">04</span></Reveal>
           <div className="sec-body">
             <Reveal variant="rise"><h2 className="display">Your keys. Your data. <span className="dim">Your call.</span></h2></Reveal>
-            <div className="arows">
-              {ACCESS.map(([n, h, p], i) => (
-                <Reveal key={n} variant="rise" delay={0.03 * i}>
-                  <div className="arow"><div className="n">{n}</div><div><h3>{h}</h3><p>{p}</p></div></div>
-                </Reveal>
-              ))}
+            <div className="access-split">
+              <div className="arows">
+                {ACCESS.map(([n, h, p], i) => (
+                  <Reveal key={n} variant="rise" delay={0.03 * i}>
+                    <div className="arow"><div className="n">{n}</div><div><h3>{h}</h3><p>{p}</p></div></div>
+                  </Reveal>
+                ))}
+              </div>
+              <Reveal variant="rise" delay={0.06} className="sign-wrap">
+                <div className="sign-card">
+                  <div className="sign-top">
+                    <span className="sign-brand"><span className="glyph" />LensAI</span>
+                    <span className="mono">SIGNATURE REQUEST</span>
+                  </div>
+                  <div className="sign-msg">
+                    <p>lensai.app wants you to sign in with your Ethereum account:</p>
+                    <code>0x7a3f…9c2e</code>
+                    <div className="sign-meta">
+                      <span><i />No transaction</span>
+                      <span><i />No gas fee</span>
+                      <span><i />No keys ever stored</span>
+                    </div>
+                  </div>
+                  <div className="sign-actions">
+                    <span className="sbtn ghost">Reject</span>
+                    <span className="sbtn primary">Sign message</span>
+                  </div>
+                </div>
+              </Reveal>
             </div>
             <Reveal variant="rise" delay={0.1}>
-              <div style={{ marginTop: 40 }}>
+              <div style={{ marginTop: 44 }}>
                 <Link className="tlink" href="/app"><span>Open the desk</span><span className="a">→</span></Link>
               </div>
             </Reveal>

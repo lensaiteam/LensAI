@@ -71,7 +71,7 @@
 .tk-key { width: 12px; height: 12px; flex-shrink: 0; }
 .tk-label { flex: 1; font-size: 14.5px; }
 .tk-pct { font-size: 14px; color: var(--mut); }
-.tk-util { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--hair); border: 1px solid var(--hair); }
+.tk-util { display: grid; grid-template-columns: repeat(auto-fit, minmax(224px, 1fr)); gap: 1px; background: var(--hair); border: 1px solid var(--hair); }
 @media (max-width: 720px) { .tk-util { grid-template-columns: 1fr; } }
 .tk-card { background: var(--void); padding: 24px; }
 .tk-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em; }
@@ -101,3 +101,49 @@
 .legal-sec h2 .mono { font-size: 13px; color: var(--accent); }
 .legal-sec p { font-size: 15px; color: var(--sec); line-height: 1.65; max-width: 72ch; margin-bottom: 10px; }
 .legal-foot { margin-top: 34px; font-size: 12.5px; color: var(--mut); font-style: italic; }
+
+/* ── Whitepaper bullet lists ── */
+.doc-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.doc-list li { position: relative; padding-left: 20px; font-size: clamp(15px, 1.2vw, 17px); line-height: 1.55; color: var(--sec); }
+.doc-list li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; background: var(--accent); }
+
+/* ── Roadmap principles + phase blurb ── */
+.rm-principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--hair); border: 1px solid var(--hair); margin: clamp(40px, 6vh, 64px) 0; }
+.rm-principle { background: var(--void); padding: 24px; }
+.rm-pn { font-size: 11px; letter-spacing: 0.14em; color: var(--accent); }
+.rm-principle h3 { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; margin: 10px 0 8px; }
+.rm-principle p { font-size: 14px; color: var(--sec); line-height: 1.55; }
+.tl-blurb { font-size: 14.5px; color: var(--sec); line-height: 1.55; margin-bottom: 14px; }
+.rm-note { margin-top: 30px; font-size: 13px; color: var(--mut); font-style: italic; }
+
+/* ── Tokenomics: section headings, vesting, value flow, faq ── */
+.tk-h { font-size: clamp(20px, 2.2vw, 28px); font-weight: 700; letter-spacing: -0.025em; margin: clamp(46px, 7vh, 74px) 0 22px; }
+.tk-vest { border-top: 1px solid var(--hair); }
+.tk-vrow { display: grid; grid-template-columns: 210px 1fr; gap: clamp(16px, 3vw, 40px); padding: 18px 0; border-bottom: 1px solid var(--hair); }
+@media (max-width: 620px) { .tk-vrow { grid-template-columns: 1fr; gap: 6px; } }
+.tk-vlabel { font-size: 15px; font-weight: 600; }
+.tk-vnote { font-size: 14px; color: var(--sec); line-height: 1.55; }
+.tk-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--hair); border: 1px solid var(--hair); }
+@media (max-width: 760px) { .tk-flow { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 460px) { .tk-flow { grid-template-columns: 1fr; } }
+.tk-fnode { background: var(--void); padding: 22px 20px; position: relative; }
+.tk-fn { font-size: 11px; color: var(--accent); letter-spacing: 0.12em; }
+.tk-fnode h4 { font-size: 15px; font-weight: 700; margin: 8px 0; letter-spacing: -0.01em; }
+.tk-fnode p { font-size: 13px; color: var(--sec); line-height: 1.5; }
+.tk-farrow { position: absolute; right: -8px; top: 50%; transform: translateY(-50%); color: var(--mut); font-size: 16px; z-index: 1; }
+@media (max-width: 760px) { .tk-farrow { display: none; } }
+.tk-faq { border-top: 1px solid var(--hair); }
+.tk-qa { padding: 22px 0; border-bottom: 1px solid var(--hair); }
+.tk-qa h4 { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+.tk-qa p { font-size: 14.5px; color: var(--sec); line-height: 1.6; max-width: 74ch; }
+
+/* ── Careers: role title (h3), what-to-expect columns ── */
+.role-main h2, .role-main h3 { font-size: clamp(22px, 2.4vw, 30px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+.care-cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px, 5vw, 64px); margin-top: 8px; }
+@media (max-width: 760px) { .care-cols { grid-template-columns: 1fr; gap: 40px; } }
+.care-col > h4 { font-family: var(--font-mono-stack); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mut); margin-bottom: 16px; }
+.care-list { display: flex; flex-direction: column; }
+.care-item { display: flex; flex-direction: column; gap: 6px; padding: 16px 0; border-top: 1px solid var(--hair); }
+.care-h { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+.care-step { font-family: var(--font-mono-stack); font-size: 10px; color: var(--accent); border: 1px solid var(--accent); width: 19px; height: 19px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.care-p { font-size: 14px; color: var(--sec); line-height: 1.55; }

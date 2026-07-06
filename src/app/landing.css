@@ -251,6 +251,29 @@
 .aside-split { display: flex; gap: 13px; margin-top: 15px; font-family: var(--font-mono-stack); font-size: 12px; }
 .aside-split .pos { color: var(--pos); } .aside-split .mix { color: var(--warn); } .aside-split .neg { color: var(--neg); }
 
+/* Hover — the panel enlarges and reveals more info (engaging on cursor). */
+.aside-card { transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease), background 0.4s var(--ease); cursor: default; }
+.stage-aside.left .aside-card { transform-origin: left center; }
+.stage-aside.right .aside-card { transform-origin: right center; }
+.aside-card:hover {
+  transform: scale(1.07);
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 48px 110px -38px rgba(20, 24, 60, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  z-index: 6;
+}
+.aside-more-hint { margin-left: auto; font-size: 8.5px; letter-spacing: 0.16em; color: var(--mut); opacity: 0.7; transition: opacity 0.3s; }
+.aside-card:hover .aside-more-hint { opacity: 0; }
+.aside-more { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.5s var(--ease), opacity 0.4s var(--ease), margin 0.45s var(--ease); }
+.aside-card:hover .aside-more { max-height: 240px; opacity: 1; margin-top: 11px; }
+.aside-more .aside-rows { margin-bottom: 10px; }
+.aside-note { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mut); padding-top: 10px; border-top: 1px solid var(--hair-soft); }
+.aside-kv { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid var(--hair-soft); font-family: var(--font-mono-stack); font-size: 12px; font-variant-numeric: tabular-nums; }
+.aside-kv span { color: var(--mut); } .aside-kv b { font-weight: 600; }
+
+/* Hero logo row — lift on hover so the fold responds to the cursor. */
+.stage-rail:not(.sel) .coin { cursor: pointer; }
+.stage-rail:not(.sel) .coin:hover { transform: translateY(-8px) scale(1.16); }
+
 /* Focus — the selected asset on a premium glass panel */
 .stage-focus { position: absolute; inset: 0; z-index: 2; }
 .stage-panel {

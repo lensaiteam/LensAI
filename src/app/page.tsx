@@ -172,23 +172,36 @@ function Stage() {
         {/* Flanking glass panels — fill the gutters, fade on scroll */}
         <motion.div className="stage-aside left" animate={{ opacity: active ? 0 : 1, x: active ? -18 : 0 }} transition={{ duration: 0.5, ease: EASE }}>
           <div className="aside-card">
-            <div className="aside-h"><span className="adot" />Market · Live</div>
+            <div className="aside-h"><span className="adot" />Market · Live<span className="aside-more-hint mono">hover</span></div>
             <div className="aside-rows">
               <div><b>BTC</b><span className="up">+5.2%</span></div>
               <div><b>ETH</b><span className="up">+12.8%</span></div>
               <div><b>SOL</b><span className="up">+13.6%</span></div>
+            </div>
+            <div className="aside-more">
+              <div className="aside-rows">
+                <div><b>LINK</b><span className="up">+4.1%</span></div>
+                <div><b>AVAX</b><span className="up">+6.9%</span></div>
+                <div><b>DOGE</b><span className="dn">−1.8%</span></div>
+              </div>
+              <div className="aside-note mono">24h volume · $128.4B</div>
             </div>
             <svg className="aside-sig" viewBox="0 0 200 40" preserveAspectRatio="none"><path d={sparkPath(SPK.pos)} fill="none" stroke="var(--pos)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" /></svg>
           </div>
         </motion.div>
         <motion.div className="stage-aside right" animate={{ opacity: active ? 0 : 1, x: active ? 18 : 0 }} transition={{ duration: 0.5, ease: EASE }}>
           <div className="aside-card">
-            <div className="aside-h">The desk</div>
+            <div className="aside-h">The desk<span className="aside-more-hint mono">hover</span></div>
             <div className="aside-stat"><b>212</b><span>assets tracked live</span></div>
             <div className="aside-split">
               <span className="pos">▲ 148</span>
               <span className="mix">◆ 41</span>
               <span className="neg">▼ 23</span>
+            </div>
+            <div className="aside-more">
+              <div className="aside-kv"><span>Avg read</span><b>4.2s</b></div>
+              <div className="aside-kv"><span>Cache hit</span><b>94%</b></div>
+              <div className="aside-kv"><span>Reads today</span><b>1,284</b></div>
             </div>
           </div>
         </motion.div>

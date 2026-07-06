@@ -266,15 +266,15 @@ function Terminal({
     <div className="flex-1 flex overflow-hidden">
       {/* Sidebar */}
       <aside
-        className="w-[220px] shrink-0 flex flex-col overflow-y-auto py-3"
+        className="app-side w-[220px] shrink-0 flex flex-col overflow-y-auto py-3"
         style={{ background: "var(--bg2)", borderRight: "1px solid var(--border)" }}
       >
         <button
           onClick={newAnalysis}
-          className="mx-3 mb-3 py-2 text-[13px] font-semibold"
+          className="side-new mx-3 mb-3 py-2 text-[13px] font-semibold"
           style={{ background: "var(--w)", color: "var(--bg)" }}
         >
-          + New analysis
+          <span>+ New analysis</span>
         </button>
         <div className="px-4 text-[9px] font-bold uppercase tracking-widest mb-1" style={{ color: "var(--dim)" }}>
           Free analyses
@@ -301,7 +301,7 @@ function Terminal({
             <button
               key={s.id}
               onClick={() => openSession(s.id)}
-              className="w-full text-left px-4 py-1.5 text-[12px] hover:bg-black/[0.04] flex items-center gap-2"
+              className={`side-hist w-full text-left px-4 py-1.5 text-[12px] flex items-center gap-2 ${sessionId === s.id ? "active" : ""}`}
               style={{ color: sessionId === s.id ? "var(--gold)" : "var(--w2)" }}
             >
               <span className="font-semibold">{s.ticker}</span>
@@ -404,6 +404,7 @@ function ThinkingTrace({ mode }: { mode: "analyze" | "chat" }) {
       <div className="think-row">
         <span className="think-orb" />
         <span key={i} className="think-line">{steps[i]}</span>
+        <span className="think-dots"><i /><i /><i /></span>
       </div>
       <div className="think-skel">
         <span className="skel-line" />

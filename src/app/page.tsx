@@ -6,17 +6,26 @@ import { Reveal, SmoothScroll } from "@/components/motion";
 import "./landing.css";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+const pad = (n: number) => String(n).padStart(2, "0");
 
-// Popular assets — real brand colours bring the page to life.
+// Popular assets — real brand colours + a one-line crux for the spotlight.
 const COINS = [
-  { s: "BTC", n: "Bitcoin", c: "#f7931a", g: "₿", d: false, price: "$62,578.74", chg: "+5.22%", up: true, v: "pos", vt: "POSITIVE", mcap: "$1.25T", rank: "#01" },
-  { s: "ETH", n: "Ethereum", c: "#627eea", g: "Ξ", d: false, price: "$1,770.52", chg: "+12.81%", up: true, v: "pos", vt: "POSITIVE", mcap: "$214B", rank: "#02" },
-  { s: "SOL", n: "Solana", c: "linear-gradient(135deg,#14f195,#9945ff)", g: "◎", d: false, price: "$80.98", chg: "+13.61%", up: true, v: "mix", vt: "MIXED", mcap: "$47B", rank: "#07" },
-  { s: "BNB", n: "BNB", c: "#f3ba2f", g: "◆", d: true, price: "$584.20", chg: "+2.10%", up: true, v: "pos", vt: "POSITIVE", mcap: "$85B", rank: "#04" },
-  { s: "XRP", n: "XRP", c: "#3b4b57", g: "✕", d: false, price: "$0.5240", chg: "−1.20%", up: false, v: "mix", vt: "MIXED", mcap: "$29B", rank: "#06" },
-  { s: "DOGE", n: "Dogecoin", c: "#c2a633", g: "Ð", d: true, price: "$0.0612", chg: "−1.80%", up: false, v: "neg", vt: "NEGATIVE", mcap: "$8.8B", rank: "#09" },
-  { s: "LINK", n: "Chainlink", c: "#2a5ada", g: "⬡", d: false, price: "$11.42", chg: "+4.10%", up: true, v: "pos", vt: "POSITIVE", mcap: "$7.1B", rank: "#14" },
-  { s: "AVAX", n: "Avalanche", c: "#e84142", g: "▲", d: false, price: "$18.70", chg: "+6.90%", up: true, v: "pos", vt: "POSITIVE", mcap: "$7.4B", rank: "#12" },
+  { s: "BTC", n: "Bitcoin", c: "#f7931a", g: "₿", d: false, price: "$62,578.74", chg: "+5.22%", up: true, v: "pos", vt: "POSITIVE", mcap: "$1.25T", rank: "#01",
+    crux: "Digital gold — the reserve asset of crypto. Deepest liquidity, hardest supply, the benchmark every other token is measured against." },
+  { s: "ETH", n: "Ethereum", c: "#627eea", g: "Ξ", d: false, price: "$1,770.52", chg: "+12.81%", up: true, v: "pos", vt: "POSITIVE", mcap: "$214B", rank: "#02",
+    crux: "The settlement layer for programmable money. Fees burn with usage; staking secures the network and pays the holders who lock it up." },
+  { s: "SOL", n: "Solana", c: "linear-gradient(135deg,#14f195,#9945ff)", g: "◎", d: false, price: "$80.98", chg: "+13.61%", up: true, v: "mix", vt: "MIXED", mcap: "$47B", rank: "#07",
+    crux: "A high-throughput L1 built for speed. Real usage and real outages — the market keeps pricing both at the same time." },
+  { s: "BNB", n: "BNB", c: "#f3ba2f", g: "◆", d: true, price: "$584.20", chg: "+2.10%", up: true, v: "pos", vt: "POSITIVE", mcap: "$85B", rank: "#04",
+    crux: "The exchange-backed chain. Utility tied to the largest venue in crypto — with exactly the centralisation that implies." },
+  { s: "XRP", n: "XRP", c: "#3b4b57", g: "✕", d: false, price: "$0.5240", chg: "−1.20%", up: false, v: "mix", vt: "MIXED", mcap: "$29B", rank: "#06",
+    crux: "Built for cross-border settlement — fast and cheap to move. Its story still rides largely on regulatory outcomes." },
+  { s: "DOGE", n: "Dogecoin", c: "#c2a633", g: "Ð", d: true, price: "$0.0612", chg: "−1.80%", up: false, v: "neg", vt: "NEGATIVE", mcap: "$8.8B", rank: "#09",
+    crux: "The original memecoin. Liquidity and culture, not fundamentals — momentum and attention are the whole thesis." },
+  { s: "LINK", n: "Chainlink", c: "#2a5ada", g: "⬡", d: false, price: "$11.42", chg: "+4.10%", up: true, v: "pos", vt: "POSITIVE", mcap: "$7.1B", rank: "#14",
+    crux: "The oracle layer feeding real-world data into contracts. Quiet infrastructure the rest of DeFi depends on." },
+  { s: "AVAX", n: "Avalanche", c: "#e84142", g: "▲", d: false, price: "$18.70", chg: "+6.90%", up: true, v: "pos", vt: "POSITIVE", mcap: "$7.4B", rank: "#12",
+    crux: "A fast smart-contract platform with subnets for app-specific chains. Throughput to spare, a smaller moat to defend." },
 ] as const;
 type Coin = (typeof COINS)[number];
 
@@ -26,12 +35,41 @@ const SPK: Record<string, number[]> = {
   neg: [62, 60, 57, 59, 54, 56, 52, 50, 53, 49, 51, 47, 49, 45, 47, 44, 46, 42],
 };
 
-// The instrument scans across these live (hero read cycles through them).
+// The instrument scans across these live — each ships the signal messages
+// the desk surfaces about it (bullish / mixed / bearish observations).
 const TOKENS = [
-  { sym: "BTC", name: "Bitcoin", price: "$62,578.74", c24: "−0.46%", up24: false, c7: "+5.22%", up7: true, mcap: "$1.25T", rank: "#01", v: "pos", vt: "POSITIVE", conf: "78%", spark: [40, 41, 39, 43, 42, 46, 44, 43, 48, 47, 51, 49, 54, 52, 57, 56, 60, 63] },
-  { sym: "ETH", name: "Ethereum", price: "$1,770.52", c24: "−0.84%", up24: false, c7: "+12.81%", up7: true, mcap: "$214B", rank: "#02", v: "pos", vt: "POSITIVE", conf: "71%", spark: [30, 32, 31, 35, 34, 38, 40, 39, 44, 47, 49, 52, 55, 58, 60, 62, 64, 66] },
-  { sym: "SOL", name: "Solana", price: "$80.98", c24: "−1.41%", up24: false, c7: "+13.61%", up7: true, mcap: "$47B", rank: "#07", v: "mix", vt: "MIXED", conf: "58%", spark: [50, 48, 52, 49, 54, 51, 56, 53, 58, 55, 60, 57, 62, 59, 63, 60, 64, 61] },
-  { sym: "PEPE", name: "Pepe", price: "$0.00000269", c24: "−3.24%", up24: false, c7: "+14.47%", up7: true, mcap: "$1.13B", rank: "#64", v: "neg", vt: "NEGATIVE", conf: "41%", spark: [62, 60, 57, 59, 54, 56, 52, 50, 53, 49, 51, 47, 49, 45, 47, 44, 46, 42] },
+  { sym: "BTC", name: "Bitcoin", c: "#f7931a", g: "₿", d: false, price: "$62,578.74", c7: "+5.22%", up7: true, mcap: "$1.25T", v: "pos", vt: "POSITIVE", conf: "78%",
+    spark: [40, 41, 39, 43, 42, 46, 44, 43, 48, 47, 51, 49, 54, 52, 57, 56, 60, 63],
+    notes: [
+      { t: "pos", m: "Exchange reserves at a multi-year low" },
+      { t: "pos", m: "Spot volume up 18% over 24h" },
+      { t: "mix", m: "Funding elevated — positioning looks crowded" },
+      { t: "pos", m: "Long-term holders still net accumulating" },
+    ] },
+  { sym: "ETH", name: "Ethereum", c: "#627eea", g: "Ξ", d: false, price: "$1,770.52", c7: "+12.81%", up7: true, mcap: "$214B", v: "pos", vt: "POSITIVE", conf: "71%",
+    spark: [30, 32, 31, 35, 34, 38, 40, 39, 44, 47, 49, 52, 55, 58, 60, 62, 64, 66],
+    notes: [
+      { t: "pos", m: "Staking ratio ticks to a new high" },
+      { t: "pos", m: "L2 activity up 22% this week" },
+      { t: "mix", m: "ETF flows flat week-over-week" },
+      { t: "pos", m: "Burn is outpacing issuance again" },
+    ] },
+  { sym: "SOL", name: "Solana", c: "linear-gradient(135deg,#14f195,#9945ff)", g: "◎", d: false, price: "$80.98", c7: "+13.61%", up7: true, mcap: "$47B", v: "mix", vt: "MIXED", conf: "58%",
+    spark: [50, 48, 52, 49, 54, 51, 56, 53, 58, 55, 60, 57, 62, 59, 63, 60, 64, 61],
+    notes: [
+      { t: "pos", m: "Leads every chain in DEX volume" },
+      { t: "mix", m: "Network stability still a cited risk" },
+      { t: "neg", m: "A token unlock cliff is approaching" },
+      { t: "mix", m: "Desks split on the current valuation" },
+    ] },
+  { sym: "PEPE", name: "Pepe", c: "#4aa544", g: "P", d: false, price: "$0.00000269", c7: "+14.47%", up7: true, mcap: "$1.13B", v: "neg", vt: "NEGATIVE", conf: "41%",
+    spark: [62, 60, 57, 59, 54, 56, 52, 50, 53, 49, 51, 47, 49, 45, 47, 44, 46, 42],
+    notes: [
+      { t: "neg", m: "Liquidity thins out below spot" },
+      { t: "neg", m: "Top-10 wallets hold an outsized share" },
+      { t: "mix", m: "Social volume spiking — momentum only" },
+      { t: "neg", m: "No fundamental catalyst found" },
+    ] },
 ];
 
 const TAPE = [
@@ -51,6 +89,208 @@ function sparkPath(spark: number[]) {
 }
 function sigColor(v: string) {
   return v === "neg" ? "var(--neg)" : v === "mix" ? "var(--warn)" : "var(--pos)";
+}
+
+/** Circular asset chip. Defaults to a brand-coloured glyph badge, then probes
+ *  /public/coins/<ticker>.png after mount and upgrades to the real logo if it
+ *  exists — so it looks clean now and auto-upgrades when PNGs are dropped in. */
+function CoinLogo({
+  sym, name, color, glyph, dark, size = 46, cls, glow,
+}: { sym: string; name: string; color: string; glyph: string; dark?: boolean; size?: number; cls?: string; glow?: boolean }) {
+  const [ok, setOk] = useState(false); // real PNG confirmed to load
+  const src = `/coins/${sym.toLowerCase()}.png`;
+  useEffect(() => {
+    const im = new window.Image();
+    im.onload = () => setOk(true);
+    im.src = src;
+  }, [src]);
+  const tint = color.startsWith("#") ? `${color}59` : "#9945ff55";
+  return (
+    <span
+      className={`coin ${cls ?? ""}`}
+      style={{
+        width: size, height: size, fontSize: Math.round(size * 0.42),
+        background: ok ? "transparent" : color,
+        color: dark ? "#0b0b12" : "#fff",
+        boxShadow: glow ? `0 40px 120px -30px ${tint}, 0 0 0 1px rgba(255,255,255,0.05)` : undefined,
+      }}
+    >
+      {ok ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt={name} style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "50%" }} />
+      ) : (
+        <span>{glyph}</span>
+      )}
+    </span>
+  );
+}
+
+/** Hero right panel — a coin's read with signal notifications popping in,
+ *  then the whole deck fades and the next asset takes the stage. */
+function SignalDeck() {
+  const reduce = useReducedMotion();
+  const [ci, setCi] = useState(0);
+  const [shown, setShown] = useState(0);
+  const t = TOKENS[ci];
+
+  useEffect(() => {
+    if (reduce) { setShown(t.notes.length); return; }
+    setShown(0);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    t.notes.forEach((_, k) => timers.push(setTimeout(() => setShown(k + 1), 640 + k * 760)));
+    const end = 640 + t.notes.length * 760 + 1750;
+    timers.push(setTimeout(() => setCi((x) => (x + 1) % TOKENS.length), end));
+    return () => timers.forEach(clearTimeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ci, reduce]);
+
+  return (
+    <motion.div className="deck" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.85, delay: 0.55, ease: EASE }}>
+      <div className="deck-top">
+        <span className="lbl">Signal desk</span>
+        <span className="live">◉ LIVE</span>
+      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={t.sym}
+          initial={{ opacity: 0, filter: "blur(10px)", y: 10 }}
+          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          exit={{ opacity: 0, filter: "blur(10px)", y: -8 }}
+          transition={{ duration: 0.5, ease: EASE }}
+        >
+          <div className="deck-id">
+            <CoinLogo sym={t.sym} name={t.name} color={t.c} glyph={t.g} dark={t.d} size={38} />
+            <div>
+              <div className="px">{t.price}</div>
+              <div className="nm">{t.name} · {t.sym}</div>
+            </div>
+            <span className={`chg ${t.up7 ? "up" : "dn"}`}>{t.c7}</span>
+          </div>
+
+          <svg className="dsig" viewBox="0 0 300 44" preserveAspectRatio="none">
+            <path d={sparkPath(t.spark)} fill="none" stroke={sigColor(t.v)} strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+          </svg>
+
+          <div className="deck-feed">
+            <AnimatePresence>
+              {t.notes.slice(0, shown).map((n, k) => (
+                <motion.div
+                  key={`${t.sym}-${k}`}
+                  className={`toast ${n.t}`}
+                  layout
+                  initial={{ opacity: 0, x: 16, filter: "blur(6px)" }}
+                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.42, ease: EASE }}
+                >
+                  <span className="dot" />
+                  <span className="m">{n.m}</span>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          <div className="deck-foot">
+            <span className={`stamp ${t.v}`}>{t.vt}</span>
+            <span className="conf">conf {t.conf} · mcap {t.mcap}</span>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+      <div className="dots">
+        {TOKENS.map((tk, k) => <span key={tk.sym} className={k === ci ? "on" : ""} />)}
+      </div>
+    </motion.div>
+  );
+}
+
+/** Live market tape — ambient motion, real content. */
+function Tape() {
+  const seg = [...TAPE, ...TAPE].map((t, k) => (
+    <span className="seg" key={k}><b>{t[0]}</b> {t[1]} <span className={t[3] ? "up" : "dn"}>{t[2]}</span></span>
+  ));
+  return (
+    <div className="tape" aria-hidden>
+      <div className="trow">{seg}</div>
+    </div>
+  );
+}
+
+/** Scroll spotlight — the stage dims, each asset's logo enlarges to half the
+ *  screen while its crux fades in beside it; the next asset takes over on scroll. */
+function Spotlight() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+  const [i, setI] = useState(0);
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    setI(Math.min(COINS.length - 1, Math.max(0, Math.floor(v * COINS.length))));
+  });
+  const t = COINS[i];
+  const tint = t.c.startsWith("#") ? t.c : "#9945ff";
+
+  return (
+    <section className="spotlight" ref={ref}>
+      <div className="sp-sticky">
+        <motion.div
+          className="sp-tint"
+          animate={{ background: `radial-gradient(760px 620px at 26% 46%, ${tint}2e, transparent 62%)` }}
+          transition={{ duration: 0.7, ease: EASE }}
+        />
+        <div className="sp-inner lp-wrap">
+          <div className="sp-head">
+            <span className="kicker">The signal desk — always watching</span>
+            <span className="cnt">{pad(i + 1)} / {pad(COINS.length)}</span>
+          </div>
+
+          <div className="sp-stage">
+            <div className="sp-logo-col">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={t.s}
+                  className="sp-logo"
+                  initial={{ opacity: 0, scale: 0.68, filter: "blur(14px)" }}
+                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, scale: 0.9, filter: "blur(14px)" }}
+                  transition={{ duration: 0.55, ease: EASE }}
+                >
+                  <CoinLogo sym={t.s} name={t.n} color={t.c} glyph={t.g} dark={t.d} size={340} glow cls="huge" />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            <div className="sp-crux-col">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${t.s}c`}
+                  className="sp-crux"
+                  initial={{ opacity: 0, x: 30, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, x: -18, filter: "blur(8px)" }}
+                  transition={{ duration: 0.5, ease: EASE }}
+                >
+                  <div className="tk">{t.n} <span>· {t.s}</span></div>
+                  <p className="crux">{t.crux}</p>
+                  <div className="facts">
+                    <div><span>PRICE</span><b>{t.price}</b></div>
+                    <div><span>7D</span><b className={t.up ? "up" : "dn"}>{t.chg}</b></div>
+                    <div><span>MARKET CAP</span><b>{t.mcap}</b></div>
+                    <div><span>RANK</span><b>{t.rank}</b></div>
+                  </div>
+                  <span className={`stamp ${t.v}`}>ASSESSMENT · {t.vt}</span>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          <div className="sp-rail">
+            {COINS.map((c, k) => (
+              <CoinLogo key={c.s} sym={c.s} name={c.n} color={c.c} glyph={c.g} dark={c.d} size={42} cls={k === i ? "on" : ""} />
+            ))}
+          </div>
+          <div className="sp-progress"><motion.i style={{ scaleX: scrollYProgress, transformOrigin: "0 0", position: "absolute", inset: 0, background: tint }} /></div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 const READ = [
@@ -76,132 +316,6 @@ const ACCESS = [
   ["A.3", "Erased on request", "One action removes your account and every session. Crypto-native by default."],
 ];
 
-/** The hero read — the instrument scans across tokens live (its heartbeat). */
-function LiveRead() {
-  const reduce = useReducedMotion();
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    if (reduce) return;
-    const id = setInterval(() => setI((x) => (x + 1) % TOKENS.length), 4200);
-    return () => clearInterval(id);
-  }, [reduce]);
-  const t = TOKENS[i];
-
-  return (
-    <motion.div className="read" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.85, delay: 0.6, ease: EASE }}>
-      <div className="rt">
-        <span className="lbl">Reading · Lens/0{i + 1}</span>
-        <span className="live">◉ LIVE</span>
-      </div>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={t.sym}
-          initial={{ opacity: 0, filter: "blur(8px)", y: 8 }}
-          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-          exit={{ opacity: 0, filter: "blur(8px)", y: -6 }}
-          transition={{ duration: 0.45, ease: EASE }}
-        >
-          <div className="px">{t.price}</div>
-          <div className="nm">{t.name} · {t.sym}</div>
-          <svg className="rsig" viewBox="0 0 300 44" preserveAspectRatio="none">
-            <path className="line" d={sparkPath(t.spark)} fill="none" stroke={sigColor(t.v)} strokeWidth="1.4" pathLength={1} vectorEffect="non-scaling-stroke" />
-          </svg>
-          <div className="kv"><span>24H</span><span className={t.up24 ? "up" : "dn"}>{t.c24}</span></div>
-          <div className="kv"><span>7D</span><span className={t.up7 ? "up" : "dn"}>{t.c7}</span></div>
-          <div className="kv"><span>MARKET CAP</span><span>{t.mcap}</span></div>
-          <div className="kv"><span>RANK</span><span>{t.rank}</span></div>
-          <div className="verdict">
-            <span className={`stamp ${t.v}`}>ASSESSMENT · {t.vt}</span>
-            <span className="mono" style={{ fontSize: 11, color: "var(--mut)" }}>conf {t.conf}</span>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-      <div className="dots">
-        {TOKENS.map((tk, k) => <span key={tk.sym} className={k === i ? "on" : ""} />)}
-      </div>
-    </motion.div>
-  );
-}
-
-/** Live market tape — ambient motion, real content. */
-function Tape() {
-  const seg = [...TAPE, ...TAPE].map((t, k) => (
-    <span className="seg" key={k}><b>{t[0]}</b> {t[1]} <span className={t[3] ? "up" : "dn"}>{t[2]}</span></span>
-  ));
-  return (
-    <div className="tape" aria-hidden>
-      <div className="trow">{seg}</div>
-    </div>
-  );
-}
-
-function CoinBadge({ coin, cls }: { coin: Coin; cls?: string }) {
-  return (
-    <span className={`coin ${cls ?? ""}`} style={{ background: coin.c, color: coin.d ? "#0b0b12" : "#fff" }}>
-      <span>{coin.g}</span>
-    </span>
-  );
-}
-
-/** Scroll to bring each asset into focus — the instrument scanning the market. */
-function Spotlight() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const [i, setI] = useState(0);
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    setI(Math.min(COINS.length - 1, Math.max(0, Math.floor(v * COINS.length))));
-  });
-  const t = COINS[i];
-  const glow = t.c.startsWith("#") ? `${t.c}80` : "#9945ff80";
-
-  return (
-    <section className="spotlight" ref={ref}>
-      <div className="sp-sticky lp-wrap">
-        <div className="sp-head">
-          <h2 className="display">The desk is <span className="dim">always watching.</span></h2>
-          <span className="cnt">{String(i + 1).padStart(2, "0")} / {String(COINS.length).padStart(2, "0")}</span>
-        </div>
-        <div className="sp-stage">
-          <AnimatePresence mode="wait">
-            <motion.div key={t.s}
-              initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
-              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
-              transition={{ duration: 0.4, ease: EASE }}
-            >
-              <span className="coin sp-coin" style={{ background: t.c, color: t.d ? "#0b0b12" : "#fff", boxShadow: `0 30px 80px -34px ${glow}` }}>
-                <span>{t.g}</span>
-              </span>
-            </motion.div>
-          </AnimatePresence>
-          <AnimatePresence mode="wait">
-            <motion.div key={`${t.s}i`} className="sp-info"
-              initial={{ opacity: 0, x: 24, filter: "blur(8px)" }}
-              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, x: -16, filter: "blur(8px)" }}
-              transition={{ duration: 0.4, ease: EASE }}
-            >
-              <div className="nm">{t.n} · {t.s}</div>
-              <div className="px">{t.price}</div>
-              <div className={`chg ${t.up ? "up" : "dn"}`}>{t.chg} · 7D</div>
-              <svg className="sig" viewBox="0 0 300 44" preserveAspectRatio="none">
-                <path d={sparkPath(SPK[t.v])} fill="none" stroke={sigColor(t.v)} strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
-              </svg>
-              <div className="kv"><span>MARKET CAP</span><span>{t.mcap}</span></div>
-              <div className="kv"><span>RANK</span><span>{t.rank}</span></div>
-              <span className={`stamp ${t.v}`}>ASSESSMENT · {t.vt}</span>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-        <div className="sp-rail">
-          {COINS.map((c, k) => <CoinBadge key={c.s} coin={c} cls={k === i ? "on" : ""} />)}
-        </div>
-        <div className="sp-progress"><motion.i style={{ scaleX: scrollYProgress, transformOrigin: "0 0", position: "absolute", inset: 0, background: "var(--gold)" }} /></div>
-      </div>
-    </section>
-  );
-}
-
 export default function Landing() {
   return (
     <SmoothScroll>
@@ -212,7 +326,7 @@ export default function Landing() {
 
 function Inner() {
   const [stuck, setStuck] = useState(false);
-  const [light, setLight] = useState(false);
+  const [light, setLight] = useState(true);
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (v) => setStuck(v > 40));
 
@@ -243,24 +357,24 @@ function Inner() {
           <span className="idx">NON-ADVISORY<br />EST. 2026</span>
         </motion.div>
 
-        <motion.h1 className="display" {...load(0.2)}>
-          Read the signal,<br /><span className="dim">not the noise.</span>
-        </motion.h1>
-
-        <motion.div className="hero-rail" {...load(0.42)}>
-          <span className="lbl">Tracking 200+ assets ↓</span>
-          <div className="coins">{COINS.map((c) => <CoinBadge key={c.s} coin={c} />)}</div>
-        </motion.div>
-
         <div className="hero-lower">
-          <motion.div className="col" {...load(0.5)}>
+          <motion.div className="col" {...load(0.2)}>
+            <h1 className="display">
+              Read the signal,<br /><span className="dim">not the noise.</span>
+            </h1>
             <p>A research instrument for crypto. Point it at any token and get a decision-grade read from live data and current news — the assessment, the reasoning, both sides. Never a buy button.</p>
+            <motion.div className="hero-rail" {...load(0.42)}>
+              <span className="lbl">Tracking 200+ assets ↓</span>
+              <div className="coins">{COINS.map((c) => (
+                <CoinLogo key={c.s} sym={c.s} name={c.n} color={c.c} glyph={c.g} dark={c.d} size={46} />
+              ))}</div>
+            </motion.div>
             <div className="cta">
               <Link className="tlink" href="/app"><span>Analyze a token</span><span className="a">→</span></Link>
             </div>
           </motion.div>
 
-          <LiveRead />
+          <SignalDeck />
         </div>
       </header>
 

@@ -471,3 +471,50 @@
   content: ""; position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%);
   width: 5px; height: 5px; background: var(--accent);
 }
+
+/* ═══════════ Data-flow section — sources streaming into one report ═══════════ */
+.flowsec { padding: clamp(90px, 15vh, 180px) 0; border-top: 1px solid var(--hair-soft); position: relative; z-index: 1; }
+.flow-grid { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(28px, 4vw, 64px); align-items: center; }
+@media (max-width: 940px) { .flow-grid { grid-template-columns: 1fr; gap: 48px; } }
+.flow-copy .kicker { display: block; margin-bottom: 20px; }
+.flow-copy h2 { font-size: clamp(30px, 3.8vw, 56px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.0; margin: 0 0 22px; }
+.flow-copy h2 .accent { color: var(--accent); }
+.flow-copy h2 .dim { color: var(--mut); }
+.flow-copy p { font-size: clamp(15px, 1.2vw, 17.5px); line-height: 1.6; color: var(--sec); max-width: 46ch; }
+
+.flow-stage { position: relative; width: 100%; aspect-ratio: 700 / 600; }
+.flow-links { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; overflow: visible; }
+
+.src-card {
+  position: absolute; transform: translate(-50%, -50%); z-index: 2;
+  width: clamp(116px, 14vw, 148px); padding: 11px 13px;
+  background: var(--card-bg); border: 1px solid var(--card-brd);
+  box-shadow: 0 24px 50px -30px rgba(20, 24, 60, 0.26);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+}
+.src-card:hover { transform: translate(-50%, -50%) scale(1.07); box-shadow: 0 34px 70px -30px rgba(20, 24, 60, 0.36); z-index: 4; }
+.src-h { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+.src-live { width: 7px; height: 7px; border-radius: 50%; background: var(--pos); }
+.src-viz { width: 100%; height: 30px; display: block; }
+
+.report-card {
+  position: absolute; left: 58.6%; top: 50%; transform: translate(-50%, -50%); z-index: 3;
+  width: clamp(282px, 33vw, 338px);
+  background: var(--card-bg); border: 1px solid var(--card-brd);
+  box-shadow: 0 54px 120px -42px rgba(20, 24, 60, 0.32);
+}
+.report-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--hair-soft); }
+.report-brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+.report-brand .glyph { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--accent); position: relative; }
+.report-brand .glyph::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--accent); }
+.report-tag { font-size: 9.5px; letter-spacing: 0.1em; color: var(--mut); border: 1px solid var(--hair); padding: 3px 7px; }
+.report-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; padding: 14px 16px 6px; }
+.report-rows { padding: 0 16px 12px; }
+.report-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--hair-soft); }
+.report-row:first-child { border-top: none; }
+.rr-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--txt); flex-shrink: 0; }
+.rr-label { font-size: 12px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rr-bar { width: 60px; flex-shrink: 0; height: 4px; background: var(--hair); position: relative; }
+.rr-bar i { position: absolute; inset: 0 auto 0 0; background: var(--txt); }
+.rr-chev { color: var(--mut); font-size: 15px; line-height: 1; }
+@media (max-width: 540px) { .rr-bar { width: 44px; } }

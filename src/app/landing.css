@@ -13,22 +13,27 @@
   --card-bg: rgba(255, 255, 255, 0.03);
   --card-brd: rgba(255, 255, 255, 0.09);
   --toast-bg: rgba(255, 255, 255, 0.035);
+  --dot: rgba(255, 255, 255, 0.05);
   position: relative;
-  /* Depth — subtle color light, not neon orbs. */
-  background:
+  /* Depth — soft colour auras + a fine dot grid (intelligence-terminal texture). */
+  background-color: var(--void);
+  background-image:
     radial-gradient(1100px 680px at 84% -12%, rgba(98, 126, 234, 0.13), transparent 62%),
     radial-gradient(900px 520px at 6% 112%, rgba(200, 168, 75, 0.07), transparent 60%),
-    var(--void);
+    radial-gradient(var(--dot) 1px, transparent 1.3px);
+  background-size: auto, auto, 30px 30px;
   color: var(--txt);
   overflow-x: clip; /* clip (not hidden) so position:sticky still works */
   font-family: var(--font-sans-stack);
   transition: color 0.4s ease;
 }
 .lp.light {
-  background:
-    radial-gradient(1100px 680px at 84% -12%, rgba(98, 126, 234, 0.1), transparent 62%),
+  --dot: rgba(18, 22, 48, 0.055);
+  background-image:
+    radial-gradient(1100px 680px at 84% -12%, rgba(98, 126, 234, 0.12), transparent 62%),
     radial-gradient(900px 520px at 6% 112%, rgba(154, 122, 46, 0.08), transparent 60%),
-    var(--void);
+    radial-gradient(var(--dot) 1px, transparent 1.3px);
+  background-size: auto, auto, 30px 30px;
 }
 
 /* Light theme (clean cool paper — premium, not warm cream). Scoped to landing. */
@@ -207,14 +212,21 @@
 /* ══════════════ STAGE — hero + character-select scroll ══════════════ */
 .stage { position: relative; height: 660vh; }
 .stage-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+/* Soft drifting colour auras — give the plain background quiet life. */
+.stage-sticky::before, .stage-sticky::after { content: ""; position: absolute; border-radius: 50%; filter: blur(90px); z-index: 0; pointer-events: none; }
+.stage-sticky::before { width: 540px; height: 540px; left: -7%; top: 8%; background: radial-gradient(circle, rgba(98, 126, 234, 0.22), transparent 68%); animation: drift1 19s var(--ease) infinite; }
+.stage-sticky::after { width: 480px; height: 480px; right: -5%; bottom: 2%; background: radial-gradient(circle, rgba(155, 140, 255, 0.18), transparent 68%); animation: drift2 23s var(--ease) infinite; }
+@keyframes drift1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(46px, 34px); } }
+@keyframes drift2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-40px, -30px); } }
+@media (prefers-reduced-motion: reduce) { .stage-sticky::before, .stage-sticky::after { animation: none; } }
 .stage-tint { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 
 /* Intro — centered headline, a little above middle */
-.stage-intro { position: absolute; top: 25%; left: 0; right: 0; z-index: 3; text-align: center; padding: 0 24px; }
+.stage-intro { position: absolute; top: 20%; left: 0; right: 0; z-index: 3; text-align: center; padding: 0 24px; }
 .stage-intro .kicker { display: block; margin-bottom: clamp(16px, 2.4vh, 26px); }
 .stage-intro h1 { font-size: clamp(42px, 7.2vw, 108px); line-height: 0.97; letter-spacing: -0.035em; margin: 0; }
 .stage-intro h1 .dim { color: var(--mut); }
-.stage-intro .scrollhint { margin-top: clamp(24px, 3.4vh, 38px); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mut); }
+.stage-hint { position: absolute; left: 0; right: 0; bottom: clamp(40px, 7vh, 74px); z-index: 3; text-align: center; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mut); pointer-events: none; }
 
 /* Focus — the selected asset */
 .stage-focus { position: absolute; inset: 0; z-index: 2; }

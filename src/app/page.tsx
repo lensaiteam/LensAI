@@ -115,9 +115,9 @@ function Questions({ coin }: { coin: Coin }) {
           key={`${coin.s}-${k}`}
           className="qbubble"
           style={{ ...QPOS[k % QPOS.length], "--qc": sigColor(coin.v) } as React.CSSProperties}
-          initial={{ opacity: 0, scale: 0.82, y: 12 }}
+          initial={{ opacity: 0, scale: 0.4, y: 34 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: reduce ? 0 : 0.2 + k * 0.26, ease: EASE }}
+          transition={{ type: "spring", stiffness: 130, damping: 13, delay: reduce ? 0 : 0.55 + k * 0.62 }}
         >
           <span className="qdot" />{q}
         </motion.div>
@@ -142,9 +142,7 @@ function Stage() {
     setI(Math.min(COINS.length - 1, Math.floor(sp * COINS.length)));
   });
 
-  const headOp = useTransform(scrollYProgress, [0, INTRO * 0.8], [1, 0]);
-  const headY = useTransform(scrollYProgress, [0, INTRO], [0, -46]);
-  const railTop = useTransform(scrollYProgress, [0, INTRO], ["64%", "80%"]);
+  const railTop = useTransform(scrollYProgress, [0, INTRO], ["66%", "80%"]);
   const railScale = useTransform(scrollYProgress, [0, INTRO], [1, 0.82]);
 
   const t = COINS[i];
@@ -168,7 +166,11 @@ function Stage() {
         >
           <span className="kicker">LensAI — Crypto Intelligence</span>
           <h1 className="display">Read the signal,<br /><span className="dim">not the noise.</span></h1>
-          <div className="scrollhint mono">Scroll to scan the market ↓</div>
+        </motion.div>
+
+        {/* Scroll hint — pinned to the bottom, clear of the logo row */}
+        <motion.div className="stage-hint mono" animate={{ opacity: active ? 0 : 1 }} transition={{ duration: 0.4, ease: EASE }}>
+          Scroll to scan the market ↓
         </motion.div>
 
         {/* Focus — the selected asset enlarges with details + questions */}
@@ -177,10 +179,10 @@ function Stage() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={t.s}
-                initial={{ opacity: 0, scale: 0.62, filter: "blur(16px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, scale: 0.85, filter: "blur(16px)" }}
-                transition={{ duration: 0.5, ease: EASE }}
+                initial={{ opacity: 0, y: 420, scale: 0.24 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 360, scale: 0.24, transition: { duration: 0.3, ease: EASE } }}
+                transition={{ type: "spring", stiffness: 88, damping: 15, mass: 0.9 }}
               >
                 <CoinLogo sym={t.s} name={t.n} color={t.c} glyph={t.g} dark={t.d} size={220} glow cls="big" />
               </motion.div>

@@ -280,6 +280,104 @@ function Tape() {
   );
 }
 
+// Source cards + their connector paths into the central report (coords in the
+// 700×620 SVG space; card left/top are the same points as a percentage).
+const FLOW_SOURCES = [
+  { id: "price", label: "Price", left: "17%", top: "15%", viz: "spark", path: "M120,90 C210,150 230,210 300,255" },
+  { id: "volume", label: "Volume", left: "47%", top: "8%", viz: "bars", path: "M330,52 C345,120 350,170 378,222" },
+  { id: "sentiment", label: "Sentiment", left: "88%", top: "32%", viz: "spark", path: "M612,200 C560,235 545,258 522,292" },
+  { id: "social", label: "Social Activity", left: "20%", top: "82%", viz: "lines", path: "M150,500 C230,468 250,435 300,378" },
+  { id: "onchain", label: "On-chain Tx", left: "80%", top: "88%", viz: "lines", path: "M556,540 C520,470 500,430 470,388" },
+];
+const FLOW_ROWS: [string, number][] = [
+  ["Overall Intelligence Score", 74],
+  ["Wallet Activity", 58],
+  ["Holder Distribution", 45],
+  ["Liquidity Health", 66],
+  ["Social Momentum", 81],
+  ["Risk Assessment", 37],
+];
+
+function FlowViz({ kind }: { kind: string }) {
+  if (kind === "bars") {
+    const bars = [8, 14, 10, 18, 12, 22, 16, 26, 20, 30];
+    return (
+      <svg className="src-viz" viewBox="0 0 120 34" preserveAspectRatio="none">
+        {bars.map((h, i) => <rect key={i} x={i * 12 + 2} y={34 - h} width="7" height={h} fill={i === bars.length - 1 ? "var(--pos)" : "var(--hair)"} />)}
+      </svg>
+    );
+  }
+  if (kind === "lines") {
+    return (
+      <svg className="src-viz" viewBox="0 0 120 34" preserveAspectRatio="none">
+        <rect x="0" y="8" width="96" height="4" rx="0" fill="var(--hair)" />
+        <rect x="0" y="20" width="64" height="4" rx="0" fill="var(--hair)" />
+      </svg>
+    );
+  }
+  return (
+    <svg className="src-viz" viewBox="0 0 120 34" preserveAspectRatio="none">
+      <path d={sparkPath(SPK.pos).replace(/300/g, "120").replace(/44/g, "34")} fill="none" stroke="var(--pos)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
+
+/** Data-flow diagram — live sources streaming into one intelligence report. */
+function DataFlow() {
+  return (
+    <section className="flowsec lp-wrap" id="pipeline">
+      <div className="flow-grid">
+        <Reveal className="flow-copy" variant="rise">
+          <span className="kicker">The intelligence layer</span>
+          <h2 className="display">Read what&apos;s <span className="accent">really</span> going on. <span className="dim">Not just the metrics.</span></h2>
+          <p>Price, volume, sentiment, social and on-chain activity — every source the desk reads, streamed live and folded into a single decision-grade summary. One layer. Complete context.</p>
+        </Reveal>
+
+        <Reveal className="flow-stage" variant="rise" delay={0.1}>
+          <svg className="flow-links" viewBox="0 0 700 620" preserveAspectRatio="xMidYMid meet" aria-hidden>
+            {FLOW_SOURCES.map((s) => (
+              <path key={s.id} id={`fp-${s.id}`} d={s.path} fill="none" stroke="var(--hair)" strokeWidth="1.4" strokeDasharray="3 5" vectorEffect="non-scaling-stroke" />
+            ))}
+            {FLOW_SOURCES.map((s, i) => (
+              <circle key={s.id} r="4.5" fill="var(--accent)">
+                <animateMotion dur="2.8s" begin={`${i * 0.55}s`} repeatCount="indefinite">
+                  <mpath href={`#fp-${s.id}`} />
+                </animateMotion>
+                <animate attributeName="opacity" dur="2.8s" begin={`${i * 0.55}s`} repeatCount="indefinite" values="0;1;1;0" keyTimes="0;0.12;0.85;1" />
+              </circle>
+            ))}
+          </svg>
+
+          {FLOW_SOURCES.map((s) => (
+            <div className="src-card" key={s.id} style={{ left: s.left, top: s.top }}>
+              <div className="src-h"><span>{s.label}</span><span className="src-live" /></div>
+              <FlowViz kind={s.viz} />
+            </div>
+          ))}
+
+          <div className="report-card">
+            <div className="report-top">
+              <span className="report-brand"><span className="glyph" />LensAI</span>
+              <span className="report-tag mono">AI Report</span>
+            </div>
+            <div className="report-title">Token intelligence summary</div>
+            <div className="report-rows">
+              {FLOW_ROWS.map(([label, pct]) => (
+                <div className="report-row" key={label}>
+                  <span className="rr-dot" />
+                  <span className="rr-label">{label}</span>
+                  <span className="rr-bar"><i style={{ width: `${pct}%` }} /></span>
+                  <span className="rr-chev">›</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 const READ = [
   ["0.1", "Snapshot", "Price, market cap, 24h/7d, volume and supply — the state of the asset."],
   ["0.2", "Tokenomics", "Supply model, holder concentration and unlock risk."],
@@ -331,6 +429,7 @@ function LandingBody() {
       {/* HERO + character-select stage */}
       <Stage />
       <Tape />
+      <DataFlow />
 
       {/* §01 THE READ — with a live sample-briefing preview */}
       <section className="lp-wrap sec" id="read">

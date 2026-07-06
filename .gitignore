@@ -22,6 +22,8 @@ next-env.d.ts
 # misc
 .DS_Store
 *.pem
+_shot.mjs
+Gemini_Generated_Image_*.png
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -215,7 +215,7 @@
 @keyframes drift1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(46px, 34px); } }
 @keyframes drift2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-40px, -30px); } }
 @media (prefers-reduced-motion: reduce) { .stage-sticky::before, .stage-sticky::after { animation: none; } }
-.stage-tint { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.stage-tint { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; }
 
 /* Intro — centered headline, a little above middle */
 .stage-intro { position: absolute; top: 20%; left: 0; right: 0; z-index: 3; text-align: center; padding: 0 24px; }
@@ -274,8 +274,10 @@
 .stage-rail:not(.sel) .coin { cursor: pointer; }
 .stage-rail:not(.sel) .coin:hover { transform: translateY(-8px) scale(1.16); }
 
-/* Focus — the selected asset on a premium glass panel */
-.stage-focus { position: absolute; inset: 0; z-index: 2; }
+/* Focus — the selected asset on a premium glass panel.
+   Hidden by default so it never flashes on first paint (before framer
+   hydrates); framer animates it in on scroll. */
+.stage-focus { position: absolute; inset: 0; z-index: 2; opacity: 0; }
 .stage-panel {
   position: absolute; top: 19%; left: 50%; transform: translateX(-50%);
   width: min(560px, 88vw); padding: 30px 40px 30px;

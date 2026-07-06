@@ -210,8 +210,8 @@
 .stage-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; }
 /* Soft drifting colour auras — give the plain background quiet life. */
 .stage-sticky::before, .stage-sticky::after { content: ""; position: absolute; border-radius: 50%; filter: blur(90px); z-index: 0; pointer-events: none; }
-.stage-sticky::before { width: 540px; height: 540px; left: -7%; top: 8%; background: radial-gradient(circle, rgba(98, 126, 234, 0.22), transparent 68%); animation: drift1 19s var(--ease) infinite; }
-.stage-sticky::after { width: 480px; height: 480px; right: -5%; bottom: 2%; background: radial-gradient(circle, rgba(155, 140, 255, 0.18), transparent 68%); animation: drift2 23s var(--ease) infinite; }
+.stage-sticky::before { width: 600px; height: 600px; left: 12%; top: 6%; background: radial-gradient(circle, rgba(98, 126, 234, 0.26), transparent 66%); animation: drift1 19s var(--ease) infinite; }
+.stage-sticky::after { width: 540px; height: 540px; right: 10%; bottom: 2%; background: radial-gradient(circle, rgba(158, 138, 255, 0.22), transparent 66%); animation: drift2 23s var(--ease) infinite; }
 @keyframes drift1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(46px, 34px); } }
 @keyframes drift2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-40px, -30px); } }
 @media (prefers-reduced-motion: reduce) { .stage-sticky::before, .stage-sticky::after { animation: none; } }
@@ -224,17 +224,28 @@
 .stage-intro h1 .dim { color: var(--mut); }
 .stage-hint { position: absolute; left: 0; right: 0; bottom: clamp(40px, 7vh, 74px); z-index: 3; text-align: center; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mut); pointer-events: none; }
 
-/* Focus — the selected asset */
+/* Focus — the selected asset on a premium glass panel */
 .stage-focus { position: absolute; inset: 0; z-index: 2; }
-.stage-portrait { position: absolute; top: 19%; left: 50%; transform: translateX(-50%); }
-.coin.big { width: clamp(150px, 19vw, 216px) !important; height: clamp(150px, 19vw, 216px) !important; }
-.coin.big span { font-size: clamp(66px, 8.5vw, 92px); }
-.stage-detail { position: absolute; top: 51%; left: 0; right: 0; text-align: center; padding: 0 24px; }
-.stage-detail > div { max-width: 640px; margin: 0 auto; }
-.stage-detail .tk { font-size: clamp(24px, 3vw, 40px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.05; }
+.stage-panel {
+  position: absolute; top: 19%; left: 50%; transform: translateX(-50%);
+  width: min(560px, 88vw); padding: 30px 40px 30px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  background: rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.6);
+  backdrop-filter: blur(26px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 28px;
+  box-shadow: 0 44px 120px -46px rgba(20, 24, 60, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.panel-logo { height: clamp(120px, 16vw, 158px); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.coin.big { width: clamp(120px, 16vw, 158px) !important; height: clamp(120px, 16vw, 158px) !important; }
+.coin.big span { font-size: clamp(56px, 8vw, 78px); }
+.stage-detail { position: static; }
+.stage-detail > div { max-width: 460px; margin: 0 auto; }
+.stage-detail .tk { font-size: clamp(22px, 2.4vw, 32px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
 .stage-detail .tk span { color: var(--mut); font-weight: 400; }
-.stage-detail .crux { font-family: var(--font-display-stack); font-weight: 400; font-size: clamp(17px, 1.7vw, 24px); line-height: 1.4; letter-spacing: -0.01em; color: var(--sec); margin: 14px auto 22px; max-width: 42ch; text-wrap: balance; }
-.stage-detail .facts { display: flex; justify-content: center; gap: clamp(18px, 3vw, 44px); flex-wrap: wrap; }
+.stage-detail .crux { font-weight: 400; font-size: clamp(15px, 1.35vw, 18px); line-height: 1.5; letter-spacing: -0.005em; color: var(--sec); margin: 12px auto 18px; max-width: 40ch; text-wrap: balance; }
+.stage-detail .facts { display: flex; justify-content: center; gap: clamp(16px, 2.6vw, 36px); flex-wrap: wrap; }
 .stage-detail .facts div { display: flex; flex-direction: column; gap: 4px; font-family: var(--font-mono-stack); }
 .stage-detail .facts span { font-size: 10px; letter-spacing: 0.12em; color: var(--mut); }
 .stage-detail .facts b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -243,10 +254,20 @@
 .stage-detail .stamp::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 .stage-detail .stamp.pos { color: var(--pos); } .stage-detail .stamp.mix { color: var(--warn); } .stage-detail .stamp.neg { color: var(--neg); }
 
-/* Question bubbles — spawn like someone asking */
+/* Question bubbles — floating glassmorphism messages over the panel */
 .stage-questions { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
-.qbubble { position: absolute; display: inline-flex; align-items: center; gap: 9px; padding: 10px 15px; border-radius: 15px 15px 15px 4px; background: var(--card-bg); border: 1px solid var(--card-brd); backdrop-filter: blur(12px); font-size: 13.5px; color: var(--txt); box-shadow: 0 24px 60px -34px rgba(8, 10, 30, 0.5); max-width: 220px; animation: qfloat 5.5s var(--ease) infinite; }
-.qbubble .qdot { width: 8px; height: 8px; border-radius: 50%; background: var(--qc, var(--gold)); flex-shrink: 0; }
+.qbubble {
+  position: absolute; display: inline-flex; align-items: center; gap: 9px;
+  padding: 11px 16px; font-size: 13.5px; color: var(--txt); max-width: 230px;
+  background: rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 17px 17px 17px 5px;
+  box-shadow: 0 26px 60px -30px rgba(20, 24, 60, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  animation: qfloat 5.5s var(--ease) infinite;
+}
+.qbubble .qdot { width: 8px; height: 8px; border-radius: 50%; background: var(--qc, var(--accent)); flex-shrink: 0; }
 @keyframes qfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
 
 /* Select tray — the same logos, always present */
@@ -343,20 +364,36 @@
    Structure comes from 1px #e6e6e6 lines + space, never shadow. Red is the
    sole chromatic punctuation; the crypto logos carry all other colour.
    ═══════════════════════════════════════════════════════════════════════ */
+/* Section panels stay austere (the premium glass is reserved for the nav
+   pill + the character-select stage). */
 .lp .deck, .lp .brief, .lp .verdict, .lp .pipe, .lp .sign-card,
-.lp .qbubble, .lp .toast, .lp .sbtn, .lp .tgl, .lp .sign-msg code {
+.lp .toast, .lp .sbtn, .lp .sign-msg code {
   border-radius: 0 !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
 .lp .brief, .lp .verdict, .lp .pipe, .lp .sign-card { background: var(--card-bg); border-color: var(--card-brd); }
 
-/* Nav — slim always-white bar with a single hairline under it. */
-.lp-nav { background: var(--nav-bg); border-bottom: 1px solid var(--hair); backdrop-filter: none; }
-.lp .navlink { font-family: var(--font-mono-stack); font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--txt); }
-.lp .navlink:hover { color: var(--mut); }
-.lp .tgl { border-radius: 0; }
-.lp .brand { text-transform: uppercase; letter-spacing: 0.1em; font-size: 14px; }
+/* ── Floating morph nav — centered glass pill ── */
+.lp-nav { position: fixed; top: 16px; left: 0; right: 0; height: auto; z-index: 50; display: flex; justify-content: center; padding: 0 20px; background: none; border: none; }
+.nav-pill {
+  display: inline-flex; align-items: center; gap: 16px; padding: 8px 10px 8px 18px;
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 100px;
+  box-shadow: 0 22px 54px -26px rgba(20, 24, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.nav-div { width: 1px; height: 18px; background: var(--hair); }
+.nav-pill .brand { text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px; }
+.nav-pill .navlink { font-family: var(--font-mono-stack); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--txt); }
+.nav-pill .navlink:hover { color: var(--mut); }
+.nav-pill .tgl { border-radius: 100px; }
+.nav-pill .navcta { background: var(--txt); color: var(--void); padding: 9px 16px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; font-weight: 500; }
+.nav-pill .navcta::after { display: none; }
+.lp .nav-pill .navcta .a { color: var(--void); }
+@media (max-width: 760px) { .nav-pill .navlink, .nav-pill .nav-div { display: none; } }
 
 /* Ghost links — uppercase tracked placards, red arrow the one accent. */
 .lp .tlink { text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; font-weight: 500; }
@@ -368,9 +405,6 @@
 .lp .stage-counter { color: var(--accent); }
 .lp .deck-top .live, .lp .read .live { color: var(--accent); }
 
-/* Kill the hero's colour atmosphere — logos are the only colour. */
-.lp .stage-tint { display: none; }
-.lp .stage-sticky::before, .lp .stage-sticky::after { display: none; }
 .lp .stage-rail .coin.on { box-shadow: none !important; }
 /* Active asset marked by a small red placard tick, not a glow. */
 .lp .stage-rail.sel .coin.on { position: relative; }

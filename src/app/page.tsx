@@ -99,10 +99,10 @@ function CoinLogo({
 
 // Where question bubbles spawn — hugging the gutters, clear of the portrait.
 const QPOS: Array<Record<string, string>> = [
-  { left: "5%", top: "29%" },
-  { right: "5%", top: "23%" },
-  { left: "8%", top: "60%" },
-  { right: "7%", top: "58%" },
+  { left: "6%", top: "30%" },
+  { right: "6%", top: "25%" },
+  { left: "9%", top: "60%" },
+  { right: "8%", top: "63%" },
 ];
 
 /** Questions that "someone is asking" — spawn at random-ish spots per asset. */
@@ -142,7 +142,7 @@ function Stage() {
     setI(Math.min(COINS.length - 1, Math.floor(sp * COINS.length)));
   });
 
-  const railTop = useTransform(scrollYProgress, [0, INTRO], ["66%", "80%"]);
+  const railTop = useTransform(scrollYProgress, [0, INTRO], ["66%", "88%"]);
   const railScale = useTransform(scrollYProgress, [0, INTRO], [1, 0.82]);
 
   const t = COINS[i];
@@ -173,42 +173,44 @@ function Stage() {
           Scroll to scan the market ↓
         </motion.div>
 
-        {/* Focus — the selected asset enlarges with details + questions */}
+        {/* Focus — the selected asset on a premium glass panel + floating messages */}
         <motion.div className="stage-focus" animate={{ opacity: active ? 1 : 0 }} transition={{ duration: 0.5, ease: EASE }} style={{ pointerEvents: active ? "auto" : "none" }}>
-          <div className="stage-portrait">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={t.s}
-                initial={{ opacity: 0, y: 420, scale: 0.24 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 360, scale: 0.24, transition: { duration: 0.22, ease: EASE } }}
-                transition={{ type: "spring", stiffness: 260, damping: 22, mass: 0.6 }}
-              >
-                <CoinLogo sym={t.s} name={t.n} color={t.c} glyph={t.g} dark={t.d} size={220} cls="big" />
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <div className="stage-panel">
+            <div className="panel-logo">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={t.s}
+                  initial={{ opacity: 0, y: 460, scale: 0.22 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 380, scale: 0.22, transition: { duration: 0.22, ease: EASE } }}
+                  transition={{ type: "spring", stiffness: 260, damping: 22, mass: 0.6 }}
+                >
+                  <CoinLogo sym={t.s} name={t.n} color={t.c} glyph={t.g} dark={t.d} size={150} cls="big" />
+                </motion.div>
+              </AnimatePresence>
+            </div>
 
-          <div className="stage-detail">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`${t.s}d`}
-                initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -12, filter: "blur(8px)" }}
-                transition={{ duration: 0.45, ease: EASE }}
-              >
-                <div className="tk display">{t.n} <span>· {t.s}</span></div>
-                <p className="crux">{t.crux}</p>
-                <div className="facts">
-                  <div><span>PRICE</span><b>{t.price}</b></div>
-                  <div><span>7D</span><b className={t.up ? "up" : "dn"}>{t.chg}</b></div>
-                  <div><span>MCAP</span><b>{t.mcap}</b></div>
-                  <div><span>RANK</span><b>{t.rank}</b></div>
-                </div>
-                <span className={`stamp ${t.v}`}>ASSESSMENT · {t.vt}</span>
-              </motion.div>
-            </AnimatePresence>
+            <div className="stage-detail">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${t.s}d`}
+                  initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: -12, filter: "blur(8px)" }}
+                  transition={{ duration: 0.45, ease: EASE }}
+                >
+                  <div className="tk display">{t.n} <span>· {t.s}</span></div>
+                  <p className="crux">{t.crux}</p>
+                  <div className="facts">
+                    <div><span>PRICE</span><b>{t.price}</b></div>
+                    <div><span>7D</span><b className={t.up ? "up" : "dn"}>{t.chg}</b></div>
+                    <div><span>MCAP</span><b>{t.mcap}</b></div>
+                    <div><span>RANK</span><b>{t.rank}</b></div>
+                  </div>
+                  <span className={`stamp ${t.v}`}>ASSESSMENT · {t.vt}</span>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
 
           <Questions key={t.s} coin={t} />
@@ -293,15 +295,17 @@ function Inner() {
 
   return (
     <div className={`lp${light ? " light" : ""}`}>
-      {/* Nav */}
+      {/* Floating morph nav — centered glass pill */}
       <nav className={`lp-nav${stuck ? " stuck" : ""}`}>
-        <Link className="brand" href="/"><span className="glyph" />LensAI</Link>
-        <div className="lp-nav-right">
+        <div className="nav-pill">
+          <Link className="brand" href="/"><span className="glyph" />LensAI</Link>
+          <span className="nav-div" />
           <a className="navlink" href="#read">The read</a>
           <a className="navlink" href="#method">Method</a>
           <a className="navlink" href="#stance">Stance</a>
+          <span className="nav-div" />
           <button className="tgl" onClick={() => setLight(!light)}>{light ? "Dark" : "Light"}</button>
-          <Link className="tlink" href="/app"><span>Open the desk</span><span className="a">→</span></Link>
+          <Link className="tlink navcta" href="/app"><span>Open the desk</span><span className="a">→</span></Link>
         </div>
       </nav>
 

@@ -1,7 +1,9 @@
 import "server-only";
 import { supabaseAdmin } from "./supabase";
+import { env } from "./env";
 
-export const FREE_ANALYSES = 2; // CLAUDE.md §5.3
+// CLAUDE.md §5.3 — 2 by default, overridable via FREE_TIER_LIMIT (see env.ts).
+export const FREE_ANALYSES = env.freeTierLimit();
 
 /**
  * Free-tier accounting, enforced SERVER-SIDE only (CLAUDE.md §13).

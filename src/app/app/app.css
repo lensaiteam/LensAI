@@ -276,6 +276,79 @@
 /* Follow-up answers are short prose, not a full report — dial the
    heading rules back so a one-liner doesn't get a giant top border. */
 .msg-ai .md:not(:has(h2)) { color: var(--txt); }
+
+/* ============================================================
+   DEPTH + MOTION — lift the app off a flat bone canvas and give
+   the thread some life. Tasteful, purposeful motion only.
+   ============================================================ */
+
+/* Faint dot-grid texture behind the thread + hero (matches landing). */
+.thread, .hero {
+  background-image: radial-gradient(circle, rgba(10, 10, 10, 0.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Message + block entrances. Each element mounts once, so it plays once. */
+@keyframes msgUp { from { opacity: 0; transform: translateY(11px); } to { opacity: 1; transform: none; } }
+@keyframes msgRight { from { opacity: 0; transform: translateX(13px); } to { opacity: 1; transform: none; } }
+@keyframes popIn { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
+@keyframes heroPop { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: none; } }
+
+.msg-ai { animation: msgUp .46s cubic-bezier(.2, .7, .2, 1) both; }
+.msg-user { animation: msgRight .38s cubic-bezier(.2, .7, .2, 1) both; }
+.think { animation: msgUp .4s ease both; }
+.verdict-pill { animation: popIn .42s ease both; }
+
+/* Hero: staggered reveal on load so the empty state feels composed. */
+.hero-mark { animation: heroPop .55s ease both; }
+.hero-title { animation: msgUp .55s ease both .05s; }
+.hero-sub { animation: msgUp .55s ease both .12s; }
+.hero-input { animation: msgUp .55s ease both .19s; }
+.hero-chips { animation: msgUp .55s ease both .26s; }
+
+/* Thinking trace: cascade the skeleton shimmer + a chat-style typing tail. */
+.think-skel .skel-line:nth-child(1) { animation-delay: 0s; }
+.think-skel .skel-line:nth-child(2) { animation-delay: .16s; }
+.think-skel .skel-line:nth-child(3) { animation-delay: .32s; }
+.think-skel .skel-line:nth-child(4) { animation-delay: .48s; }
+.think-dots { display: inline-flex; gap: 3px; margin-left: 8px; vertical-align: middle; }
+.think-dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--dim); animation: dotB 1.2s infinite; }
+.think-dots i:nth-child(2) { animation-delay: .15s; }
+.think-dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes dotB { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+
+/* Composer: red underline sweeps in on focus. */
+.composer { position: relative; }
+.composer::after {
+  content: ""; position: absolute; left: -1px; right: -1px; bottom: -1px; height: 2px;
+  background: #ff0000; transform: scaleX(0); transition: transform .28s cubic-bezier(.2, .7, .2, 1);
+}
+.composer:focus-within::after { transform: scaleX(1); }
+.send-btn:active:not(:disabled) { transform: scale(.92); }
+
+/* ---- Sidebar — more character, live states ------------------------ */
+.app-side .side-new {
+  position: relative; overflow: hidden; transition: background .15s;
+}
+.app-side .side-new::before {
+  content: ""; position: absolute; inset: 0; background: #ff0000;
+  transform: translateX(-101%); transition: transform .28s cubic-bezier(.2, .7, .2, 1); z-index: 0;
+}
+.app-side .side-new:hover::before { transform: translateX(0); }
+.app-side .side-new > span { position: relative; z-index: 1; }
+
+.side-hist {
+  position: relative; transition: background .12s, padding-left .16s;
+  border-left: 2px solid transparent;
+}
+.side-hist:hover { background: rgba(10, 10, 10, 0.04); padding-left: 20px; }
+.side-hist.active { border-left-color: #ff0000; background: rgba(255, 0, 0, 0.05); }
+
+@media (prefers-reduced-motion: reduce) {
+  .msg-ai, .msg-user, .think, .verdict-pill, .hero-mark, .hero-title, .hero-sub,
+  .hero-input, .hero-chips, .think-dots i, .think-skel .skel-line { animation: none !important; }
+  .composer::after, .side-hist, .app-side .side-new::before { transition: none !important; }
+}
 .composer-hint {
   margin-top: 9px; font-family: var(--font-mono-stack); font-size: 10.5px; letter-spacing: .03em;
   color: var(--m); display: flex; gap: 15px; flex-wrap: wrap;

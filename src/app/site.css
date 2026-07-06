@@ -1,0 +1,103 @@
+/* ============================================================
+   Footer + marketing sub-pages — bone-white gallery, flat, hairline.
+   Depends on the tokens defined in landing.css (.lp / .lp.light).
+   ============================================================ */
+
+/* ── Footer ── */
+.site-footer { border-top: 1px solid var(--hair); margin-top: clamp(60px, 10vh, 120px); position: relative; z-index: 1; }
+.foot-inner { display: grid; grid-template-columns: 1.4fr 2fr; gap: clamp(30px, 5vw, 70px); padding-top: clamp(48px, 7vh, 72px); padding-bottom: 40px; }
+@media (max-width: 860px) { .foot-inner { grid-template-columns: 1fr; gap: 40px; } }
+.foot-brand .brand { margin-bottom: 16px; }
+.foot-brand p { font-size: 13.5px; color: var(--sec); line-height: 1.6; max-width: 42ch; }
+.foot-cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+@media (max-width: 620px) { .foot-cols { grid-template-columns: repeat(2, 1fr); gap: 28px; } }
+.foot-col h4 { font-family: var(--font-mono-stack); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mut); margin-bottom: 14px; }
+.foot-col a { display: block; font-size: 13.5px; color: var(--txt); margin-bottom: 10px; transition: color 0.2s; }
+.foot-col a:hover { color: var(--accent); }
+.foot-base { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 20px 0 44px; border-top: 1px solid var(--hair-soft); font-family: var(--font-mono-stack); font-size: 11px; color: var(--mut); letter-spacing: 0.03em; }
+
+/* ── Sub-page shell ── */
+.subpage { padding-top: clamp(130px, 17vh, 178px); padding-bottom: clamp(70px, 10vh, 120px); position: relative; z-index: 1; }
+.page-head { max-width: 940px; }
+.page-head .kicker { display: block; margin-bottom: 20px; }
+.page-head h1 { font-size: clamp(38px, 6vw, 78px); font-weight: 700; letter-spacing: -0.035em; line-height: 0.98; margin: 0; }
+.page-sub { margin-top: 24px; font-size: clamp(16px, 1.4vw, 20px); line-height: 1.55; color: var(--sec); max-width: 62ch; }
+.doc-cta { display: flex; gap: clamp(20px, 4vw, 40px); flex-wrap: wrap; margin-top: clamp(40px, 6vh, 64px); }
+
+/* ── Whitepaper doc ── */
+.doc { border-top: 1px solid var(--hair); margin-top: clamp(44px, 7vh, 76px); }
+.doc-sec { display: grid; grid-template-columns: 84px 1fr; gap: clamp(20px, 4vw, 60px); padding: clamp(32px, 5vh, 54px) 0; border-bottom: 1px solid var(--hair); }
+@media (max-width: 720px) { .doc-sec { grid-template-columns: 1fr; gap: 12px; } }
+.doc-n { font-size: 13px; color: var(--accent); letter-spacing: 0.1em; padding-top: 9px; }
+.doc-body h2 { font-size: clamp(24px, 2.6vw, 34px); font-weight: 700; letter-spacing: -0.025em; margin-bottom: 16px; }
+.doc-body p { font-size: clamp(15px, 1.2vw, 17px); line-height: 1.65; color: var(--sec); max-width: 68ch; margin-bottom: 12px; }
+
+/* ── Roadmap timeline ── */
+.timeline { margin-top: clamp(44px, 7vh, 76px); }
+.tl-item { display: grid; grid-template-columns: 34px 1fr; gap: clamp(16px, 3vw, 30px); padding-bottom: clamp(24px, 4vh, 40px); }
+.tl-marker { display: flex; justify-content: center; position: relative; }
+.tl-marker::before { content: ""; position: absolute; top: 8px; bottom: -100%; width: 1px; background: var(--hair); }
+.tl-item:last-child .tl-marker::before { display: none; }
+.tl-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--mut); background: var(--void); margin-top: 4px; z-index: 1; }
+.tl-item.shipped .tl-dot { border-color: var(--txt); background: var(--txt); }
+.tl-item.active .tl-dot { border-color: var(--accent); background: var(--accent); }
+.tl-card { border: 1px solid var(--card-brd); background: var(--card-bg); padding: 22px 24px; }
+.tl-top { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.tl-q { font-size: 11px; letter-spacing: 0.12em; color: var(--mut); }
+.tl-state { font-family: var(--font-mono-stack); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--hair); color: var(--mut); }
+.tl-state.active { color: var(--accent); border-color: var(--accent); }
+.tl-state.shipped { color: var(--pos); border-color: var(--pos); }
+.tl-card h2 { font-size: clamp(20px, 2.2vw, 28px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 14px; }
+.tl-card ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.tl-card li { position: relative; padding-left: 18px; font-size: 14.5px; color: var(--sec); line-height: 1.5; }
+.tl-card li::before { content: ""; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; background: var(--mut); }
+
+/* ── Tokenomics ── */
+.tk-supply { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--hair); margin: clamp(44px, 7vh, 72px) 0 40px; }
+@media (max-width: 620px) { .tk-supply { grid-template-columns: 1fr; } }
+.tk-supply > div { padding: 22px 24px; display: flex; flex-direction: column; gap: 6px; border-right: 1px solid var(--hair); }
+.tk-supply > div:last-child { border-right: none; }
+.tk-supply .mono { font-size: 10px; letter-spacing: 0.12em; color: var(--mut); }
+.tk-supply b { font-size: clamp(22px, 2.6vw, 32px); font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.tk-tick { font-size: 11px; color: var(--sec); }
+.tk-alloc { margin-bottom: 50px; }
+.tk-bar { display: flex; height: 46px; border: 1px solid var(--hair); }
+.tk-seg { height: 100%; }
+.tk-seg + .tk-seg { border-left: 1px solid var(--void); }
+.t-a { background: #ff0000; } .t-b { background: #0a0a0a; } .t-c { background: #6b6b6b; } .t-d { background: #a8a8a8; } .t-e { background: #d6d6d6; }
+.tk-legend { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 clamp(24px, 4vw, 48px); margin-top: 24px; }
+@media (max-width: 620px) { .tk-legend { grid-template-columns: 1fr; } }
+.tk-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--hair-soft); }
+.tk-key { width: 12px; height: 12px; flex-shrink: 0; }
+.tk-label { flex: 1; font-size: 14.5px; }
+.tk-pct { font-size: 14px; color: var(--mut); }
+.tk-util { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--hair); border: 1px solid var(--hair); }
+@media (max-width: 720px) { .tk-util { grid-template-columns: 1fr; } }
+.tk-card { background: var(--void); padding: 24px; }
+.tk-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em; }
+.tk-card p { font-size: 14px; color: var(--sec); line-height: 1.55; }
+
+/* ── Careers ── */
+.roles { border-top: 1px solid var(--hair); margin-top: clamp(44px, 7vh, 76px); }
+.role { display: grid; grid-template-columns: 1fr auto; gap: clamp(20px, 4vw, 40px); padding: clamp(26px, 4vh, 40px) 0; border-bottom: 1px solid var(--hair); align-items: start; }
+@media (max-width: 720px) { .role { grid-template-columns: 1fr; gap: 16px; } }
+.role-main h2 { font-size: clamp(22px, 2.4vw, 30px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+.role-main p { font-size: 15px; color: var(--sec); line-height: 1.6; max-width: 60ch; }
+.role-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 190px; }
+.role-meta .mono { font-size: 11px; letter-spacing: 0.1em; color: var(--mut); text-transform: uppercase; }
+.role-meta .role-type { color: var(--sec); }
+.role-meta .tlink { margin-top: 8px; }
+.role-general { margin-top: clamp(40px, 6vh, 60px); padding: clamp(32px, 5vh, 52px); border: 1px solid var(--hair); text-align: center; }
+.role-general h3 { font-size: clamp(22px, 2.4vw, 30px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+.role-general p { color: var(--sec); margin-bottom: 22px; }
+.role-general .tlink { justify-content: center; }
+
+/* ── Legal docs ── */
+.legal-updated { font-size: 11px; letter-spacing: 0.1em; color: var(--mut); text-transform: uppercase; margin: 26px 0; }
+.legal-intro { font-size: clamp(16px, 1.3vw, 19px); line-height: 1.6; color: var(--sec); max-width: 64ch; margin-bottom: 8px; }
+.legal-body { border-top: 1px solid var(--hair); margin-top: clamp(32px, 5vh, 52px); }
+.legal-sec { padding: clamp(24px, 4vh, 38px) 0; border-bottom: 1px solid var(--hair); }
+.legal-sec h2 { font-size: clamp(19px, 2vw, 24px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 14px; display: flex; align-items: baseline; gap: 14px; }
+.legal-sec h2 .mono { font-size: 13px; color: var(--accent); }
+.legal-sec p { font-size: 15px; color: var(--sec); line-height: 1.65; max-width: 72ch; margin-bottom: 10px; }
+.legal-foot { margin-top: 34px; font-size: 12.5px; color: var(--mut); font-style: italic; }

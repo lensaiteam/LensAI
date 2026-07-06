@@ -292,3 +292,52 @@
 .pipe-node .pipe-h { font-size: 15px; font-weight: 560; letter-spacing: -0.01em; }
 .pipe-node .pipe-arrow { margin-left: 14px; color: var(--mut); }
 @media (max-width: 620px) { .pipe { flex-direction: column; align-items: stretch; } .pipe-node .pipe-arrow { display: none; } }
+
+/* ── §03 stance: verdict meter + both-cases card ── */
+.verdict-wrap { margin-top: 44px; }
+.verdict { border: 1px solid var(--card-brd); border-radius: 18px; padding: clamp(20px, 3vw, 32px); background: var(--card-bg); backdrop-filter: blur(10px); box-shadow: 0 34px 80px -56px rgba(8, 10, 30, 0.5); }
+.verdict-top { display: flex; justify-content: space-between; align-items: center; }
+.verdict-top .mono { font-size: 11px; letter-spacing: 0.14em; color: var(--mut); }
+.verdict-top .stamp { font-family: var(--font-mono-stack); font-size: 12px; letter-spacing: 0.12em; color: var(--warn); display: inline-flex; align-items: center; gap: 8px; }
+.verdict-top .stamp::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.meter { position: relative; height: 8px; margin: 26px 0 10px; }
+.meter-track { position: absolute; inset: 0; border-radius: 100px; background: linear-gradient(90deg, var(--neg), var(--warn) 52%, var(--pos)); }
+.meter-needle { position: absolute; top: 50%; width: 3px; height: 22px; border-radius: 3px; background: var(--txt); transform: translate(-50%, -50%); box-shadow: 0 4px 14px rgba(8, 10, 30, 0.4); }
+.meter-ticks { display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 0.1em; color: var(--mut); }
+.cases { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 3vw, 44px); margin-top: 30px; }
+@media (max-width: 620px) { .cases { grid-template-columns: 1fr; gap: 22px; } }
+.case-h { font-family: var(--font-mono-stack); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 10px; }
+.case.bull .case-h { color: var(--pos); }
+.case.bear .case-h { color: var(--neg); }
+.case-row { display: flex; align-items: baseline; gap: 11px; padding: 9px 0; font-size: 14px; color: var(--sec); line-height: 1.5; border-top: 1px solid var(--hair-soft); }
+.case-row .ci { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; transform: translateY(-1px); }
+.case.bull .ci { background: var(--pos); }
+.case.bear .ci { background: var(--neg); }
+.stance-nodes { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(18px, 2.4vw, 32px); margin-top: 38px; }
+@media (max-width: 680px) { .stance-nodes { grid-template-columns: 1fr; } }
+.snode { padding-top: 16px; border-top: 1px solid var(--hair); }
+.snode .t { font-family: var(--font-mono-stack); font-size: 12.5px; letter-spacing: 0.14em; }
+.snode.pos .t { color: var(--pos); } .snode.mix .t { color: var(--warn); } .snode.neg .t { color: var(--neg); }
+.snode p { font-size: 14px; color: var(--sec); line-height: 1.6; margin-top: 12px; }
+
+/* ── §04 access: rows + signature-request card ── */
+.access-split { display: grid; grid-template-columns: 1fr minmax(0, 340px); gap: clamp(30px, 4vw, 56px); margin-top: 44px; align-items: start; }
+.access-split .arows { margin-top: 0; }
+@media (max-width: 860px) { .access-split { grid-template-columns: 1fr; } }
+.sign-wrap { position: sticky; top: 120px; }
+.sign-card { border: 1px solid var(--card-brd); border-radius: 16px; background: var(--card-bg); backdrop-filter: blur(12px); box-shadow: 0 34px 80px -50px rgba(8, 10, 30, 0.5); overflow: hidden; }
+.sign-top { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--hair-soft); }
+.sign-brand { display: inline-flex; align-items: center; gap: 9px; font-weight: 600; font-size: 14px; }
+.sign-brand .glyph { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--gold); position: relative; }
+.sign-brand .glyph::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: var(--gold); }
+.sign-top .mono { font-size: 10px; letter-spacing: 0.12em; color: var(--mut); }
+.sign-msg { padding: 18px; }
+.sign-msg p { font-size: 13.5px; color: var(--sec); line-height: 1.55; }
+.sign-msg code { display: block; font-family: var(--font-mono-stack); font-size: 13px; color: var(--txt); background: var(--toast-bg); border: 1px solid var(--hair-soft); border-radius: 8px; padding: 10px 12px; margin: 12px 0 14px; }
+.sign-meta { display: flex; flex-direction: column; gap: 9px; }
+.sign-meta span { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--sec); }
+.sign-meta i { width: 6px; height: 6px; border-radius: 50%; background: var(--pos); flex-shrink: 0; }
+.sign-actions { display: flex; gap: 10px; padding: 0 18px 18px; }
+.sbtn { flex: 1; text-align: center; padding: 11px; border-radius: 10px; font-size: 13px; font-weight: 560; }
+.sbtn.ghost { border: 1px solid var(--card-brd); color: var(--sec); }
+.sbtn.primary { background: var(--txt); color: var(--void); }

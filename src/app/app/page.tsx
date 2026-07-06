@@ -8,6 +8,7 @@ import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { FirstLoginModal } from "@/components/FirstLoginModal";
 import { Markdown } from "@/components/Markdown";
 import { streamPost } from "@/lib/streamClient";
+import "./app.css";
 
 const QUICK = ["BTC", "ETH", "SOL", "XRP", "DOGE", "PEPE"];
 type Msg = { role: "user" | "assistant"; content: string };
@@ -17,7 +18,7 @@ export default function ResearchTerminal() {
   const { user, freeTier, loading, signingIn, signIn, signOut, error: authError, refresh } = useAuth();
 
   return (
-    <div className="flex flex-col h-screen" style={{ background: "var(--bg)" }}>
+    <div className="app-shell flex flex-col h-screen" style={{ background: "var(--bg)" }}>
       <DisclaimerBanner />
       <Topbar />
       {loading ? (
@@ -41,13 +42,8 @@ function Topbar() {
       style={{ background: "var(--bg2)", borderBottom: "1px solid var(--border)" }}
     >
       <Link href="/" className="flex items-center gap-2.5">
-        <span
-          className="w-7 h-7 rounded-lg flex items-center justify-center text-black font-extrabold text-[10px]"
-          style={{ background: "linear-gradient(135deg,var(--gold),#7a5a18)" }}
-        >
-          L
-        </span>
-        <span className="font-bold text-[13px] tracking-tight">LensAI</span>
+        <span className="app-glyph" />
+        <span className="font-bold text-[14px] tracking-tight">LensAI</span>
       </Link>
       <ConnectButton showBalance={false} chainStatus="none" accountStatus="address" />
     </div>
@@ -78,8 +74,8 @@ function SignInGate({
         className="max-w-sm w-full text-center rounded-2xl p-8"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
       >
-        <div className="text-3xl mb-3">🔐</div>
-        <h1 className="text-lg font-bold mb-1.5">Sign in with your wallet</h1>
+        <div className="flex justify-center mb-4"><span className="app-mark" /></div>
+        <h1 className="text-lg font-bold mb-1.5 tracking-tight">Sign in with your wallet</h1>
         <p className="text-sm mb-6" style={{ color: "var(--w2)" }}>
           Connect MetaMask and sign a message to prove ownership. No transaction, no gas, no private keys.
         </p>
@@ -89,8 +85,8 @@ function SignInGate({
             <button
               onClick={signIn}
               disabled={signingIn}
-              className="w-full py-3 rounded-lg font-semibold text-black disabled:opacity-60"
-              style={{ background: "var(--gold)" }}
+              className="w-full py-3 font-semibold disabled:opacity-60"
+              style={{ background: "var(--w)", color: "var(--bg)" }}
             >
               {signingIn ? "Check your wallet…" : "Sign in"}
             </button>
@@ -223,8 +219,8 @@ function Terminal({
       >
         <button
           onClick={newAnalysis}
-          className="mx-3 mb-3 py-2 rounded-lg text-[13px] font-semibold text-black"
-          style={{ background: "var(--gold)" }}
+          className="mx-3 mb-3 py-2 text-[13px] font-semibold"
+          style={{ background: "var(--w)", color: "var(--bg)" }}
         >
           + New analysis
         </button>
@@ -253,7 +249,7 @@ function Terminal({
             <button
               key={s.id}
               onClick={() => openSession(s.id)}
-              className="w-full text-left px-4 py-1.5 text-[12px] hover:bg-white/[0.03] flex items-center gap-2"
+              className="w-full text-left px-4 py-1.5 text-[12px] hover:bg-black/[0.04] flex items-center gap-2"
               style={{ color: sessionId === s.id ? "var(--gold)" : "var(--w2)" }}
             >
               <span className="font-semibold">{s.ticker}</span>
@@ -322,8 +318,8 @@ function Terminal({
             <button
               onClick={sendChat}
               disabled={streaming || !sessionId}
-              className="px-5 rounded-lg text-sm font-semibold text-black disabled:opacity-50"
-              style={{ background: "var(--gold)" }}
+              className="px-5 text-sm font-semibold disabled:opacity-50"
+              style={{ background: "var(--w)", color: "var(--bg)" }}
             >
               Send
             </button>
@@ -352,13 +348,8 @@ function EmptyState({ onAnalyze, error }: { onAnalyze: (t: string) => void; erro
   const [v, setV] = useState("");
   return (
     <div className="h-full flex flex-col items-center justify-center px-6 text-center">
-      <div
-        className="w-16 h-16 rounded-2xl flex items-center justify-center text-black text-2xl font-extrabold mb-5"
-        style={{ background: "linear-gradient(135deg,var(--gold),#7a5a18)" }}
-      >
-        L
-      </div>
-      <h1 className="text-2xl font-bold mb-2">Analyze a token</h1>
+      <span className="app-mark mb-6" />
+      <h1 className="text-2xl font-bold mb-2 tracking-tight">Analyze a token</h1>
       <p className="text-sm mb-7 max-w-md" style={{ color: "var(--w2)" }}>
         Enter a ticker for a decision-grade, non-advisory read from live data and current news.
       </p>
@@ -373,8 +364,8 @@ function EmptyState({ onAnalyze, error }: { onAnalyze: (t: string) => void; erro
         />
         <button
           onClick={() => onAnalyze(v)}
-          className="px-6 rounded-lg text-sm font-semibold text-black"
-          style={{ background: "var(--gold)" }}
+          className="px-6 text-sm font-semibold"
+          style={{ background: "var(--w)", color: "var(--bg)" }}
         >
           Analyze
         </button>

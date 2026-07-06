@@ -2,7 +2,7 @@
 import { useState, type ReactNode } from "react";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { MotionConfig } from "framer-motion";
 import "@rainbow-me/rainbowkit/styles.css";
 import { wagmiConfig } from "@/lib/wagmi";
@@ -14,10 +14,10 @@ export function Providers({ children }: { children: ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
-          theme={darkTheme({
-            accentColor: "#c8a84b",
-            accentColorForeground: "#000",
-            borderRadius: "medium",
+          theme={lightTheme({
+            accentColor: "#0a0a0a",
+            accentColorForeground: "#ffffff",
+            borderRadius: "none",
           })}
         >
           <MotionConfig reducedMotion="user">

@@ -1,0 +1,58 @@
+/* ============================================================
+   Research terminal — bone-white gallery theme, matching the site.
+   The app's markup uses CSS-var-driven inline styles; remapping the
+   tokens here flips the whole product to the light system without
+   rewriting every element.
+   ============================================================ */
+.app-shell {
+  /* Core tokens (used by Markdown + newer styles) */
+  --void: #f6f6f6;
+  --ink-1: #ffffff;
+  --ink-2: #ffffff;
+  --ink-3: #eef0f2;
+  --line: #e6e6e6;
+  --line-2: #dcdcdc;
+  --mut: #8b8b94;
+  --sec: #3a3a42;
+  --txt: #0a0a0a;
+  --aqua: #c62828;
+  --pos: #148a4f;
+  --neg: #d8404c;
+  --warn: #bd8420;
+
+  /* Back-compat aliases (used by the terminal's inline styles) */
+  --bg: #f6f6f6;
+  --bg2: #ffffff;
+  --bg3: #f0f0f0;
+  --panel: #ffffff;
+  --card: #ffffff;
+  --card2: #eef0f2;
+  --border: #e6e6e6;
+  --border2: #dcdcdc;
+  --w: #0a0a0a;
+  --w2: #55555f;
+  --m: #8b8b94;
+  --dim: #cdced2;
+  --gold: #ff0000;   /* accent → signal red */
+  --gold2: #ff0000;
+  --green: #148a4f;
+  --red: #d8404c;
+  --orange: #bd8420;
+
+  color: #0a0a0a;
+  font-family: var(--font-sans-stack);
+}
+
+/* Sharpen the terminal's own rounded elements (RainbowKit is portaled
+   and uses its own class names, so it is unaffected). */
+.app-shell [class*="rounded-"] { border-radius: 0 !important; }
+
+/* Brand marks — red ring + dot, matching the site glyph. */
+.app-glyph { width: 22px; height: 22px; border: 1.5px solid #ff0000; border-radius: 50%; position: relative; display: inline-block; flex-shrink: 0; }
+.app-glyph::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: #ff0000; }
+.app-mark { width: 46px; height: 46px; border: 2px solid #ff0000; border-radius: 50%; position: relative; display: inline-block; }
+.app-mark::after { content: ""; position: absolute; inset: 13px; border-radius: 50%; background: #ff0000; }
+
+/* Inputs + buttons read as flat, hairline gallery controls. */
+.app-shell input { font-family: var(--font-sans-stack); }
+.app-shell input::placeholder { color: var(--m); }

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Bricolage_Grotesque } from "next/font/google";
+import { JetBrains_Mono, Arimo } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Type system: Bricolage Grotesque (a characterful display grotesk, ink-trapped)
-// for headlines, Geist for UI/body, JetBrains Mono for data. No serif.
+// Type system (Bécane reference): a neutral Helvetica-like grotesque for
+// display — Arimo is a Helvetica/Arial metric clone; the stack still prefers
+// real Helvetica Neue where installed. Geist for UI/body, JetBrains for data.
 const jbmono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
-const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+const arimo = Arimo({ subsets: ["latin"], variable: "--font-display", display: "swap", weight: ["400", "500", "600", "700"] });
 
 export const metadata: Metadata = {
   title: "LensAI — Crypto Token Analysis",
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${jbmono.variable} ${bricolage.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${jbmono.variable} ${arimo.variable}`}>
       <body>
         <Providers>{children}</Providers>
       </body>

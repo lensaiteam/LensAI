@@ -56,6 +56,91 @@ function extractVerdict(text: string): Verdict | null {
   return (m?.[1] as Verdict) ?? null;
 }
 
+// Compact market snapshot shipped from /api/analyze via the x-lensai-market
+// header (see route). Rendered as a scannable stat grid above the analysis.
+type Snap = {
+  name: string;
+  symbol: string;
+  price: string;
+  c24: number | null;
+  c7: number | null;
+  vol: number | null;
+  mcap: number | null;
+  circ: number | null;
+  rank: number | null;
+  source?: string;
+  unresolved: boolean;
+};
+
+function parseMarket(h: Headers): Snap | null {
+  const raw = h.get("x-lensai-market");
+  if (!raw) return null;
+  try {
+    return JSON.parse(decodeURIComponent(raw)) as Snap;
+  } catch {
+    return null;
+  }
+}
+
+function fmtUSD(n: number | null): string {
+  if (n == null) return "—";
+  const a = Math.abs(n);
+  if (a >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
+  if (a >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
+  if (a >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+  if (a >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
+  return `$${n.toFixed(2)}`;
+}
+function fmtNum(n: number | null): string {
+  if (n == null) return "—";
+  const a = Math.abs(n);
+  if (a >= 1e12) return `${(n / 1e12).toFixed(2)}T`;
+  if (a >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
+  if (a >= 1e6) return `${(n / 1e6).toFixed(2)}M`;
+  if (a >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
+  return `${Math.round(n)}`;
+}
+function pct(n: number | null): { t: string; cls: string } {
+  if (n == null) return { t: "—", cls: "" };
+  return { t: `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`, cls: n >= 0 ? "up" : "down" };
+}
+
+function SnapshotGrid({ snap }: { snap: Snap }) {
+  const c24 = pct(snap.c24);
+  const c7 = pct(snap.c7);
+  return (
+    <div className="snap">
+      <div className="snap-cell">
+        <span className="snap-k">Price</span>
+        <span className="snap-v">{snap.price || "—"}</span>
+        {snap.c24 != null && <span className={`snap-d ${c24.cls}`}>{c24.t} 24h</span>}
+      </div>
+      <div className="snap-cell">
+        <span className="snap-k">24h</span>
+        <span className={`snap-v ${c24.cls}`}>{c24.t}</span>
+      </div>
+      <div className="snap-cell">
+        <span className="snap-k">7d</span>
+        <span className={`snap-v ${c7.cls}`}>{c7.t}</span>
+      </div>
+      <div className="snap-cell">
+        <span className="snap-k">Market cap</span>
+        <span className="snap-v">{fmtUSD(snap.mcap)}</span>
+        {snap.rank != null && <span className="snap-d muted">#{snap.rank}</span>}
+      </div>
+      <div className="snap-cell">
+        <span className="snap-k">24h volume</span>
+        <span className="snap-v">{fmtUSD(snap.vol)}</span>
+      </div>
+      <div className="snap-cell">
+        <span className="snap-k">Circ. supply</span>
+        <span className="snap-v">{fmtNum(snap.circ)}</span>
+        <span className="snap-d muted">{snap.symbol}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function ResearchTerminal() {
   const { user, freeTier, loading, signingIn, signIn, signOut, error: authError, refresh } = useAuth();
 
@@ -156,6 +241,7 @@ function Terminal({
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [ticker, setTicker] = useState<string | null>(null);
   const [asOf, setAsOf] = useState<string | null>(null);
+  const [snap, setSnap] = useState<Snap | null>(null);
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<Session[]>([]);
@@ -179,13 +265,19 @@ function Terminal({
       if (!t || streaming) return;
       setError(null);
       setAsOf(null);
+      setSnap(null);
       setMessages([{ role: "user", content: `Analyze ${t}` }]);
       setStreamText("");
       setThinkKind("analyze");
       setStreaming(true);
       setTicker(t);
       try {
-        const r = await streamPost("/api/analyze", { ticker: t }, (txt) => setStreamText(txt));
+        const r = await streamPost(
+          "/api/analyze",
+          { ticker: t },
+          (txt) => setStreamText(txt),
+          (h) => setSnap(parseMarket(h)),
+        );
         setSessionId(r.headers.get("x-lensai-session"));
         if (r.headers.get("x-lensai-cache-hit") === "1") setAsOf(r.headers.get("x-lensai-as-of"));
         setMessages((m) => [...m, { role: "assistant", content: r.full }]);
@@ -241,6 +333,7 @@ function Terminal({
     setTicker(data.ticker);
     setMessages(data.messages ?? []);
     setAsOf(null);
+    setSnap(null);
     setError(null);
   }, []);
 
@@ -249,6 +342,7 @@ function Terminal({
     setSessionId(null);
     setTicker(null);
     setAsOf(null);
+    setSnap(null);
     setError(null);
   };
 
@@ -343,6 +437,7 @@ function Terminal({
 
           <div className="thread" ref={scrollRef}>
             <div className="thread-inner">
+              {snap && !snap.unresolved && <SnapshotGrid snap={snap} />}
               {messages.map((m, i) =>
                 m.role === "user" ? (
                   <div key={i} className="msg-user">{m.content}</div>

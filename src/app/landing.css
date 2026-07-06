@@ -204,41 +204,79 @@
 .hero-rail .coin { width: 46px; height: 46px; font-size: 19px; transition: transform 0.3s var(--ease); cursor: default; }
 .hero-rail .coin:hover { transform: translateY(-5px) scale(1.1); }
 
-/* ── Spotlight: the stage dims to a dark focus room; each asset's logo
-      enlarges to half the screen while its crux fades in beside it. ── */
-.spotlight { position: relative; height: 360vh; }
-.sp-sticky {
-  position: sticky; top: 0; height: 100vh; overflow: hidden;
-  background: #08080f; color: #f3f4ff;
-  /* Always a dark focus stage, even under the light theme. */
-  --sec: #b8b9d6; --mut: #7a7b96;
-  --hair: rgba(255, 255, 255, 0.12); --hair-soft: rgba(255, 255, 255, 0.07);
-  --pos: #3ecf8e; --neg: #f4636e; --warn: #e8a13c; --gold-l: #e8c96a;
+/* ══════════════ STAGE — hero + character-select scroll ══════════════ */
+.stage { position: relative; height: 660vh; }
+.stage-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.stage-tint { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+
+/* Intro — centered headline, a little above middle */
+.stage-intro { position: absolute; top: 25%; left: 0; right: 0; z-index: 3; text-align: center; padding: 0 24px; }
+.stage-intro .kicker { display: block; margin-bottom: clamp(16px, 2.4vh, 26px); }
+.stage-intro h1 { font-size: clamp(42px, 7.2vw, 108px); line-height: 0.97; letter-spacing: -0.035em; margin: 0; }
+.stage-intro h1 .dim { color: var(--mut); }
+.stage-intro .scrollhint { margin-top: clamp(24px, 3.4vh, 38px); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mut); }
+
+/* Focus — the selected asset */
+.stage-focus { position: absolute; inset: 0; z-index: 2; }
+.stage-portrait { position: absolute; top: 19%; left: 50%; transform: translateX(-50%); }
+.coin.big { width: clamp(150px, 19vw, 216px) !important; height: clamp(150px, 19vw, 216px) !important; }
+.coin.big span { font-size: clamp(66px, 8.5vw, 92px); }
+.stage-detail { position: absolute; top: 51%; left: 0; right: 0; text-align: center; padding: 0 24px; }
+.stage-detail > div { max-width: 640px; margin: 0 auto; }
+.stage-detail .tk { font-size: clamp(24px, 3vw, 40px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.05; }
+.stage-detail .tk span { color: var(--mut); font-weight: 400; }
+.stage-detail .crux { font-family: var(--font-display-stack); font-weight: 400; font-size: clamp(17px, 1.7vw, 24px); line-height: 1.4; letter-spacing: -0.01em; color: var(--sec); margin: 14px auto 22px; max-width: 42ch; text-wrap: balance; }
+.stage-detail .facts { display: flex; justify-content: center; gap: clamp(18px, 3vw, 44px); flex-wrap: wrap; }
+.stage-detail .facts div { display: flex; flex-direction: column; gap: 4px; font-family: var(--font-mono-stack); }
+.stage-detail .facts span { font-size: 10px; letter-spacing: 0.12em; color: var(--mut); }
+.stage-detail .facts b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stage-detail .facts b.up { color: var(--pos); } .stage-detail .facts b.dn { color: var(--neg); }
+.stage-detail .stamp { display: inline-flex; align-items: center; gap: 9px; font-family: var(--font-mono-stack); font-size: 12px; letter-spacing: 0.14em; margin-top: 22px; }
+.stage-detail .stamp::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.stage-detail .stamp.pos { color: var(--pos); } .stage-detail .stamp.mix { color: var(--warn); } .stage-detail .stamp.neg { color: var(--neg); }
+
+/* Question bubbles — spawn like someone asking */
+.stage-questions { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.qbubble { position: absolute; display: inline-flex; align-items: center; gap: 9px; padding: 10px 15px; border-radius: 15px 15px 15px 4px; background: var(--card-bg); border: 1px solid var(--card-brd); backdrop-filter: blur(12px); font-size: 13.5px; color: var(--txt); box-shadow: 0 24px 60px -34px rgba(8, 10, 30, 0.5); max-width: 220px; animation: qfloat 5.5s var(--ease) infinite; }
+.qbubble .qdot { width: 8px; height: 8px; border-radius: 50%; background: var(--qc, var(--gold)); flex-shrink: 0; }
+@keyframes qfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+
+/* Select tray — the same logos, always present */
+.stage-rail { position: absolute; left: 0; right: 0; z-index: 3; display: flex; justify-content: center; gap: clamp(12px, 1.7vw, 22px); flex-wrap: wrap; padding: 0 24px; }
+.stage-rail .coin { transition: opacity 0.35s var(--ease), transform 0.35s var(--ease), box-shadow 0.35s; cursor: default; }
+/* Only dim the non-selected logos once selection is active (not at rest). */
+.stage-rail.sel .coin { opacity: 0.38; transform: scale(0.88); }
+.stage-rail.sel .coin.on { opacity: 1; transform: scale(1.18); box-shadow: 0 18px 44px -20px rgba(8, 10, 30, 0.45); }
+
+.stage-counter { position: absolute; top: clamp(88px, 12vh, 118px); right: clamp(24px, 6vw, 88px); z-index: 5; font-size: 12px; letter-spacing: 0.12em; color: var(--gold); }
+.stage-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--hair-soft); z-index: 5; }
+
+@media (max-width: 720px) {
+  .qbubble { display: none; }
+  .stage-detail .facts { gap: 14px; }
 }
-.sp-tint { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
-.sp-inner { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; padding-top: clamp(60px, 9vh, 104px); padding-bottom: clamp(34px, 6vh, 72px); }
-.sp-head { display: flex; justify-content: space-between; align-items: baseline; }
-.sp-head .kicker { color: rgba(255, 255, 255, 0.5); }
-.sp-head .cnt { font-family: var(--font-mono-stack); font-size: 12px; color: var(--gold-l); letter-spacing: 0.12em; }
-.sp-stage { flex: 1; display: grid; grid-template-columns: 44% 1fr; gap: clamp(28px, 5vw, 76px); align-items: center; }
-@media (max-width: 860px) { .sp-stage { grid-template-columns: 1fr; gap: 30px; justify-items: start; } .sp-logo-col { justify-self: center; } }
-.sp-logo-col { display: flex; justify-content: center; align-items: center; min-height: clamp(240px, 40vh, 380px); }
-.sp-logo { display: flex; }
-.coin.huge { width: clamp(200px, 30vw, 340px) !important; height: clamp(200px, 30vw, 340px) !important; }
-.coin.huge span { font-size: clamp(96px, 15vw, 170px); }
-.sp-crux-col { max-width: 540px; }
-.sp-crux .tk { font-family: var(--font-display-stack); font-size: clamp(24px, 2.6vw, 40px); font-weight: 600; letter-spacing: -0.025em; }
-.sp-crux .tk span { color: rgba(255, 255, 255, 0.42); font-weight: 400; }
-.sp-crux .crux { font-family: var(--font-display-stack); font-weight: 400; font-size: clamp(19px, 1.85vw, 29px); line-height: 1.35; letter-spacing: -0.01em; color: #e9eaff; margin: 18px 0 30px; text-wrap: balance; }
-.sp-crux .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 200px)); gap: 0 clamp(20px, 3vw, 48px); }
-.sp-crux .facts div { display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--hair-soft); font-family: var(--font-mono-stack); font-size: 12.5px; font-variant-numeric: tabular-nums; }
-.sp-crux .facts span { color: rgba(255, 255, 255, 0.48); }
-.sp-crux .facts b { font-weight: 600; }
-.sp-crux .facts b.up { color: var(--pos); } .sp-crux .facts b.dn { color: var(--neg); }
-.sp-crux .stamp { display: inline-flex; align-items: center; gap: 9px; font-family: var(--font-mono-stack); font-size: 12px; letter-spacing: 0.14em; margin-top: 26px; }
-.sp-crux .stamp::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-.sp-crux .stamp.pos { color: var(--pos); } .sp-crux .stamp.mix { color: var(--warn); } .sp-crux .stamp.neg { color: var(--neg); }
-.sp-rail { display: flex; justify-content: center; gap: 14px; margin-top: clamp(16px, 3vh, 28px); flex-wrap: wrap; }
-.sp-rail .coin { opacity: 0.4; transform: scale(0.82); transition: opacity 0.35s var(--ease), transform 0.35s var(--ease); }
-.sp-rail .coin.on { opacity: 1; transform: scale(1.14); }
-.sp-progress { height: 1px; background: var(--hair-soft); position: relative; margin-top: 16px; }
+
+/* ── §01 read: two-column list + sample briefing card ── */
+.read-split { display: grid; grid-template-columns: 1fr minmax(0, 300px); gap: clamp(30px, 4vw, 56px); margin-top: 44px; align-items: start; }
+.read-split .nlist { margin-top: 0; }
+@media (max-width: 860px) { .read-split { grid-template-columns: 1fr; } .brief-wrap { display: none; } }
+.brief-wrap { position: sticky; top: 120px; }
+.brief { border: 1px solid var(--card-brd); border-radius: 16px; padding: 18px; background: var(--card-bg); backdrop-filter: blur(10px); box-shadow: 0 34px 80px -56px rgba(8, 10, 30, 0.5); }
+.brief-top { display: flex; justify-content: space-between; align-items: center; }
+.brief-top .mono { font-size: 10.5px; letter-spacing: 0.12em; color: var(--mut); }
+.brief-top .stamp { font-family: var(--font-mono-stack); font-size: 11px; letter-spacing: 0.1em; color: var(--pos); display: inline-flex; align-items: center; gap: 7px; }
+.brief-top .stamp::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.brief-sig { width: 100%; height: 38px; display: block; margin: 12px 0 6px; }
+.brief-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--hair-soft); }
+.brief-row .bn { font-size: 11px; color: var(--mut); }
+.brief-row .bh { font-size: 13px; color: var(--txt); flex: 1; }
+.brief-row .bd { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.brief-row .bd.pos { background: var(--pos); } .brief-row .bd.mix { background: var(--warn); } .brief-row .bd.neg { background: var(--neg); }
+
+/* ── §02 method: pipeline diagram ── */
+.pipe { display: flex; align-items: center; margin-top: 40px; flex-wrap: wrap; border: 1px solid var(--card-brd); border-radius: 14px; background: var(--card-bg); backdrop-filter: blur(10px); padding: 4px; }
+.pipe-node { display: flex; align-items: center; gap: 11px; padding: 14px 20px; }
+.pipe-node .pipe-n { font-size: 11px; color: var(--gold); letter-spacing: 0.1em; }
+.pipe-node .pipe-h { font-size: 15px; font-weight: 560; letter-spacing: -0.01em; }
+.pipe-node .pipe-arrow { margin-left: 14px; color: var(--mut); }
+@media (max-width: 620px) { .pipe { flex-direction: column; align-items: stretch; } .pipe-node .pipe-arrow { display: none; } }

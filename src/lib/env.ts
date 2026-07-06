@@ -52,6 +52,13 @@ export const env = {
   appUrl: () => optional("NEXT_PUBLIC_APP_URL", "http://localhost:3000"),
   cronSecret: () => required("CRON_SECRET"),
 
+  // Free-tier size (spec §5.3). Defaults to 2 for real users; override
+  // with FREE_TIER_LIMIT locally to test without burning through credits.
+  freeTierLimit: () => {
+    const n = parseInt(optional("FREE_TIER_LIMIT", "2"), 10);
+    return Number.isFinite(n) && n > 0 ? n : 2;
+  },
+
   /** True once the datastore is wired (needed for auth, cache, history). */
   dbConfigured: () =>
     Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY),

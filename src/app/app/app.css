@@ -56,3 +56,194 @@
 /* Inputs + buttons read as flat, hairline gallery controls. */
 .app-shell input { font-family: var(--font-sans-stack); }
 .app-shell input::placeholder { color: var(--m); }
+.app-shell textarea::placeholder { color: var(--m); }
+
+/* ============================================================
+   CHAT / RESEARCH THREAD
+   Layout: sidebar | [ sticky head · scrolling thread · composer ]
+   The composer lives INSIDE the thread column, pinned to the
+   bottom, full width — the way people expect a chat to work.
+   ============================================================ */
+.chat-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* Sticky header — ticker + verdict payoff (peak-end reveal). */
+.chat-head {
+  position: sticky; top: 0; z-index: 5;
+  padding: 12px 24px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(10px) saturate(120%);
+  border-bottom: 1px solid var(--border);
+}
+.chat-head-inner {
+  max-width: 760px; margin: 0 auto; width: 100%;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.chat-head .tk { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.chat-head .asof {
+  font-family: var(--font-mono-stack); font-size: 10.5px; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--m);
+}
+
+/* Verdict pill — POSITIVE / MIXED / NEGATIVE. Semantic color, NOT the
+   brand accent, so status reads at a glance without fighting the red. */
+.verdict-pill {
+  font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  padding: 4px 10px; border: 1px solid; display: inline-flex; align-items: center; gap: 7px;
+}
+.verdict-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.v-pos { color: #148a4f; border-color: #c2e2ce; background: #f0f8f3; }
+.v-mix { color: #a9760f; border-color: #ecdcae; background: #faf5e8; }
+.v-neg { color: #c62828; border-color: #f0cccc; background: #fbf0f0; }
+
+/* Thread — a centred reading column, generous line rhythm. */
+.thread { flex: 1; overflow-y: auto; }
+.thread-inner {
+  max-width: 760px; margin: 0 auto; padding: 26px 24px 44px;
+  display: flex; flex-direction: column; gap: 22px;
+}
+
+/* Messages. User = right-aligned chip. Assistant = full-width with a
+   small identity mark, so the two voices never blur together. */
+.msg-user {
+  align-self: flex-end; max-width: 80%;
+  background: var(--card2); border: 1px solid var(--border);
+  padding: 9px 13px; font-size: 14px; line-height: 1.55; color: var(--w);
+  white-space: pre-wrap; word-break: break-word;
+}
+.msg-ai { align-self: stretch; }
+.msg-ai-head { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+.msg-label {
+  font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700;
+  letter-spacing: .18em; text-transform: uppercase; color: var(--m);
+}
+.mini-mark {
+  width: 17px; height: 17px; border: 1.5px solid #ff0000; border-radius: 50%;
+  position: relative; flex-shrink: 0;
+}
+.mini-mark::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #ff0000; }
+/* Blink the caret while streaming so live text reads as *arriving*. */
+.stream-caret {
+  display: inline-block; width: 7px; height: 15px; margin-left: 2px;
+  background: #ff0000; vertical-align: -2px; animation: caretBlink 1s steps(1) infinite;
+}
+@keyframes caretBlink { 50% { opacity: 0; } }
+
+/* ---- Thinking trace (the Labor Illusion) --------------------------
+   Concrete, ordered steps mirroring the real gather pipeline, so the
+   wait reads as productive work rather than a dead spinner. ---------- */
+.think { align-self: stretch; }
+.think-row { display: flex; align-items: center; gap: 11px; margin-bottom: 16px; }
+.think-orb {
+  width: 15px; height: 15px; border-radius: 50%; flex-shrink: 0; position: relative;
+  background: #ff0000; box-shadow: 0 0 0 0 rgba(255,0,0,.45); animation: orbPulse 1.4s ease-out infinite;
+}
+@keyframes orbPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255,0,0,.40); }
+  70%  { box-shadow: 0 0 0 9px rgba(255,0,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); }
+}
+.think-line {
+  font-size: 14.5px; color: var(--w); font-weight: 500;
+  animation: thinkIn .34s ease both;
+}
+@keyframes thinkIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
+.think-skel { display: flex; flex-direction: column; gap: 11px; }
+.skel-line {
+  height: 11px; border-radius: 2px;
+  background: linear-gradient(90deg, #ececec 0%, #f5f5f5 45%, #ececec 90%);
+  background-size: 220% 100%; animation: skelSweep 1.5s ease-in-out infinite;
+}
+@keyframes skelSweep { 0% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
+
+/* ---- Composer -----------------------------------------------------
+   Bottom-pinned, full width. Grows with content; Enter sends. -------- */
+.composer-wrap { flex-shrink: 0; border-top: 1px solid var(--border); background: var(--bg2); padding: 14px 24px 15px; }
+.composer-inner { max-width: 760px; margin: 0 auto; }
+
+/* Recognition-over-recall follow-up chips (also steer to cheap
+   stored-field answers). */
+.chips { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 11px; }
+.chip {
+  font-family: var(--font-mono-stack); font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
+  padding: 5px 11px; border: 1px solid var(--border); background: var(--panel); color: var(--w2);
+  cursor: pointer; transition: border-color .12s, color .12s, background .12s;
+}
+.chip:hover:not(:disabled) { border-color: #0a0a0a; color: var(--w); }
+.chip:disabled { opacity: .45; cursor: default; }
+
+.composer {
+  display: flex; align-items: flex-end; gap: 9px;
+  border: 1px solid var(--border2); background: var(--panel);
+  padding: 8px 8px 8px 14px; transition: border-color .15s;
+}
+.composer:focus-within { border-color: #0a0a0a; }
+.composer textarea {
+  flex: 1; background: transparent; border: none; outline: none; resize: none;
+  font-family: var(--font-sans-stack); font-size: 14px; line-height: 1.5; color: var(--w);
+  max-height: 168px; padding: 6px 0;
+}
+.send-btn {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--w); color: var(--bg); border: none; cursor: pointer;
+  transition: opacity .12s, background .14s, transform .14s;
+}
+.send-btn:hover:not(:disabled) { background: #ff0000; transform: scale(1.06); }
+.send-btn:disabled { opacity: .35; cursor: default; }
+.send-btn svg { width: 16px; height: 16px; }
+
+/* ---- New-analysis hero — big, playful, alive (no dead box) --------- */
+.hero { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px 24px 40px; }
+.hero-mark { margin-bottom: 26px; }
+.hero-title {
+  font-size: clamp(30px, 5.2vw, 47px); font-weight: 800; letter-spacing: -0.022em;
+  line-height: 1.04; margin-bottom: 14px; max-width: 18ch; text-wrap: balance;
+}
+.hero-title .amp { color: #ff0000; }
+.hero-sub { font-size: 14px; color: var(--w2); max-width: 30rem; margin-bottom: 36px; line-height: 1.55; }
+
+.hero-input {
+  display: flex; align-items: center; gap: 16px; width: 100%; max-width: 460px;
+  border-bottom: 2px solid var(--border2); padding-bottom: 12px; transition: border-color .2s;
+}
+.hero-input:focus-within { border-color: #ff0000; }
+.hero-dollar { font-size: 33px; font-weight: 800; color: var(--dim); line-height: 1; user-select: none; }
+.hero-field {
+  flex: 1; min-width: 0; background: transparent; border: none; outline: none;
+  font-family: var(--font-sans-stack); font-size: clamp(28px, 5vw, 38px); font-weight: 800;
+  letter-spacing: -0.01em; text-transform: uppercase; color: var(--w); caret-color: #ff0000;
+}
+.hero-field::placeholder { color: var(--dim); }
+.hero-go {
+  flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%; border: none;
+  background: var(--w); color: var(--bg); display: grid; place-items: center; cursor: pointer;
+  transition: transform .14s, background .14s;
+}
+.hero-go:hover { background: #ff0000; transform: scale(1.06); }
+.hero-go svg { width: 20px; height: 20px; }
+
+.hero-chips { display: flex; gap: 9px; flex-wrap: wrap; justify-content: center; margin-top: 26px; }
+.hero-chip {
+  font-family: var(--font-mono-stack); font-size: 12px; letter-spacing: .03em;
+  padding: 7px 15px; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--panel); color: var(--w2); cursor: pointer;
+  transition: transform .12s, border-color .12s, color .12s;
+}
+.hero-chip:hover { border-color: #ff0000; color: var(--w); transform: translateY(-2px); }
+.composer-hint {
+  margin-top: 9px; font-family: var(--font-mono-stack); font-size: 10.5px; letter-spacing: .03em;
+  color: var(--m); display: flex; gap: 15px; flex-wrap: wrap;
+}
+.composer-hint kbd {
+  font-family: inherit; background: var(--card2); border: 1px solid var(--border);
+  padding: 0 4px; margin-right: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .think-orb, .skel-line, .think-line, .stream-caret { animation: none !important; }
+}
+@media (max-width: 640px) {
+  .thread-inner, .composer-inner, .chat-head-inner { padding-left: 16px; padding-right: 16px; }
+  .msg-user { max-width: 88%; }
+}

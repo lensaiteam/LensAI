@@ -336,6 +336,59 @@ function Terminal({
   const [history, setHistory] = useState<Session[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Typewriter — reveal streamed text at a readable pace even when the network
+  // delivers it in big bursts, so the model reads as if it's typing rather than
+  // pasting. `shown` is how many chars of `streamText` are currently visible;
+  // an ease-out loop keeps it just behind the incoming text and finishes fast.
+  const [shown, setShown] = useState(0);
+  const shownRef = useRef(0);
+  const targetRef = useRef("");
+  const rafRef = useRef<number | null>(null);
+  const reduceRef = useRef(false);
+  useEffect(() => {
+    reduceRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
+
+  const startTyping = useCallback(() => {
+    if (rafRef.current != null) return;
+    const loop = () => {
+      const target = targetRef.current.length;
+      if (shownRef.current < target) {
+        const gap = target - shownRef.current;
+        // ~9% of the remaining gap per frame (min 2 chars) → smooth, ~1s tail.
+        const step = reduceRef.current ? gap : Math.max(2, Math.floor(gap * 0.09));
+        shownRef.current = Math.min(target, shownRef.current + step);
+        setShown(shownRef.current);
+      }
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+  }, []);
+  const stopTyping = useCallback(() => {
+    if (rafRef.current != null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  }, []);
+  const resetTyping = useCallback(() => {
+    stopTyping();
+    shownRef.current = 0;
+    targetRef.current = "";
+    setShown(0);
+  }, [stopTyping]);
+  const awaitTypingDone = useCallback(
+    () =>
+      new Promise<void>((resolve) => {
+        const check = () => {
+          if (shownRef.current >= targetRef.current.length) resolve();
+          else requestAnimationFrame(check);
+        };
+        check();
+      }),
+    [],
+  );
+  useEffect(() => () => stopTyping(), [stopTyping]);
+
   const loadHistory = useCallback(async () => {
     const res = await fetch("/api/history", { cache: "no-store" });
     if (res.ok) setHistory((await res.json()).sessions ?? []);
@@ -346,7 +399,7 @@ function Terminal({
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, streamText, thinkKind]);
+  }, [messages, shown, thinkKind]);
 
   const analyze = useCallback(
     async (raw: string) => {
@@ -357,16 +410,24 @@ function Terminal({
       setSnap(null);
       setMessages([{ role: "user", content: `Analyze ${t}` }]);
       setStreamText("");
+      resetTyping();
       setThinkKind("analyze");
       setStreaming(true);
       setTicker(t);
+      startTyping();
       try {
         const r = await streamPost(
           "/api/analyze",
           { ticker: t },
-          (txt) => setStreamText(txt),
+          (txt) => {
+            targetRef.current = txt;
+            setStreamText(txt);
+          },
           (h) => setSnap(parseMarket(h)),
         );
+        targetRef.current = r.full;
+        setStreamText(r.full);
+        await awaitTypingDone(); // let the typewriter finish before committing
         setSessionId(r.headers.get("x-lensai-session"));
         if (r.headers.get("x-lensai-cache-hit") === "1") setAsOf(r.headers.get("x-lensai-as-of"));
         setMessages((m) => [...m, { role: "assistant", content: r.full }]);
@@ -385,9 +446,10 @@ function Terminal({
         setStreaming(false);
         setStreamText("");
         setThinkKind(null);
+        resetTyping();
       }
     },
-    [streaming, onUsed, loadHistory],
+    [streaming, onUsed, loadHistory, startTyping, resetTyping, awaitTypingDone],
   );
 
   const sendChat = useCallback(
@@ -398,10 +460,18 @@ function Terminal({
       setError(null);
       setMessages((m) => [...m, { role: "user", content: msg }]);
       setStreamText("");
+      resetTyping();
       setThinkKind("chat");
       setStreaming(true);
+      startTyping();
       try {
-        const r = await streamPost("/api/chat", { sessionId, message: msg }, (txt) => setStreamText(txt));
+        const r = await streamPost("/api/chat", { sessionId, message: msg }, (txt) => {
+          targetRef.current = txt;
+          setStreamText(txt);
+        });
+        targetRef.current = r.full;
+        setStreamText(r.full);
+        await awaitTypingDone();
         setMessages((m) => [...m, { role: "assistant", content: r.full }]);
       } catch (e) {
         setError((e as Error).message || "Chat failed.");
@@ -409,9 +479,10 @@ function Terminal({
         setStreaming(false);
         setStreamText("");
         setThinkKind(null);
+        resetTyping();
       }
     },
-    [input, sessionId, streaming],
+    [input, sessionId, streaming, startTyping, resetTyping, awaitTypingDone],
   );
 
   const openSession = useCallback(async (id: string) => {
@@ -424,7 +495,8 @@ function Terminal({
     setAsOf(null);
     setSnap(null);
     setError(null);
-  }, []);
+    resetTyping();
+  }, [resetTyping]);
 
   const newAnalysis = () => {
     setMessages([]);
@@ -433,6 +505,7 @@ function Terminal({
     setAsOf(null);
     setSnap(null);
     setError(null);
+    resetTyping();
   };
 
   const deleteAccount = async () => {
@@ -534,8 +607,10 @@ function Terminal({
                   <AssistantMessage key={i} content={m.content} />
                 ),
               )}
-              {streaming && !streamText && thinkKind && <ThinkingTrace mode={thinkKind} />}
-              {streaming && streamText && <AssistantMessage content={streamText} streaming />}
+              {streaming && shown === 0 && thinkKind && <ThinkingTrace mode={thinkKind} />}
+              {streaming && shown > 0 && (
+                <AssistantMessage content={streamText.slice(0, shown)} streaming />
+              )}
               {error && <p className="text-xs" style={{ color: "var(--red)" }}>{error}</p>}
             </div>
           </div>

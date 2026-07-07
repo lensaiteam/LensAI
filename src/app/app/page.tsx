@@ -194,6 +194,50 @@ function VerdictCallout({ verdict, disclaimer }: { verdict: VerdictData; disclai
   );
 }
 
+function shortAddr(a: string): string {
+  return a.length > 10 ? `${a.slice(0, 6)}…${a.slice(-4)}` : a;
+}
+/** Deterministic 2-stop gradient from a wallet address (mini identicon). */
+function addrGradient(a: string): string {
+  let h = 0;
+  for (let i = 0; i < a.length; i++) h = (h * 31 + a.charCodeAt(i)) % 360;
+  return `linear-gradient(135deg, hsl(${h} 70% 55%), hsl(${(h + 60) % 360} 70% 50%))`;
+}
+
+function AssetHeader({
+  ticker,
+  snap,
+  asOf,
+  verdict,
+}: {
+  ticker: string;
+  snap: Snap | null;
+  asOf: string | null;
+  verdict: Verdict | null;
+}) {
+  const c24 = pct(snap?.c24 ?? null);
+  return (
+    <div className="chat-head-inner">
+      <div className="ah-left">
+        <div className="ah-id">
+          <span className="ah-tk">{ticker}</span>
+          {snap?.name && snap.name.toUpperCase() !== ticker && <span className="ah-name">{snap.name}</span>}
+        </div>
+        {snap?.price && (
+          <div className="ah-price">
+            <span className="ah-px">{snap.price}</span>
+            {snap.c24 != null && <span className={`ah-delta ${c24.cls}`}>{c24.t}</span>}
+          </div>
+        )}
+      </div>
+      <div className="ah-right">
+        {asOf && <span className="asof">cached · {new Date(asOf).toLocaleTimeString()}</span>}
+        {verdict && <VerdictPill verdict={verdict} />}
+      </div>
+    </div>
+  );
+}
+
 function SnapshotGrid({ snap }: { snap: Snap }) {
   const c24 = pct(snap.c24);
   const c7 = pct(snap.c7);
@@ -244,7 +288,12 @@ export default function ResearchTerminal() {
       ) : (
         <>
           <FirstLoginModal walletAddress={user.walletAddress} />
-          <Terminal freeTierRemaining={freeTier?.remaining ?? 0} onUsed={refresh} onSignOut={signOut} />
+          <Terminal
+            walletAddress={user.walletAddress}
+            freeTierRemaining={freeTier?.remaining ?? 0}
+            onUsed={refresh}
+            onSignOut={signOut}
+          />
         </>
       )}
     </div>
@@ -315,10 +364,12 @@ function SignInGate({
 }
 
 function Terminal({
+  walletAddress,
   freeTierRemaining,
   onUsed,
   onSignOut,
 }: {
+  walletAddress: string;
   freeTierRemaining: number;
   onUsed: () => void;
   onSignOut: () => void;
@@ -557,10 +608,10 @@ function Terminal({
             <button
               key={s.id}
               onClick={() => openSession(s.id)}
-              className={`side-hist w-full text-left px-4 py-1.5 text-[12px] flex items-center gap-2 ${sessionId === s.id ? "active" : ""}`}
+              className={`side-hist w-full text-left px-4 py-2 text-[12px] flex items-center gap-2 ${sessionId === s.id ? "active" : ""}`}
               style={{ color: sessionId === s.id ? "var(--gold)" : "var(--w2)" }}
             >
-              <span className="font-semibold">{s.ticker}</span>
+              <span className="font-semibold flex-1">{s.ticker}</span>
               <span className="text-[10px]" style={{ color: "var(--m)" }}>
                 {new Date(s.created_at).toLocaleDateString()}
               </span>
@@ -568,13 +619,15 @@ function Terminal({
           ))}
         </div>
 
-        <div className="px-3 pt-3 mt-2" style={{ borderTop: "1px solid var(--border)" }}>
-          <button onClick={onSignOut} className="w-full text-left px-1 py-1.5 text-[12px]" style={{ color: "var(--w2)" }}>
-            Sign out
-          </button>
-          <button onClick={deleteAccount} className="w-full text-left px-1 py-1.5 text-[12px]" style={{ color: "var(--red)" }}>
-            Delete account
-          </button>
+        <div className="side-acct">
+          <div className="acct-chip">
+            <span className="acct-dot" style={{ background: addrGradient(walletAddress) }} />
+            <span className="acct-addr">{shortAddr(walletAddress)}</span>
+          </div>
+          <div className="acct-actions">
+            <button onClick={onSignOut} className="acct-btn">Sign out</button>
+            <button onClick={deleteAccount} className="acct-btn danger">Delete</button>
+          </div>
         </div>
       </aside>
 
@@ -586,15 +639,7 @@ function Terminal({
       ) : (
         <div className="chat-col">
           <header className="chat-head">
-            <div className="chat-head-inner">
-              <span className="tk">{ticker}</span>
-              <div className="flex items-center gap-3">
-                {asOf && (
-                  <span className="asof">cached · as of {new Date(asOf).toLocaleTimeString()}</span>
-                )}
-                {verdict && <VerdictPill verdict={verdict} />}
-              </div>
-            </div>
+            <AssetHeader ticker={ticker ?? ""} snap={snap} asOf={asOf} verdict={verdict} />
           </header>
 
           <div className="thread" ref={scrollRef}>
@@ -633,6 +678,29 @@ function VerdictPill({ verdict }: { verdict: Verdict }) {
   return <span className={`verdict-pill ${cls}`}>{verdict}</span>;
 }
 
+function CopyButton({ text }: { text: string }) {
+  const [done, setDone] = useState(false);
+  return (
+    <button
+      className="msg-copy"
+      onClick={() => {
+        navigator.clipboard?.writeText(text).then(() => {
+          setDone(true);
+          setTimeout(() => setDone(false), 1400);
+        });
+      }}
+      aria-label="Copy"
+    >
+      {done ? (
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.5 3.5L13 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" /></svg>
+      ) : (
+        <svg viewBox="0 0 16 16" fill="none"><rect x="5.5" y="5.5" width="7.5" height="7.5" stroke="currentColor" strokeWidth="1.3" /><path d="M3 10.5V3h7.5" stroke="currentColor" strokeWidth="1.3" /></svg>
+      )}
+      <span>{done ? "Copied" : "Copy"}</span>
+    </button>
+  );
+}
+
 function AssistantMessage({ content, streaming }: { content: string; streaming?: boolean }) {
   // While streaming, render raw so a half-formed Overall read doesn't flicker a
   // partial callout. Once final, lift it into the designed verdict panel.
@@ -643,6 +711,7 @@ function AssistantMessage({ content, streaming }: { content: string; streaming?:
       <div className="msg-ai-head">
         <span className="mini-mark" />
         <span className="msg-label">LensAI</span>
+        {!streaming && <CopyButton text={content} />}
       </div>
       <div>
         <Markdown>{body}</Markdown>

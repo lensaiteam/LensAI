@@ -21,6 +21,8 @@ export interface MarketData {
   totalSupply: number | null;
   maxSupply: number | null;
   rank: number | null;
+  /** ~30 daily closes, oldest→newest, for a price sparkline (Coinbase only). */
+  sparkline: number[] | null;
   source: "coinbase" | "coingecko" | "coinbase+coingecko";
   /** True when neither source could resolve the ticker. */
   unresolved: boolean;

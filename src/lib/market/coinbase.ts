@@ -60,6 +60,29 @@ export async function fetchCoinbase(symbol: string): Promise<CoinbaseSnapshot | 
   };
 }
 
+/** A price series for the interactive chart: {t: unix secs, c: close},
+ *  oldest→newest. Returns null when the ticker isn't a Coinbase product. */
+export async function fetchCandleSeries(
+  symbol: string,
+  granularity: number,
+  limit: number,
+): Promise<{ t: number; c: number }[] | null> {
+  try {
+    const product = `${symbol.toUpperCase()}-USD`;
+    const res = await cbFetch(`/products/${product}/candles?granularity=${granularity}`);
+    if (!res.ok) return null;
+    const candles = (await res.json()) as number[][];
+    if (!Array.isArray(candles) || candles.length < 3) return null;
+    return candles
+      .slice(0, limit)
+      .map((c) => ({ t: c[0], c: c[4] }))
+      .filter((p) => Number.isFinite(p.c) && Number.isFinite(p.t))
+      .reverse();
+  } catch {
+    return null;
+  }
+}
+
 /** 7d change + ~30d sparkline from one daily-candle call.
  *  Candle shape: [time, low, high, open, close, volume], newest-first. */
 async function fetchHistory(

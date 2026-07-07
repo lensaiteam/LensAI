@@ -105,6 +105,95 @@ function pct(n: number | null): { t: string; cls: string } {
   return { t: `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`, cls: n >= 0 ? "up" : "down" };
 }
 
+// Structured "Overall read" lifted out of the prose into a designed callout.
+type VerdictData = { signal: Verdict; bull: string[]; bear: string[]; synthesis: string };
+
+function stripInline(s: string): string {
+  return s.replace(/\*\*/g, "").replace(/`/g, "").trim();
+}
+function bullets(section: string, label: string): string[] {
+  const re = new RegExp(
+    `\\*\\*\\s*${label}\\s*\\*\\*([\\s\\S]*?)(?=\\*\\*\\s*(?:Bull case|Bear case)\\s*\\*\\*|$)`,
+    "i",
+  );
+  const block = section.match(re)?.[1] ?? "";
+  return block
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => /^[-*]\s+/.test(l))
+    .map((l) => stripInline(l.replace(/^[-*]\s+/, "")));
+}
+
+/** Split an analysis into body prose + the structured Overall read (if present). */
+function parseOverallRead(md: string): { body: string; verdict: VerdictData | null; disclaimer: string } {
+  const m = md.match(/^##\s+Overall read\s*$/im);
+  if (!m || m.index === undefined) return { body: md, verdict: null, disclaimer: "" };
+
+  const body = md.slice(0, m.index).trimEnd();
+  const section = md.slice(m.index + m[0].length).trim();
+
+  const signal =
+    ((section.match(/Signal:\s*\**\s*(POSITIVE|MIXED|NEGATIVE)/i)?.[1]?.toUpperCase() as Verdict) ||
+      extractVerdict(section) ||
+      "MIXED") as Verdict;
+  const bull = bullets(section, "Bull case");
+  const bear = bullets(section, "Bear case");
+  const disclaimer = stripInline(section.split("\n").find((l) => /financial advice/i.test(l)) ?? "");
+  const synthesis = stripInline(
+    section
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(
+        (l) =>
+          l &&
+          !/Signal:\s*\**\s*(POSITIVE|MIXED|NEGATIVE)/i.test(l) &&
+          !/^\*\*\s*(Bull case|Bear case)\s*\*\*/i.test(l) &&
+          !/^[-*]\s+/.test(l) &&
+          !/financial advice/i.test(l),
+      )
+      .join(" "),
+  );
+
+  return { body, verdict: { signal, bull, bear, synthesis }, disclaimer };
+}
+
+function VerdictCallout({ verdict, disclaimer }: { verdict: VerdictData; disclaimer: string }) {
+  const cls =
+    verdict.signal === "POSITIVE" ? "v-positive" : verdict.signal === "NEGATIVE" ? "v-negative" : "v-mixed";
+  const hasCases = verdict.bull.length > 0 || verdict.bear.length > 0;
+  return (
+    <div className={`verdict-callout ${cls}`}>
+      <div className="vc-head">
+        <span className="vc-badge">{verdict.signal}</span>
+        <span className="vc-title">Overall read</span>
+        <span className="vc-note">Current signals · not advice</span>
+      </div>
+      {verdict.synthesis && <p className="vc-synth">{verdict.synthesis}</p>}
+      {hasCases && (
+        <div className="vc-cases">
+          <div className="vc-col vc-bull">
+            <span className="vc-col-h">Bull case</span>
+            <ul>
+              {verdict.bull.map((b, i) => (
+                <li key={i}>{b}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="vc-col vc-bear">
+            <span className="vc-col-h">Bear case</span>
+            <ul>
+              {verdict.bear.map((b, i) => (
+                <li key={i}>{b}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+      {disclaimer && <p className="vc-disc">{disclaimer}</p>}
+    </div>
+  );
+}
+
 function SnapshotGrid({ snap }: { snap: Snap }) {
   const c24 = pct(snap.c24);
   const c7 = pct(snap.c7);
@@ -470,6 +559,10 @@ function VerdictPill({ verdict }: { verdict: Verdict }) {
 }
 
 function AssistantMessage({ content, streaming }: { content: string; streaming?: boolean }) {
+  // While streaming, render raw so a half-formed Overall read doesn't flicker a
+  // partial callout. Once final, lift it into the designed verdict panel.
+  const parsed = streaming ? null : parseOverallRead(content);
+  const body = parsed ? parsed.body : content;
   return (
     <div className="msg-ai">
       <div className="msg-ai-head">
@@ -477,9 +570,10 @@ function AssistantMessage({ content, streaming }: { content: string; streaming?:
         <span className="msg-label">LensAI</span>
       </div>
       <div>
-        <Markdown>{content}</Markdown>
+        <Markdown>{body}</Markdown>
         {streaming && <span className="stream-caret" />}
       </div>
+      {parsed?.verdict && <VerdictCallout verdict={parsed.verdict} disclaimer={parsed.disclaimer} />}
     </div>
   );
 }

@@ -13,6 +13,8 @@ export interface CoinbaseSnapshot {
   change24hPct: number | null;
   change7dPct: number | null;
   volume24h: number | null;
+  /** ~30 daily closes, oldest→newest, for a price sparkline. */
+  sparkline: number[] | null;
 }
 
 async function cbFetch(path: string): Promise<Response> {
@@ -46,28 +48,45 @@ export async function fetchCoinbase(symbol: string): Promise<CoinbaseSnapshot | 
     Number.isFinite(open24) && open24 > 0 ? ((price - open24) / open24) * 100 : null;
 
   const volume24h = parseFloat(ticker.volume ?? stats.volume ?? "");
+  const history = await fetchHistory(product, price);
 
   return {
     symbol: symbol.toUpperCase(),
     price,
     change24hPct,
-    change7dPct: await fetch7dChange(product, price),
+    change7dPct: history.change7dPct,
     volume24h: Number.isFinite(volume24h) ? volume24h * price : null, // volume is in base units
+    sparkline: history.sparkline,
   };
 }
 
-/** 7d change from daily candles: [time, low, high, open, close, volume]. */
-async function fetch7dChange(product: string, currentPrice: number): Promise<number | null> {
+/** 7d change + ~30d sparkline from one daily-candle call.
+ *  Candle shape: [time, low, high, open, close, volume], newest-first. */
+async function fetchHistory(
+  product: string,
+  currentPrice: number,
+): Promise<{ change7dPct: number | null; sparkline: number[] | null }> {
   try {
     const res = await cbFetch(`/products/${product}/candles?granularity=86400`);
-    if (!res.ok) return null;
+    if (!res.ok) return { change7dPct: null, sparkline: null };
     const candles = (await res.json()) as number[][];
-    if (!Array.isArray(candles) || candles.length < 8) return null;
-    // Candles are newest-first; index 7 ≈ 7 days ago. Close is index 4.
+    if (!Array.isArray(candles) || candles.length < 8) return { change7dPct: null, sparkline: null };
+
     const weekAgoClose = candles[7]?.[4];
-    if (!Number.isFinite(weekAgoClose) || weekAgoClose <= 0) return null;
-    return ((currentPrice - weekAgoClose) / weekAgoClose) * 100;
+    const change7dPct =
+      Number.isFinite(weekAgoClose) && weekAgoClose > 0
+        ? ((currentPrice - weekAgoClose) / weekAgoClose) * 100
+        : null;
+
+    // Last ~30 daily closes, oldest→newest for a left-to-right sparkline.
+    const spark = candles
+      .slice(0, 30)
+      .map((c) => c[4])
+      .filter((n) => Number.isFinite(n))
+      .reverse();
+
+    return { change7dPct, sparkline: spark.length >= 5 ? spark : null };
   } catch {
-    return null;
+    return { change7dPct: null, sparkline: null };
   }
 }

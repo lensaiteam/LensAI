@@ -68,6 +68,7 @@ type Snap = {
   mcap: number | null;
   circ: number | null;
   rank: number | null;
+  spark?: number[] | null;
   source?: string;
   unresolved: boolean;
 };
@@ -103,6 +104,112 @@ function fmtNum(n: number | null): string {
 function pct(n: number | null): { t: string; cls: string } {
   if (n == null) return { t: "—", cls: "" };
   return { t: `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`, cls: n >= 0 ? "up" : "down" };
+}
+
+/** Ease a number from 0 → target once, so figures tick up as they land. */
+function useCountUp(target: number | null, dur = 800): number {
+  const [val, setVal] = useState(target ?? 0);
+  useEffect(() => {
+    if (target == null) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setVal(target);
+      return;
+    }
+    let raf = 0;
+    let start = 0;
+    const step = (ts: number) => {
+      if (!start) start = ts;
+      const p = Math.min(1, (ts - start) / dur);
+      setVal(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [target, dur]);
+  return val;
+}
+
+/** A stat figure that counts up to its value on mount. */
+function CountStat({ value, format }: { value: number | null; format: (n: number | null) => string }) {
+  const v = useCountUp(value);
+  return <>{format(value == null ? null : v)}</>;
+}
+
+/** Single-series price sparkline (change-over-time). Colored by net move,
+ *  always paired with the +/-% label so it's never color-alone. */
+function Sparkline({ data, up, width = 108, height = 30 }: { data: number[]; up: boolean; width?: number; height?: number }) {
+  if (!data || data.length < 3) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * (width - 3) + 1.5;
+    const y = height - 3 - ((v - min) / range) * (height - 6);
+    return [x, y] as const;
+  });
+  const line = pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+  const area = `${line} L${pts[pts.length - 1][0].toFixed(1)},${height} L${pts[0][0].toFixed(1)},${height} Z`;
+  const color = up ? "#148a4f" : "#c62828";
+  const gid = up ? "spark-up" : "spark-down";
+  const last = pts[pts.length - 1];
+  return (
+    <svg className="spark" width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden>
+      <defs>
+        <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={color} stopOpacity="0.2" />
+          <stop offset="1" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={area} fill={`url(#${gid})`} />
+      <path className="spark-line" d={line} fill="none" stroke={color} strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" pathLength={1} />
+      <circle cx={last[0]} cy={last[1]} r="2.4" fill={color} />
+    </svg>
+  );
+}
+
+/** Diverging signal gauge: NEGATIVE (red) ↔ MIXED (amber) ↔ POSITIVE (green),
+ *  with a needle that sweeps to the reading on mount. */
+function SignalGauge({ signal }: { signal: Verdict }) {
+  const cx = 66;
+  const cy = 60;
+  const r = 50;
+  const polar = (deg: number, rad = r) => {
+    const a = (deg * Math.PI) / 180;
+    return [cx + rad * Math.cos(a), cy - rad * Math.sin(a)] as const;
+  };
+  const arc = (a1: number, a2: number) => {
+    const [x1, y1] = polar(a1);
+    const [x2, y2] = polar(a2);
+    return `M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+  };
+  const targetDeg = signal === "NEGATIVE" ? 152 : signal === "POSITIVE" ? 28 : 90;
+  const [rot, setRot] = useState(0);
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const to = 90 - targetDeg;
+    if (reduce) {
+      setRot(to);
+      return;
+    }
+    const id = requestAnimationFrame(() => setRot(to));
+    return () => cancelAnimationFrame(id);
+  }, [targetDeg]);
+  const [nx, ny] = polar(90, r - 6); // needle tip when pointing straight up
+  const cls = signal === "POSITIVE" ? "v-positive" : signal === "NEGATIVE" ? "v-negative" : "v-mixed";
+  return (
+    <div className={`gauge ${cls}`}>
+      <svg width="132" height="74" viewBox="0 0 132 74" aria-hidden>
+        <path d={arc(180, 125)} stroke="#d8404c" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.9" />
+        <path d={arc(119, 61)} stroke="#bd8420" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.9" />
+        <path d={arc(55, 0)} stroke="#148a4f" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.9" />
+        <g style={{ transform: `rotate(${rot}deg)`, transformOrigin: `${cx}px ${cy}px`, transition: "transform 1.05s cubic-bezier(.34,1.4,.5,1)" }}>
+          <line x1={cx} y1={cy} x2={nx} y2={ny} stroke="var(--txt)" strokeWidth="2.4" strokeLinecap="round" />
+        </g>
+        <circle cx={cx} cy={cy} r="5" fill="var(--txt)" />
+        <circle cx={cx} cy={cy} r="2" fill="#fff" />
+      </svg>
+    </div>
+  );
 }
 
 // Structured "Overall read" lifted out of the prose into a designed callout.
@@ -164,8 +271,11 @@ function VerdictCallout({ verdict, disclaimer }: { verdict: VerdictData; disclai
   return (
     <div className={`verdict-callout ${cls}`}>
       <div className="vc-head">
-        <span className="vc-badge">{verdict.signal}</span>
-        <span className="vc-title">Overall read</span>
+        <SignalGauge signal={verdict.signal} />
+        <div className="vc-head-txt">
+          <span className="vc-badge">{verdict.signal}</span>
+          <span className="vc-title">Overall read</span>
+        </div>
         <span className="vc-note">Current signals · not advice</span>
       </div>
       {verdict.synthesis && <p className="vc-synth">{verdict.synthesis}</p>}
@@ -228,6 +338,9 @@ function AssetHeader({
             <span className="ah-px">{snap.price}</span>
             {snap.c24 != null && <span className={`ah-delta ${c24.cls}`}>{c24.t}</span>}
           </div>
+        )}
+        {snap?.spark && snap.spark.length > 2 && (
+          <Sparkline data={snap.spark} up={(snap.c7 ?? snap.c24 ?? 0) >= 0} />
         )}
       </div>
       <div className="ah-right">
@@ -309,24 +422,28 @@ function SnapshotGrid({ snap }: { snap: Snap }) {
       </div>
       <div className="snap-cell">
         <span className="snap-k">24h</span>
-        <span className={`snap-v ${c24.cls}`}>{c24.t}</span>
+        <span className={`snap-v ${c24.cls}`}>
+          <CountStat value={snap.c24} format={(n) => (n == null ? "—" : `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`)} />
+        </span>
       </div>
       <div className="snap-cell">
         <span className="snap-k">7d</span>
-        <span className={`snap-v ${c7.cls}`}>{c7.t}</span>
+        <span className={`snap-v ${c7.cls}`}>
+          <CountStat value={snap.c7} format={(n) => (n == null ? "—" : `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`)} />
+        </span>
       </div>
       <div className="snap-cell">
         <span className="snap-k">Market cap</span>
-        <span className="snap-v">{fmtUSD(snap.mcap)}</span>
+        <span className="snap-v"><CountStat value={snap.mcap} format={fmtUSD} /></span>
         {snap.rank != null && <span className="snap-d muted">#{snap.rank}</span>}
       </div>
       <div className="snap-cell">
         <span className="snap-k">24h volume</span>
-        <span className="snap-v">{fmtUSD(snap.vol)}</span>
+        <span className="snap-v"><CountStat value={snap.vol} format={fmtUSD} /></span>
       </div>
       <div className="snap-cell">
         <span className="snap-k">Circ. supply</span>
-        <span className="snap-v">{fmtNum(snap.circ)}</span>
+        <span className="snap-v"><CountStat value={snap.circ} format={fmtNum} /></span>
         <span className="snap-d muted">{snap.symbol}</span>
       </div>
     </div>

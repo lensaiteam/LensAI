@@ -25,6 +25,8 @@ function marketHeader(m: MarketData | null | undefined): string {
     mcap: m.marketCap,
     circ: m.circulatingSupply,
     rank: m.rank,
+    // Round sparkline points to 6 sig-figs to keep the header compact.
+    spark: m.sparkline?.map((n) => Number(n.toPrecision(6))) ?? null,
     source: m.source,
     unresolved: m.unresolved,
   };

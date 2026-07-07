@@ -82,7 +82,11 @@ export async function POST(req: NextRequest) {
     // (risk_flags, signal) the client parses from a live stream.
     const cacheTrailer =
       `\n\n${TRAILER_SENTINEL}\n\`\`\`json\n` +
-      JSON.stringify({ signal: cached.analysis.signal, risk_flags: cached.risk_flags ?? [] }) +
+      JSON.stringify({
+        signal: cached.analysis.signal,
+        risk_flags: cached.risk_flags ?? [],
+        sentiment: cached.sentiment ?? null,
+      }) +
       "\n```";
     return streamText(cached.analysis.markdown + cacheTrailer, {
       "x-lensai-session": sessionId,

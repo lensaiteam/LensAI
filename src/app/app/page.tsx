@@ -49,6 +49,18 @@ const CHAT_STEPS = [
 type Msg = { role: "user" | "assistant"; content: string };
 type Session = { id: string; ticker: string; created_at: string };
 type Verdict = "POSITIVE" | "MIXED" | "NEGATIVE";
+type RiskFlag = { level: "green" | "yellow" | "red"; label: string };
+
+/** Pull structured risk flags out of the stream trailer, safely. */
+function extractRiskFlags(trailer: Record<string, unknown> | null): RiskFlag[] | null {
+  const rf = trailer?.risk_flags;
+  if (!Array.isArray(rf)) return null;
+  const out = rf
+    .filter((x): x is RiskFlag => !!x && typeof x === "object" && "level" in x && "label" in x)
+    .map((x) => ({ level: x.level, label: String(x.label) }))
+    .filter((f) => f.level === "red" || f.level === "yellow" || f.level === "green");
+  return out.length ? out : null;
+}
 
 /** Pull the model's overall read for the header payoff (peak-end rule). */
 function extractVerdict(text: string): Verdict | null {
@@ -568,6 +580,45 @@ function SnapshotGrid({ snap }: { snap: Snap }) {
   );
 }
 
+const RISK_WORD: Record<RiskFlag["level"], string> = { red: "High", yellow: "Watch", green: "Low" };
+
+/** Severity-coded risk flags (status palette; each row carries a word tag,
+ *  never colour alone). A thin bar shows the overall risk mix. */
+function RiskFlags({ flags }: { flags: RiskFlag[] }) {
+  const rank = { red: 0, yellow: 1, green: 2 };
+  const sorted = [...flags].sort((a, b) => rank[a.level] - rank[b.level]);
+  const counts = {
+    red: flags.filter((f) => f.level === "red").length,
+    yellow: flags.filter((f) => f.level === "yellow").length,
+    green: flags.filter((f) => f.level === "green").length,
+  };
+  const worst = counts.red ? "red" : counts.yellow ? "yellow" : "green";
+  return (
+    <div className="risk-card">
+      <div className="risk-head">
+        <span className="risk-title">Risk flags</span>
+        <div className="risk-bar" aria-hidden>
+          {(["red", "yellow", "green"] as const).map((l) =>
+            counts[l] ? <span key={l} className={`risk-seg risk-${l}`} style={{ flex: counts[l] }} /> : null,
+          )}
+        </div>
+        <span className={`risk-count risk-${worst}`}>
+          {counts.red ? `${counts.red} high` : counts.yellow ? `${counts.yellow} to watch` : "low risk"}
+        </span>
+      </div>
+      <div className="risk-list">
+        {sorted.map((f, i) => (
+          <div key={i} className="risk-item">
+            <span className={`risk-dot risk-${f.level}`} />
+            <span className="risk-label">{f.label}</span>
+            <span className={`risk-tag risk-${f.level}`}>{RISK_WORD[f.level]}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ResearchTerminal() {
   const { user, freeTier, loading, signingIn, signIn, signOut, error: authError, refresh } = useAuth();
 
@@ -676,6 +727,7 @@ function Terminal({
   const [ticker, setTicker] = useState<string | null>(null);
   const [asOf, setAsOf] = useState<string | null>(null);
   const [snap, setSnap] = useState<Snap | null>(null);
+  const [riskFlags, setRiskFlags] = useState<RiskFlag[] | null>(null);
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<Session[]>([]);
@@ -753,6 +805,7 @@ function Terminal({
       setError(null);
       setAsOf(null);
       setSnap(null);
+      setRiskFlags(null);
       setMessages([{ role: "user", content: `Analyze ${t}` }]);
       setStreamText("");
       resetTyping();
@@ -772,6 +825,7 @@ function Terminal({
         );
         targetRef.current = r.full;
         setStreamText(r.full);
+        setRiskFlags(extractRiskFlags(r.trailer));
         await awaitTypingDone(); // let the typewriter finish before committing
         setSessionId(r.headers.get("x-lensai-session"));
         if (r.headers.get("x-lensai-cache-hit") === "1") setAsOf(r.headers.get("x-lensai-as-of"));
@@ -839,6 +893,7 @@ function Terminal({
     setMessages(data.messages ?? []);
     setAsOf(null);
     setSnap(null);
+    setRiskFlags(null);
     setError(null);
     resetTyping();
   }, [resetTyping]);
@@ -849,6 +904,7 @@ function Terminal({
     setTicker(null);
     setAsOf(null);
     setSnap(null);
+    setRiskFlags(null);
     setError(null);
     resetTyping();
   };
@@ -936,6 +992,7 @@ function Terminal({
             <div className="thread-inner">
               {snap && !snap.unresolved && <SnapshotGrid snap={snap} />}
               {snap && !snap.unresolved && ticker && <PriceChart ticker={ticker} />}
+              {riskFlags && riskFlags.length > 0 && <RiskFlags flags={riskFlags} />}
               {messages.map((m, i) =>
                 m.role === "user" ? (
                   <div key={i} className="msg-user">{m.content}</div>

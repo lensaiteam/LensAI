@@ -7,6 +7,23 @@ export interface StreamResult {
   headers: Headers;
   full: string;
   status: number;
+  /** Structured data the model appended after the sentinel (risk_flags,
+   *  sentiment, signal, …). Null when absent/unparseable. */
+  trailer: Record<string, unknown> | null;
+}
+
+/** Extract the JSON the server/model placed after the sentinel. */
+function parseTrailer(raw: string, cut: number): Record<string, unknown> | null {
+  if (cut === -1) return null;
+  const after = raw.slice(cut + SENTINEL.length);
+  const fenced = after.match(/```json\s*([\s\S]*?)```/);
+  const jsonStr = fenced ? fenced[1] : after.match(/\{[\s\S]*\}/)?.[0] ?? "";
+  if (!jsonStr.trim()) return null;
+  try {
+    return JSON.parse(jsonStr) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -52,5 +69,10 @@ export async function streamPost(
   }
 
   const cut = raw.indexOf(SENTINEL);
-  return { headers: res.headers, full: cut === -1 ? raw : raw.slice(0, cut), status: res.status };
+  return {
+    headers: res.headers,
+    full: cut === -1 ? raw : raw.slice(0, cut),
+    status: res.status,
+    trailer: parseTrailer(raw, cut),
+  };
 }

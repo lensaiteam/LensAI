@@ -303,6 +303,53 @@
 .snap-d.down { color: #c62828; }
 .snap-d.muted { color: var(--m); font-weight: 500; }
 
+/* ---- Verdict callout ----------------------------------------------
+   The "Overall read" lifted out of prose into a designed panel — the
+   report's payoff (peak-end). Signal badge + bull/bear columns, with a
+   coloured top rail keyed to the verdict. Semantic green/red, separate
+   from the brand accent. ------------------------------------------- */
+.verdict-callout {
+  border: 1px solid var(--border); border-top: 2px solid var(--line-2);
+  background: var(--panel); margin-top: 32px; animation: msgUp .5s ease both;
+}
+.v-positive { border-top-color: #148a4f; }
+.v-mixed { border-top-color: #bd8420; }
+.v-negative { border-top-color: #c62828; }
+
+.vc-head { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.vc-badge {
+  font-family: var(--font-mono-stack); font-size: 12px; font-weight: 800; letter-spacing: .12em;
+  padding: 5px 11px; border: 1px solid;
+}
+.v-positive .vc-badge { color: #148a4f; background: #f0f8f3; border-color: #c2e2ce; }
+.v-mixed .vc-badge { color: #a9760f; background: #faf5e8; border-color: #ecdcae; }
+.v-negative .vc-badge { color: #c62828; background: #fbf0f0; border-color: #f0cccc; }
+.vc-title { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: var(--txt); }
+.vc-note {
+  margin-left: auto; font-family: var(--font-mono-stack); font-size: 10px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--m);
+}
+.vc-synth { padding: 15px 18px; font-size: 14px; line-height: 1.62; color: var(--sec); }
+.vc-cases { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border); }
+.vc-col { padding: 15px 18px; }
+.vc-bull { border-right: 1px solid var(--border); }
+.vc-col-h {
+  display: block; font-family: var(--font-mono-stack); font-size: 10px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase; margin-bottom: 11px;
+}
+.vc-bull .vc-col-h { color: #148a4f; }
+.vc-bear .vc-col-h { color: #c62828; }
+.vc-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.vc-col li { position: relative; padding-left: 17px; font-size: 13.5px; line-height: 1.5; color: var(--sec); }
+.vc-col li::before { content: ""; position: absolute; left: 2px; top: 8px; width: 5px; height: 5px; border-radius: 50%; }
+.vc-bull li::before { background: #148a4f; }
+.vc-bear li::before { background: #c62828; }
+.vc-disc {
+  padding: 11px 18px; font-size: 11px; line-height: 1.5; color: var(--m);
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 560px) { .vc-cases { grid-template-columns: 1fr; } .vc-bull { border-right: none; border-bottom: 1px solid var(--border); } }
+
 /* ============================================================
    DEPTH + MOTION — lift the app off a flat bone canvas and give
    the thread some life. Tasteful, purposeful motion only.

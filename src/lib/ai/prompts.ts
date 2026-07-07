@@ -26,7 +26,11 @@ OUTPUT FORMAT — respond in GitHub-flavored markdown with exactly these six sec
 ## Overall read
 
 - Keep the whole analysis tight (roughly 400–650 words).
-- In "Overall read", begin with a single bold line: **Signal: POSITIVE** (or MIXED / NEGATIVE), then the reasoning with bull and bear cases.
+- In "Overall read", use EXACTLY this structure so it can be rendered as a verdict panel:
+  - First, a single bold line: **Signal: POSITIVE** (or MIXED / NEGATIVE).
+  - Then a bold line **Bull case** followed by 2–3 "- " bullet points (each a short, self-contained point).
+  - Then a bold line **Bear case** followed by 2–3 "- " bullet points.
+  - Then one short synthesis paragraph weighing the two sides (still framed as current signals, never advice).
 - End the prose with this exact disclaimer on its own line:
 ${SHORT_DISCLAIMER}
 

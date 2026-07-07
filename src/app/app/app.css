@@ -284,9 +284,21 @@
 .snap {
   display: grid; grid-template-columns: repeat(3, 1fr);
   gap: 1px; background: var(--border); border: 1px solid var(--border);
-  margin-bottom: 6px; animation: msgUp .5s ease both;
+  margin-bottom: 6px; animation: snapIn .28s ease both;
 }
 @media (max-width: 560px) { .snap { grid-template-columns: repeat(2, 1fr); } }
+@keyframes snapIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Cells fill the hairline grid one by one — the table builds itself over
+   its own grey skeleton rather than spawning whole. */
+.snap-cell { animation: cellIn .42s cubic-bezier(.2, .7, .2, 1) both; }
+.snap-cell:nth-child(1) { animation-delay: .06s; }
+.snap-cell:nth-child(2) { animation-delay: .14s; }
+.snap-cell:nth-child(3) { animation-delay: .22s; }
+.snap-cell:nth-child(4) { animation-delay: .30s; }
+.snap-cell:nth-child(5) { animation-delay: .38s; }
+.snap-cell:nth-child(6) { animation-delay: .46s; }
+@keyframes cellIn { from { opacity: 0; transform: translateY(8px) scale(.96); } to { opacity: 1; transform: none; } }
 .snap-cell { background: var(--panel); padding: 13px 16px; display: flex; flex-direction: column; gap: 5px; }
 .snap-k {
   font-family: var(--font-mono-stack); font-size: 9.5px; font-weight: 700;
@@ -419,7 +431,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .msg-ai, .msg-user, .think, .verdict-pill, .hero-mark, .hero-title, .hero-sub,
-  .hero-input, .hero-chips, .think-dots i, .think-skel .skel-line { animation: none !important; }
+  .hero-input, .hero-chips, .think-dots i, .think-skel .skel-line,
+  .snap, .snap-cell, .verdict-callout { animation: none !important; }
   .composer::after, .side-hist, .app-side .side-new::before { transition: none !important; }
 }
 .composer-hint {

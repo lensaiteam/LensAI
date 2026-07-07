@@ -50,6 +50,7 @@ type Msg = { role: "user" | "assistant"; content: string };
 type Session = { id: string; ticker: string; created_at: string };
 type Verdict = "POSITIVE" | "MIXED" | "NEGATIVE";
 type RiskFlag = { level: "green" | "yellow" | "red"; label: string };
+type Sentiment = { overall: Verdict; tone: string; sources: string[] };
 
 /** Pull structured risk flags out of the stream trailer, safely. */
 function extractRiskFlags(trailer: Record<string, unknown> | null): RiskFlag[] | null {
@@ -60,6 +61,19 @@ function extractRiskFlags(trailer: Record<string, unknown> | null): RiskFlag[] |
     .map((x) => ({ level: x.level, label: String(x.label) }))
     .filter((f) => f.level === "red" || f.level === "yellow" || f.level === "green");
   return out.length ? out : null;
+}
+
+/** Pull the structured sentiment read out of the stream trailer, safely. */
+function extractSentiment(trailer: Record<string, unknown> | null): Sentiment | null {
+  const s = trailer?.sentiment as { overall?: unknown; tone?: unknown; sources?: unknown } | undefined;
+  if (!s || typeof s !== "object") return null;
+  const overall = s.overall;
+  if (overall !== "POSITIVE" && overall !== "MIXED" && overall !== "NEGATIVE") return null;
+  return {
+    overall,
+    tone: typeof s.tone === "string" ? s.tone : "",
+    sources: Array.isArray(s.sources) ? s.sources.map(String).slice(0, 5) : [],
+  };
 }
 
 /** Pull the model's overall read for the header payoff (peak-end rule). */
@@ -580,6 +594,47 @@ function SnapshotGrid({ snap }: { snap: Snap }) {
   );
 }
 
+/** Horizontal bearish↔bullish sentiment meter (distinct from the verdict's
+ *  radial gauge). Marker slides to the crowd's tone on mount. */
+function SentimentMeter({ s }: { s: Sentiment }) {
+  const target = s.overall === "NEGATIVE" ? 15 : s.overall === "POSITIVE" ? 85 : 50;
+  const [pos, setPos] = useState(50);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setPos(target);
+      return;
+    }
+    const id = requestAnimationFrame(() => setPos(target));
+    return () => cancelAnimationFrame(id);
+  }, [target]);
+  const cls = s.overall === "POSITIVE" ? "v-pos" : s.overall === "NEGATIVE" ? "v-neg" : "v-mix";
+  const word = s.overall === "POSITIVE" ? "Bullish" : s.overall === "NEGATIVE" ? "Bearish" : "Neutral";
+  return (
+    <div className="senti-card">
+      <div className="senti-head">
+        <span className="senti-title">Market sentiment</span>
+        <span className={`senti-word ${cls}`}>{word}</span>
+      </div>
+      <div className="senti-track">
+        <span className="senti-marker" style={{ left: `${pos}%` }} />
+      </div>
+      <div className="senti-scale">
+        <span>Bearish</span>
+        <span>Neutral</span>
+        <span>Bullish</span>
+      </div>
+      {s.tone && <p className="senti-tone">{s.tone}</p>}
+      {s.sources.length > 0 && (
+        <div className="senti-src">
+          {s.sources.map((src, i) => (
+            <span key={i} className="senti-chip">{src}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const RISK_WORD: Record<RiskFlag["level"], string> = { red: "High", yellow: "Watch", green: "Low" };
 
 /** Severity-coded risk flags (status palette; each row carries a word tag,
@@ -728,6 +783,7 @@ function Terminal({
   const [asOf, setAsOf] = useState<string | null>(null);
   const [snap, setSnap] = useState<Snap | null>(null);
   const [riskFlags, setRiskFlags] = useState<RiskFlag[] | null>(null);
+  const [sentiment, setSentiment] = useState<Sentiment | null>(null);
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<Session[]>([]);
@@ -806,6 +862,7 @@ function Terminal({
       setAsOf(null);
       setSnap(null);
       setRiskFlags(null);
+      setSentiment(null);
       setMessages([{ role: "user", content: `Analyze ${t}` }]);
       setStreamText("");
       resetTyping();
@@ -826,6 +883,7 @@ function Terminal({
         targetRef.current = r.full;
         setStreamText(r.full);
         setRiskFlags(extractRiskFlags(r.trailer));
+        setSentiment(extractSentiment(r.trailer));
         await awaitTypingDone(); // let the typewriter finish before committing
         setSessionId(r.headers.get("x-lensai-session"));
         if (r.headers.get("x-lensai-cache-hit") === "1") setAsOf(r.headers.get("x-lensai-as-of"));
@@ -894,6 +952,7 @@ function Terminal({
     setAsOf(null);
     setSnap(null);
     setRiskFlags(null);
+    setSentiment(null);
     setError(null);
     resetTyping();
   }, [resetTyping]);
@@ -905,6 +964,7 @@ function Terminal({
     setAsOf(null);
     setSnap(null);
     setRiskFlags(null);
+    setSentiment(null);
     setError(null);
     resetTyping();
   };
@@ -992,6 +1052,7 @@ function Terminal({
             <div className="thread-inner">
               {snap && !snap.unresolved && <SnapshotGrid snap={snap} />}
               {snap && !snap.unresolved && ticker && <PriceChart ticker={ticker} />}
+              {sentiment && <SentimentMeter s={sentiment} />}
               {riskFlags && riskFlags.length > 0 && <RiskFlags flags={riskFlags} />}
               {messages.map((m, i) =>
                 m.role === "user" ? (

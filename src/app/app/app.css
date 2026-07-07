@@ -725,3 +725,48 @@
 .risk-green.risk-tag { color: #148a4f; background: #f0f8f3; border-color: #c2e2ce; }
 
 @media (prefers-reduced-motion: reduce) { .risk-card { animation: none !important; } }
+
+/* ---- Sentiment meter ---------------------------------------------- */
+.senti-card {
+  border: 1px solid var(--line); border-radius: var(--r-md); background: var(--panel);
+  box-shadow: var(--sh-md); margin-bottom: 6px; padding: 14px 16px 15px;
+  animation: msgUp .5s ease both; transition: box-shadow .22s;
+}
+.senti-card:hover { box-shadow: var(--sh-lg); }
+.senti-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; }
+.senti-title {
+  font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--m);
+}
+.senti-word {
+  font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid;
+}
+.senti-word.v-pos { color: #148a4f; background: #f0f8f3; border-color: #c2e2ce; }
+.senti-word.v-mix { color: #a9760f; background: #faf5e8; border-color: #ecdcae; }
+.senti-word.v-neg { color: #c62828; background: #fbf0f0; border-color: #f0cccc; }
+
+.senti-track {
+  position: relative; height: 8px; border-radius: 999px;
+  background: linear-gradient(90deg, #d8404c 0%, #e0b23e 50%, #148a4f 100%);
+  opacity: .92;
+}
+.senti-marker {
+  position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--panel); border: 3px solid var(--txt); transform: translate(-50%, -50%);
+  box-shadow: var(--sh-md); transition: left .95s cubic-bezier(.34, 1.35, .5, 1);
+}
+.senti-scale {
+  display: flex; justify-content: space-between; margin-top: 7px;
+  font-family: var(--font-mono-stack); font-size: 9.5px; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--m);
+}
+.senti-tone { margin-top: 12px; font-size: 13.5px; line-height: 1.55; color: var(--sec); }
+.senti-src { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+.senti-chip {
+  font-family: var(--font-mono-stack); font-size: 10px; letter-spacing: .02em;
+  padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--card2); color: var(--w2);
+}
+
+@media (prefers-reduced-motion: reduce) { .senti-card { animation: none !important; } .senti-marker { transition: none !important; } }

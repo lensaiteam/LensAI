@@ -10,6 +10,7 @@ import { buildDigest } from "@/lib/news/digest";
 import { createSession, addMessage } from "@/lib/sessions";
 import { logUsage } from "@/lib/usage";
 import { env } from "@/lib/env";
+import { TRAILER_SENTINEL } from "@/lib/ai/trailer";
 import type { MarketData } from "@/lib/types";
 
 /** Compact, URL-encoded market snapshot for the client stat grid. */
@@ -77,7 +78,13 @@ export async function POST(req: NextRequest) {
       webSearches: 0,
       cacheHit: true,
     });
-    return streamText(cached.analysis.markdown, {
+    // Re-attach a trailer so cache hits carry the same structured data
+    // (risk_flags, signal) the client parses from a live stream.
+    const cacheTrailer =
+      `\n\n${TRAILER_SENTINEL}\n\`\`\`json\n` +
+      JSON.stringify({ signal: cached.analysis.signal, risk_flags: cached.risk_flags ?? [] }) +
+      "\n```";
+    return streamText(cached.analysis.markdown + cacheTrailer, {
       "x-lensai-session": sessionId,
       "x-lensai-ticker": ticker,
       "x-lensai-cache-hit": "1",

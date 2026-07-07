@@ -167,6 +167,124 @@ function Sparkline({ data, up, width = 108, height = 30 }: { data: number[]; up:
   );
 }
 
+type Candle = { t: number; c: number };
+
+/** Interactive price chart: range toggle + hover crosshair/tooltip.
+ *  Single series (change-over-time), coloured by net move. */
+function PriceChart({ ticker }: { ticker: string }) {
+  const [range, setRange] = useState<7 | 30 | 90>(30);
+  const [pts, setPts] = useState<Candle[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [hoverX, setHoverX] = useState<number | null>(null);
+  const plotRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    fetch(`/api/candles?ticker=${encodeURIComponent(ticker)}&range=${range}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!alive) return;
+        setPts(d?.points ?? []);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (alive) {
+          setPts([]);
+          setLoading(false);
+        }
+      });
+    return () => {
+      alive = false;
+    };
+  }, [ticker, range]);
+
+  // Once we know a ticker has no Coinbase series, hide the whole card.
+  if (!loading && (!pts || pts.length < 3)) return null;
+
+  const W = 720;
+  const H = 210;
+  const pad = { l: 6, r: 6, t: 12, b: 22 };
+  const plotW = W - pad.l - pad.r;
+  const plotH = H - pad.t - pad.b;
+
+  const data = pts && pts.length >= 3 ? pts : [];
+  const closes = data.map((p) => p.c);
+  const min = closes.length ? Math.min(...closes) : 0;
+  const max = closes.length ? Math.max(...closes) : 1;
+  const range01 = max - min || 1;
+  const x = (i: number) => pad.l + (i / Math.max(1, data.length - 1)) * plotW;
+  const y = (v: number) => pad.t + plotH - ((v - min) / range01) * plotH;
+  const line = data.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.c).toFixed(1)}`).join(" ");
+  const area = data.length ? `${line} L${x(data.length - 1).toFixed(1)},${pad.t + plotH} L${x(0).toFixed(1)},${pad.t + plotH} Z` : "";
+  const up = data.length >= 2 && data[data.length - 1].c >= data[0].c;
+  const color = up ? "#148a4f" : "#c62828";
+
+  const hi = hoverX != null && data.length ? Math.min(data.length - 1, Math.max(0, Math.round((hoverX) * (data.length - 1)))) : null;
+  const onMove = (e: React.MouseEvent) => {
+    const rect = plotRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setHoverX(Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)));
+  };
+
+  const fmtAxis = (v: number) => (v >= 1000 ? "$" + (v / 1000).toFixed(1) + "k" : "$" + v.toFixed(v < 1 ? 4 : 2));
+  const fmtDate = (t: number) =>
+    new Date(t * 1000).toLocaleDateString("en", { month: "short", day: "numeric" });
+
+  return (
+    <div className="chart-card">
+      <div className="chart-head">
+        <span className="chart-title">Price history</span>
+        <div className="chart-range">
+          {([7, 30, 90] as const).map((r) => (
+            <button key={r} className={range === r ? "on" : ""} onClick={() => setRange(r)}>
+              {r}D
+            </button>
+          ))}
+        </div>
+      </div>
+      {loading ? (
+        <div className="chart-skel" />
+      ) : (
+        <div className="chart-plot" ref={plotRef} onMouseMove={onMove} onMouseLeave={() => setHoverX(null)}>
+          <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ display: "block" }}>
+            <defs>
+              <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor={color} stopOpacity="0.16" />
+                <stop offset="1" stopColor={color} stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            {/* recessive gridlines at min / mid / max */}
+            {[0, 0.5, 1].map((f) => (
+              <line key={f} x1={pad.l} x2={W - pad.r} y1={pad.t + plotH * f} y2={pad.t + plotH * f} stroke="var(--line)" strokeWidth="1" />
+            ))}
+            <path d={area} fill="url(#chart-fill)" />
+            <path className="chart-line" d={line} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" pathLength={1} />
+            {hi != null && (
+              <>
+                <line x1={x(hi)} x2={x(hi)} y1={pad.t} y2={pad.t + plotH} stroke="var(--m)" strokeWidth="1" strokeDasharray="3 3" />
+                <circle cx={x(hi)} cy={y(data[hi].c)} r="3.5" fill={color} stroke="#fff" strokeWidth="1.5" />
+              </>
+            )}
+          </svg>
+          {/* y labels */}
+          <span className="chart-y chart-y-hi">{fmtAxis(max)}</span>
+          <span className="chart-y chart-y-lo">{fmtAxis(min)}</span>
+          {/* x endpoints */}
+          {data.length > 0 && <span className="chart-x chart-x-lo">{fmtDate(data[0].t)}</span>}
+          {data.length > 0 && <span className="chart-x chart-x-hi">{fmtDate(data[data.length - 1].t)}</span>}
+          {hi != null && (
+            <div className="chart-tip" style={{ left: `${(x(hi) / W) * 100}%` }}>
+              <span className="chart-tip-px">{fmtAxis(data[hi].c)}</span>
+              <span className="chart-tip-dt">{fmtDate(data[hi].t)}</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /** Diverging signal gauge: NEGATIVE (red) ↔ MIXED (amber) ↔ POSITIVE (green),
  *  with a needle that sweeps to the reading on mount. */
 function SignalGauge({ signal }: { signal: Verdict }) {
@@ -817,6 +935,7 @@ function Terminal({
           <div className="thread" ref={scrollRef}>
             <div className="thread-inner">
               {snap && !snap.unresolved && <SnapshotGrid snap={snap} />}
+              {snap && !snap.unresolved && ticker && <PriceChart ticker={ticker} />}
               {messages.map((m, i) =>
                 m.role === "user" ? (
                   <div key={i} className="msg-user">{m.content}</div>

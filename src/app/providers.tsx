@@ -17,7 +17,7 @@ export function Providers({ children }: { children: ReactNode }) {
           theme={lightTheme({
             accentColor: "#0a0a0a",
             accentColorForeground: "#ffffff",
-            borderRadius: "none",
+            borderRadius: "medium",
           })}
         >
           <MotionConfig reducedMotion="user">

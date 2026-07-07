@@ -39,13 +39,18 @@
   --red: #d8404c;
   --orange: #bd8420;
 
+  /* The app gets its own softer, layered language (the marketing site stays
+     flat/sharp). Radius scale + elevation tokens. */
+  --r-lg: 16px;
+  --r-md: 12px;
+  --r-sm: 9px;
+  --sh-sm: 0 1px 2px rgba(16, 16, 22, .05), 0 1px 3px rgba(16, 16, 22, .04);
+  --sh-md: 0 2px 8px rgba(16, 16, 22, .05), 0 10px 26px rgba(16, 16, 22, .06);
+  --sh-lg: 0 12px 44px rgba(16, 16, 22, .14);
+
   color: #0a0a0a;
   font-family: var(--font-sans-stack);
 }
-
-/* Sharpen the terminal's own rounded elements (RainbowKit is portaled
-   and uses its own class names, so it is unaffected). */
-.app-shell [class*="rounded-"] { border-radius: 0 !important; }
 
 /* Brand marks — red ring + dot, matching the site glyph. */
 .app-glyph { width: 22px; height: 22px; border: 1.5px solid #ff0000; border-radius: 50%; position: relative; display: inline-block; flex-shrink: 0; }
@@ -489,4 +494,105 @@
 @media (max-width: 640px) {
   .thread-inner, .composer-inner, .chat-head-inner { padding-left: 16px; padding-right: 16px; }
   .msg-user { max-width: 88%; }
+}
+
+/* ============================================================
+   APP DEPTH & RADIUS — the terminal's own soft, layered skin.
+   Elements become rounded cards with real elevation instead of
+   hard hairline rectangles. Palette + red accent unchanged.
+   ============================================================ */
+
+/* Surfaces float on a faintly tinted canvas. */
+.app-shell { --bg: #f1f1f3; }
+
+/* Top bar + sidebar get a hair of elevation to separate from the canvas. */
+.app-shell > .h-\[52px\] { box-shadow: var(--sh-sm); position: relative; z-index: 10; }
+
+/* Sign-in card + modal (Tailwind rounded-* now allowed again). */
+.app-shell .rounded-2xl { border-radius: var(--r-lg); box-shadow: var(--sh-md); }
+
+/* --- Sidebar controls --- */
+.app-side .side-new {
+  border-radius: var(--r-sm); box-shadow: var(--sh-sm);
+}
+.app-side .side-new:hover { box-shadow: var(--sh-md); }
+.side-hist { border-radius: var(--r-sm); margin: 1px 8px; width: auto !important; }
+.side-hist:hover { padding-left: 12px !important; }
+.side-hist.active { border-left: none; box-shadow: inset 0 0 0 1px rgba(255,0,0,.14); }
+
+/* Free-tier pips a touch softer */
+.app-side .w-2.h-2 { box-shadow: var(--sh-sm); }
+
+/* --- Asset header --- */
+.chat-head { box-shadow: var(--sh-sm); }
+.verdict-pill { border-radius: 999px; }
+
+/* --- Snapshot grid: a floating card with rounded corners --- */
+.snap {
+  border-radius: var(--r-md); overflow: hidden; box-shadow: var(--sh-md);
+  border: 1px solid var(--line);
+}
+
+/* --- Assistant / user messages --- */
+.msg-user {
+  border-radius: 16px 16px 5px 16px; box-shadow: var(--sh-sm);
+  background: #ffffff; border-color: var(--line);
+}
+.msg-copy { border-radius: 6px; padding: 2px 5px; }
+
+/* --- Verdict callout: elevated rounded card --- */
+.verdict-callout { border-radius: var(--r-md); overflow: hidden; box-shadow: var(--sh-md); }
+
+/* --- Skeleton + thinking --- */
+.skel-line { border-radius: 5px; }
+
+/* --- Follow-up chips → pills with lift --- */
+.chip { border-radius: 999px; transition: border-color .12s, color .12s, background .12s, box-shadow .12s, transform .12s; }
+.chip:hover:not(:disabled) { box-shadow: var(--sh-sm); transform: translateY(-1px); }
+
+/* --- Composer: a floating, rounded input bar --- */
+.composer-wrap { border-top: none; background: transparent; padding: 6px 24px 18px; }
+.composer {
+  border-radius: var(--r-lg); box-shadow: var(--sh-md);
+  border: 1px solid var(--line); padding: 9px 9px 9px 16px;
+  transition: box-shadow .18s, border-color .18s;
+}
+.composer:focus-within { border-color: #cfcfd4; box-shadow: var(--sh-lg); }
+.composer::after { display: none; } /* drop the sharp-era underline sweep */
+.composer-hint { padding-left: 4px; }
+.composer-hint kbd { border-radius: 5px; }
+
+/* --- Account block → a menu that opens upward --- */
+.side-acct { position: relative; }
+.acct-chip {
+  border-radius: var(--r-sm); box-shadow: var(--sh-sm); cursor: pointer; width: 100%;
+  transition: box-shadow .14s; justify-content: flex-start;
+}
+.acct-chip:hover { box-shadow: var(--sh-md); }
+.acct-caret { margin-left: auto; color: var(--m); transition: transform .18s; }
+.acct-chip.open .acct-caret { transform: rotate(180deg); }
+.acct-menu {
+  position: absolute; left: 12px; right: 12px; bottom: calc(100% - 2px);
+  background: #ffffff; border: 1px solid var(--line); border-radius: var(--r-md);
+  box-shadow: var(--sh-lg); overflow: hidden; padding: 6px;
+  animation: menuUp .16s cubic-bezier(.2,.7,.2,1) both; z-index: 30;
+}
+@keyframes menuUp { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: none; } }
+.acct-menu-head { padding: 8px 9px 10px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
+.acct-menu-addr { font-family: var(--font-mono-stack); font-size: 12px; color: var(--txt); }
+.acct-menu-sub { font-size: 10.5px; color: var(--m); margin-top: 2px; }
+.acct-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  padding: 9px 9px; border-radius: var(--r-sm); font-size: 13px; color: var(--sec);
+  background: transparent; border: none; cursor: pointer; transition: background .12s, color .12s;
+}
+.acct-item:hover { background: rgba(16,16,22,.05); color: var(--txt); }
+.acct-item.danger:hover { background: rgba(198,40,40,.08); color: #c62828; }
+.acct-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .8; }
+
+/* Rounder RainbowKit is handled in providers (lightTheme borderRadius). */
+
+@media (prefers-reduced-motion: reduce) {
+  .acct-menu { animation: none !important; }
+  .chip:hover:not(:disabled) { transform: none; }
 }

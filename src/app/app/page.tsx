@@ -238,6 +238,65 @@ function AssetHeader({
   );
 }
 
+function AccountMenu({
+  walletAddress,
+  freeRemaining,
+  onSignOut,
+  onDelete,
+}: {
+  walletAddress: string;
+  freeRemaining: number;
+  onSignOut: () => void;
+  onDelete: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  return (
+    <div className="side-acct" ref={ref}>
+      {open && (
+        <div className="acct-menu">
+          <div className="acct-menu-head">
+            <div className="acct-menu-addr">{shortAddr(walletAddress)}</div>
+            <div className="acct-menu-sub">Connected · {freeRemaining} free left</div>
+          </div>
+          <button
+            className="acct-item"
+            onClick={() => {
+              navigator.clipboard?.writeText(walletAddress);
+              setOpen(false);
+            }}
+          >
+            <svg viewBox="0 0 16 16" fill="none"><rect x="5.5" y="5.5" width="7.5" height="7.5" rx="1.5" stroke="currentColor" strokeWidth="1.3" /><path d="M3 10.5V4a1 1 0 011-1h6.5" stroke="currentColor" strokeWidth="1.3" /></svg>
+            Copy address
+          </button>
+          <button className="acct-item" onClick={onSignOut}>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M10 11.5L13 8l-3-3.5M13 8H5.5M6.5 3H3v10h3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            Sign out
+          </button>
+          <button className="acct-item danger" onClick={onDelete}>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3.5 4.5h9M6.5 4.5V3h3v1.5M5 4.5l.5 8.5h5l.5-8.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            Delete account
+          </button>
+        </div>
+      )}
+      <button className={`acct-chip ${open ? "open" : ""}`} onClick={() => setOpen((o) => !o)}>
+        <span className="acct-dot" style={{ background: addrGradient(walletAddress) }} />
+        <span className="acct-addr">{shortAddr(walletAddress)}</span>
+        <svg className="acct-caret" viewBox="0 0 16 16" fill="none" width="13" height="13"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+    </div>
+  );
+}
+
 function SnapshotGrid({ snap }: { snap: Snap }) {
   const c24 = pct(snap.c24);
   const c7 = pct(snap.c7);
@@ -619,16 +678,12 @@ function Terminal({
           ))}
         </div>
 
-        <div className="side-acct">
-          <div className="acct-chip">
-            <span className="acct-dot" style={{ background: addrGradient(walletAddress) }} />
-            <span className="acct-addr">{shortAddr(walletAddress)}</span>
-          </div>
-          <div className="acct-actions">
-            <button onClick={onSignOut} className="acct-btn">Sign out</button>
-            <button onClick={deleteAccount} className="acct-btn danger">Delete</button>
-          </div>
-        </div>
+        <AccountMenu
+          walletAddress={walletAddress}
+          freeRemaining={freeTierRemaining}
+          onSignOut={onSignOut}
+          onDelete={deleteAccount}
+        />
       </aside>
 
       {/* Main column: header · thread · composer */}

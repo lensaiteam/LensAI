@@ -29,3 +29,11 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# capture layer (v2) — the immutable corpus is the moat; it is NEVER committed.
+# It lives on the always-on capture host and is backed up off-machine (see README).
+/data/
+*.db
+*.db-wal
+*.db-shm
+/backups/

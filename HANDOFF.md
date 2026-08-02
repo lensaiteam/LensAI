@@ -17,9 +17,13 @@ backup. All five invariants are encoded in code AND tests.
 - `8f672e3` scheduler + ingest_runs bookkeeping + logger
 - `c8ba232` guardrails (non-advisory filter INV3, claim-verifier stub INV4)
 - `a44075e` scripts (migrate/capture/tail/backup) + README
+- `0269723` deepening: pure mapper seams for factor adapters + fixture tests
+- `433d5a3` deepening: DAL read-filter + claims (getClaims) + DB-hardening tests
+- `66f6e95` CI: typecheck + invariant/guardrail suites on Node 24 (.github/workflows/ci.yml)
 
-**Tests:** 68 green across 9 files (immutability, point-in-time, dedupe/revisions,
-hash, normalize, sources, adapters, scheduler, guardrails). Typecheck clean.
+**Tests:** 88 green across 11 files (immutability, point-in-time, dedupe/revisions,
+DAL filters + FK + WAL + reopen, hash, normalize, sources, adapters + pure mappers,
+scheduler, guardrails). Typecheck clean. CI runs it all on Node 24.
 
 **Live DoD run:** `capture --once` → 249 rows (CoinDesk 25, Cointelegraph 30, The
 Block 20, Blockworks 50, The Defiant 100; Binance funding/OI/depth, Bybit

@@ -47,17 +47,43 @@ cmd/nvm default → then plain `npm test` / `npm run capture` work.
 Minor: vitest occasionally prints "Failed to terminate worker" on teardown (native
 addon in a fork) — cosmetic, tests still pass; re-run is clean.
 
-## Next: Phase 2 (DO NOT START without approval)
+## Deploy kit — DONE (Phase 1 "running on a box")
 
-Per the strict build sequence, Phase 2 is the **factor state store**: percentile
-normalization of each stream against its OWN history, regime tags, one clock. It
-reads the corpus via the point-in-time DAL (extend it with the "value visible at
-as_of / latest captured_at <= as_of per slot" resolver already unit-tested).
-No UI, LLM, SERA, or extraction work until each phase is approved.
+`deploy/` + `scripts/restore-check.ts`: systemd unit (Restart=always), env on the
+box (FRED_API_KEY never in repo), backup (litestream OR cron snapshot shipped
+off-machine), RESTORE test (rehearsed locally: integrity ok, 5 sources, 6 streams),
+health via `tail`. Full walkthrough in `deploy/RUNBOOK.md`. **Phase 1 closes when
+you run it on the VPS and rows land** (≥3 article sources, ≥4 factor streams).
 
-Optional Phase 1 deepening if asked: add `FRED_API_KEY` and confirm macro rows;
-per-instrument article intervals in config; more adapter unit tests; a CI workflow
-pinned to Node 24.
+## ⛔ PUSH BLOCKED — needs you (one command)
+
+`git push` is rejected: the `lensaiteam` token lacks the `workflow` scope (needed
+because `.github/workflows/ci.yml` is in the branch). Grant it, then I push + open
+the PR:
+```
+! gh auth refresh -h github.com -u lensaiteam -s workflow
+```
+(Active gh account was `Predict-Protocol-Team`; I switched it to `lensaiteam`.)
+
+## Phase 2 — IN PROGRESS (approved with amendments)
+
+Done: **amendment 1 (backfill before normalize)** — `is_backfill` provenance
+(migration 0002 + DAL) and a real-data backfill job (`npm run backfill`; Binance
+funding/OI, CoinGecko prices/vol, FRED full series). Verified live: 1500 funding
+rows imported. Tests: backfillProvenance (5) + backfill (7).
+
+Remaining Phase 2 amendments (normalize engine — next):
+2. Derived tables (percentiles, regime tags) — NOT corpus: separate tables, exempt
+   from immutability triggers, every derived row records code version + params.
+3. Everything (incl. the normalizer) reads through the as_of DAL — re-runnable
+   anchored to any past instant (enables the calibration record).
+4. Min-sample guard: percentile over < N obs -> `insufficient_history`, not a number
+   (pick + document N).
+5. One clock: canonical UTC slot grid + each stream's mapping; joined rows carry
+   own observed_at + a staleness field (FRED lags days — must be visible).
+6. Regime tags v1: small hand-written documented rule set (curation, not discovery).
+
+Tests currently: 100 green across 13 files, Node 24. Suite/toolchain notes above.
 
 ## Git rules (user)
 

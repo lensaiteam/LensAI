@@ -1,0 +1,34 @@
+[Unit]
+Description=LensAI capture daemon (v2 Research Desk)
+Documentation=https://github.com/lensaiteam/LensAI/blob/main/deploy/RUNBOOK.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=lensai
+Group=lensai
+WorkingDirectory=/opt/lensai
+# Secrets (FRED_API_KEY, backup targets) live on the BOX, never in the repo.
+EnvironmentFile=/etc/lensai/capture.env
+# Run node with the tsx loader in ONE process so systemd's SIGTERM reaches our
+# SIGINT/SIGTERM handler for a clean shutdown.
+ExecStart=/usr/bin/node --import tsx scripts/capture.ts
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+KillMode=mixed
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/lensai
+
+# Structured JSON logs go to the journal (journalctl -u lensai-capture -f)
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

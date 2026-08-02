@@ -1,0 +1,20 @@
+# Copy to /etc/litestream.yml. Litestream continuously replicates the WAL to
+# object storage — the PREFERRED backup for an always-on corpus.
+#
+# Credentials go in /etc/default/litestream (read by the litestream systemd unit):
+#   LITESTREAM_ACCESS_KEY_ID=...
+#   LITESTREAM_SECRET_ACCESS_KEY=...
+#
+# LensAI opens the DB in WAL mode with a normal autocheckpoint, which is exactly
+# what litestream needs — do not add manual `PRAGMA wal_checkpoint(TRUNCATE)`.
+
+dbs:
+  - path: /var/lib/lensai/capture.db
+    replicas:
+      - type: s3
+        bucket: your-bucket
+        path: lensai/capture
+        # endpoint: https://s3.your-provider.example   # for R2 / Backblaze / MinIO
+        # region: auto
+        retention: 720h          # keep 30 days of restore points
+        snapshot-interval: 6h

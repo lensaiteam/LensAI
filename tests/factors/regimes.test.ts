@@ -60,6 +60,20 @@ describe("regime tags v1", () => {
     expect(rows.find((r) => r.regime_key === "funding_regime" && r.asset === "BTC")!.regime_value).toBe("unknown");
   });
 
+  it("uses the canonical source and emits ONE regime per asset (no per-source dupes)", () => {
+    const dal = createDal(db);
+    // binance: full history -> ok/elevated. bybit: only a couple of forward points.
+    for (let i = 0; i < 400; i++) dal.insertObservation({ stream: "funding_rate", source: "binance", asset: "BTC", instrument: "BTCUSDT", value: i, observedAt: i * DAY }, i * DAY);
+    dal.insertObservation({ stream: "funding_rate", source: "bybit", asset: "BTC", instrument: "BTCUSDT", value: 0.5, observedAt: 399 * DAY }, 399 * DAY);
+
+    const asOf = 399 * DAY;
+    normalizeAll(db, { asOf, slot: 399 * DAY });
+    const rows = computeRegimes(db, { asOf, slot: 399 * DAY });
+    const funding = rows.filter((r) => r.regime_key === "funding_regime" && r.asset === "BTC");
+    expect(funding).toHaveLength(1); // not one per source
+    expect(funding[0].regime_value).toBe("elevated"); // binance (canonical, ok) wins
+  });
+
   it("is idempotent (derived upsert)", () => {
     seedFunding(true);
     const asOf = 399 * DAY;

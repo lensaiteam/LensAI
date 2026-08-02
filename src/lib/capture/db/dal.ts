@@ -42,6 +42,7 @@ export interface ObservationRow {
   captured_at: number;
   metadata: Record<string, unknown> | null;
   content_hash: string;
+  is_backfill: number;
 }
 
 export interface ClaimRow {
@@ -78,6 +79,7 @@ export interface ObservationReadOpts {
   instrument?: string;
   since?: number | Date;
   limit?: number;
+  isBackfill?: boolean;
 }
 
 function ms(t: number | Date): number {
@@ -95,7 +97,9 @@ function requireAsOf(asOf: number | Date | undefined): number {
 
 export interface CaptureDal {
   insertArticle(input: ArticleInput, capturedAt?: number): InsertResult;
-  insertObservation(input: ObservationInput, capturedAt?: number): InsertResult;
+  /** `isBackfill` marks a row imported from historical data; captured_at stays the
+   *  true "when we learned it" time so point-in-time reads remain honest. */
+  insertObservation(input: ObservationInput, capturedAt?: number, isBackfill?: boolean): InsertResult;
   insertClaim(input: ClaimInput, capturedAt?: number): InsertResult;
   getArticles(opts: ArticleReadOpts): ArticleRow[];
   getObservations(opts: ObservationReadOpts): ObservationRow[];
@@ -113,9 +117,9 @@ export function createDal(db: DB): CaptureDal {
 
   const insObs = db.prepare(`
     INSERT INTO factor_observations
-      (stream, source, asset, instrument, value, unit, observed_at, captured_at, metadata, content_hash)
+      (stream, source, asset, instrument, value, unit, observed_at, captured_at, metadata, content_hash, is_backfill)
     VALUES
-      (@stream, @source, @asset, @instrument, @value, @unit, @observed_at, @captured_at, @metadata, @content_hash)
+      (@stream, @source, @asset, @instrument, @value, @unit, @observed_at, @captured_at, @metadata, @content_hash, @is_backfill)
     ON CONFLICT (stream, source, asset, instrument, observed_at, content_hash) DO NOTHING
   `);
 
@@ -148,7 +152,7 @@ export function createDal(db: DB): CaptureDal {
       return { inserted, id: inserted ? Number(info.lastInsertRowid) : null };
     },
 
-    insertObservation(input, capturedAt = Date.now()): InsertResult {
+    insertObservation(input, capturedAt = Date.now(), isBackfill = false): InsertResult {
       const content_hash = hashObservation(input);
       const info = insObs.run({
         stream: input.stream,
@@ -161,6 +165,7 @@ export function createDal(db: DB): CaptureDal {
         captured_at: capturedAt,
         metadata: input.metadata != null ? JSON.stringify(input.metadata) : null,
         content_hash,
+        is_backfill: isBackfill ? 1 : 0,
       });
       const inserted = info.changes > 0;
       return { inserted, id: inserted ? Number(info.lastInsertRowid) : null };
@@ -225,6 +230,10 @@ export function createDal(db: DB): CaptureDal {
       if (opts.since !== undefined) {
         where.push("captured_at >= @since");
         params.since = ms(opts.since);
+      }
+      if (opts.isBackfill !== undefined) {
+        where.push("is_backfill = @isBackfill");
+        params.isBackfill = opts.isBackfill ? 1 : 0;
       }
       let sql = `SELECT * FROM factor_observations WHERE ${where.join(" AND ")} ORDER BY observed_at DESC, captured_at DESC, id DESC`;
       if (opts.limit !== undefined) {

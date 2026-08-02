@@ -1,0 +1,25 @@
+{
+  "$comment": "LensAI capture source registry. Adding a source of a supported type is DATA-ONLY (no code). Article feeds are RSS/Atom. Factor 'adapter' names map to src/lib/capture/adapters. interval_sec is the poll cadence.",
+  "articles": [
+    { "id": "coindesk", "name": "CoinDesk", "type": "rss", "url": "https://www.coindesk.com/arc/outboundfeeds/rss/" },
+    { "id": "cointelegraph", "name": "Cointelegraph", "type": "rss", "url": "https://cointelegraph.com/rss" },
+    { "id": "theblock", "name": "The Block", "type": "rss", "url": "https://www.theblock.co/rss.xml" },
+    { "id": "blockworks", "name": "Blockworks", "type": "rss", "url": "https://blockworks.co/feed" },
+    { "id": "thedefiant", "name": "The Defiant", "type": "rss", "url": "https://thedefiant.io/feed" }
+  ],
+  "factors": [
+    { "id": "binance_funding", "adapter": "binanceFunding", "stream": "funding_rate", "source": "binance", "instruments": ["BTCUSDT", "ETHUSDT", "SOLUSDT"], "interval_sec": 3600 },
+    { "id": "binance_oi", "adapter": "binanceOpenInterest", "stream": "open_interest", "source": "binance", "instruments": ["BTCUSDT", "ETHUSDT", "SOLUSDT"], "interval_sec": 900 },
+    { "id": "binance_depth", "adapter": "binanceDepth", "stream": "depth", "source": "binance", "instruments": ["BTCUSDT", "ETHUSDT", "SOLUSDT"], "interval_sec": 900 },
+    { "id": "bybit_funding", "adapter": "bybitFunding", "stream": "funding_rate", "source": "bybit", "instruments": ["BTCUSDT", "ETHUSDT", "SOLUSDT"], "interval_sec": 3600 },
+    { "id": "bybit_oi", "adapter": "bybitOpenInterest", "stream": "open_interest", "source": "bybit", "instruments": ["BTCUSDT", "ETHUSDT", "SOLUSDT"], "interval_sec": 900 },
+    { "id": "coingecko_spot", "adapter": "coingeckoSpot", "stream": "spot", "source": "coingecko", "assets": ["bitcoin", "ethereum", "solana"], "interval_sec": 300 },
+    { "id": "defillama_stablecoins", "adapter": "defillamaStablecoins", "stream": "stablecoin_float", "source": "defillama", "interval_sec": 3600 },
+    { "id": "fred_dxy", "adapter": "fred", "stream": "macro_dxy", "source": "fred", "series": "DTWEXBGS", "asset": "DXY", "interval_sec": 86400 },
+    { "id": "fred_10y", "adapter": "fred", "stream": "macro_rate", "source": "fred", "series": "DGS10", "asset": "DGS10", "interval_sec": 86400 }
+  ],
+  "stubbed": [
+    { "id": "etf_flows", "status": "stub", "reason": "Spot BTC/ETH ETF flows — paid/institutional feed", "key": "ETF_FLOWS_API_KEY" },
+    { "id": "institutional_depth", "status": "stub", "reason": "Institutional-grade order-book depth vendor", "key": "INSTITUTIONAL_DEPTH_API_KEY" }
+  ]
+}

@@ -14,6 +14,7 @@
     "capture": "tsx scripts/capture.ts",
     "capture:tail": "tsx scripts/tail.ts",
     "backfill": "tsx scripts/backfill.ts",
+    "normalize": "tsx scripts/normalize.ts",
     "backup": "tsx scripts/backup.ts",
     "test": "vitest run",
     "test:watch": "vitest"

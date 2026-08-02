@@ -44,9 +44,28 @@ export interface ObservationRow {
   content_hash: string;
 }
 
+export interface ClaimRow {
+  id: number;
+  article_id: number | null;
+  claimant: string;
+  claimant_incentive: string | null;
+  claimed_at: number | null;
+  claim_text: string;
+  mechanism_refs: string[] | null;
+  content_hash: string;
+  captured_at: number;
+}
+
 export interface ArticleReadOpts {
   asOf: number | Date;
   source?: string;
+  since?: number | Date;
+  limit?: number;
+}
+
+export interface ClaimReadOpts {
+  asOf: number | Date;
+  claimant?: string;
   since?: number | Date;
   limit?: number;
 }
@@ -80,6 +99,7 @@ export interface CaptureDal {
   insertClaim(input: ClaimInput, capturedAt?: number): InsertResult;
   getArticles(opts: ArticleReadOpts): ArticleRow[];
   getObservations(opts: ObservationReadOpts): ObservationRow[];
+  getClaims(opts: ClaimReadOpts): ClaimRow[];
 }
 
 export function createDal(db: DB): CaptureDal {
@@ -213,6 +233,27 @@ export function createDal(db: DB): CaptureDal {
       }
       const rows = db.prepare(sql).all(params) as (Omit<ObservationRow, "metadata"> & { metadata: string | null })[];
       return rows.map((r) => ({ ...r, metadata: r.metadata ? (JSON.parse(r.metadata) as Record<string, unknown>) : null }));
+    },
+
+    getClaims(opts): ClaimRow[] {
+      const asOf = requireAsOf(opts.asOf);
+      const where: string[] = ["captured_at <= @asOf"];
+      const params: Record<string, unknown> = { asOf };
+      if (opts.claimant) {
+        where.push("claimant = @claimant");
+        params.claimant = opts.claimant;
+      }
+      if (opts.since !== undefined) {
+        where.push("captured_at >= @since");
+        params.since = ms(opts.since);
+      }
+      let sql = `SELECT * FROM claims WHERE ${where.join(" AND ")} ORDER BY captured_at DESC, id DESC`;
+      if (opts.limit !== undefined) {
+        sql += " LIMIT @limit";
+        params.limit = opts.limit;
+      }
+      const rows = db.prepare(sql).all(params) as (Omit<ClaimRow, "mechanism_refs"> & { mechanism_refs: string | null })[];
+      return rows.map((r) => ({ ...r, mechanism_refs: r.mechanism_refs ? (JSON.parse(r.mechanism_refs) as string[]) : null }));
     },
   };
 }

@@ -110,3 +110,84 @@ In production, schedule this every 30–60 min (e.g. Vercel Cron) against `/api/
 - **Provider & models** are env-configurable (`LLM_PROVIDER`, `ANALYSIS_MODEL`, `CHAT_MODEL`) behind
   `src/lib/ai/provider` — no provider/model name appears elsewhere. Dev default: Gemini Flash.
 - `usage_log` records tokens, web searches, and `cache_hit` so you can validate real cost against §12.
+
+---
+
+# Capture layer (v2 Research Desk — Phase 1)
+
+The v2 rebuild starts with **capture**: an append-only, point-in-time corpus of
+articles + factor observations. It is a **separate subsystem from the web app** —
+it does NOT touch Supabase; the corpus is a local **SQLite** file (`better-sqlite3`,
+WAL) that is the moat. See the spec for the architecture and the
+five invariants, and [`HANDOFF.md`](./HANDOFF.md) for status.
+
+```
+config/sources.json              source registry (RSS feeds + factor providers) — add a source with DATA only
+db/capture/migrations/           per-dialect schema + immutability triggers (sqlite live, postgres twin)
+src/lib/capture/                 config · db (client/migrate/dal/runs) · normalize · hash · adapters · scheduler
+src/lib/guardrails/              non-advisory output filter (INV3) + claim-verifier stub (INV4)
+scripts/                         migrate · capture · tail · backup
+```
+
+## ⚠️ Node 24 required
+
+`better-sqlite3` is a native addon built for **Node 24**. This dev machine also has
+a stray Node 20 that `npx`/`cmd` default to (plus a stale `node` shim in a
+user-level `node_modules/.bin`), which **segfaults** the addon. Until that's
+cleaned up, run the tools under Node 24 explicitly:
+
+```bash
+NODE='/c/Program Files/nodejs/node.exe'   # the v24 binary
+"$NODE" node_modules/tsx/dist/cli.mjs scripts/migrate.ts
+"$NODE" node_modules/vitest/vitest.mjs run        # tests
+```
+
+Once `node` is v24 everywhere, the plain `npm run …` scripts below work directly.
+
+## Setup
+
+1. `npm install` (installs `better-sqlite3`, `rss-parser`, `vitest`).
+2. Optional keys in `.env.local` (capture works mostly keyless):
+   - `FRED_API_KEY` — macro (DXY proxy `DTWEXBGS`, 10y `DGS10`). Free:
+     <https://fred.stlouisfed.org/docs/api/api_key.html>. Without it, the macro jobs
+     record an `ingest_runs` **error** (visible in `capture:tail`) rather than a
+     silent gap — they never fabricate data.
+   - `CAPTURE_DB_PATH` (default `./data/capture.db`), `CAPTURE_TICK_MS` (default 15000).
+   - Backup: `LITESTREAM_REPLICA_URL` **or** `CAPTURE_BACKUP_DIR` (see below).
+
+## Run
+
+```bash
+npm run migrate          # apply the SQLite schema + immutability triggers
+npm run capture -- --once   # one pass over every source, then exit
+npm run capture          # run forever (CAPTURE_TICK_MS); Ctrl-C to stop
+npm run capture:tail     # corpus counts + last-success-per-source + recent runs
+npm test                 # 68 tests (immutability, point-in-time, dedupe/revisions, adapters, scheduler, guardrails)
+```
+
+A fresh `capture -- --once` lands real rows from **5 article sources** (CoinDesk,
+Cointelegraph, The Block, Blockworks, The Defiant) and **6 factor streams**
+(funding rate, open interest, ±1%/±2% depth, spot price, spot volume, stablecoin
+float). Re-running within a slot is a **no-op** (idempotent + restart-safe: state
+lives in `ingest_runs`). `capture:tail` is how you watch rows land and spot gaps.
+
+## Backup (the corpus is a single point of failure)
+
+The daemon expects an **always-on host**, and one SQLite file on one disk is a SPOF.
+Configure one of:
+
+- **litestream** (preferred, continuous): set `LITESTREAM_REPLICA_URL` (e.g.
+  `s3://bucket/capture`) and run litestream as a sidecar process replicating
+  `CAPTURE_DB_PATH`.
+- **snapshot fallback**: set `CAPTURE_BACKUP_DIR` and run `npm run backup` on a
+  schedule (cron). It writes a WAL-consistent `.backup` copy; **copy it OFF the
+  machine** (object storage / another host).
+
+## Invariants (enforced in code + tests)
+
+1. **Immutable capture** — content-hashed; `published_at`/`observed_at` separate from
+   `captured_at`; UPDATE/DELETE rejected by DB triggers; corrections/revisions are new rows.
+2. **Point-in-time** — every DAL read requires `as_of` and filters `captured_at <= as_of`.
+3. **Non-advisory** — `src/lib/guardrails/outputFilter.ts` + red-team suite (runs in CI now).
+4. **Numeric traceability** — `ClaimVerifier` interface + fail-closed stub (implemented Phase 6).
+5. **Typed claims** — `claims` table (claimant / incentive / claimed_at / text / mechanism_refs); schema only.

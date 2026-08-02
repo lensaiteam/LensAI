@@ -1,80 +1,59 @@
-# HANDOFF — Phase 1 (capture layer)
+# HANDOFF — capture layer
 
-Working state for the next session. Branch: **`phase1-capture`** (off `main`).
-Nothing pushed. Read `CLAUDE.md` first, then this.
+Branch: **`phase1-capture`** (off `main`). Nothing pushed. Read `CLAUDE.md` first.
 
-## Done so far
+## Phase 1 — COMPLETE ✅ (DoD met)
 
-- **Orientation:** v2 spec read; codebase mapped; SERA repos confirmed **Apache-2.0**
-  (SERA-CryptoAgent, ROMA, Sentient-Agent-Framework) — recorded in CLAUDE.md.
-- **CLAUDE.md** rewritten for v2; v1 spec archived to `docs/CLAUDE-v1.md`.
-- **Commit 1 (`a6807c1`)** — scaffold: vitest, deps (better-sqlite3, rss-parser),
-  npm scripts, `.env.example` capture section, `KEYS_NEEDED.md`, `OPEN_QUESTIONS.md`.
-- **Commit 2 (`a0c0462`)** — DB layer: per-dialect migrations (SQLite live +
-  Postgres twin), append-only schema (articles / factor_observations / claims +
-  ingest_runs), immutability triggers, WAL client, migration runner, and
-  `tests/db/immutability.test.ts` (5 tests, **green**). Typecheck clean.
+One command lands real rows from **5 article sources + 6 factor streams** into an
+append-only, point-in-time SQLite corpus; tests pass; README documents run +
+backup. All five invariants are encoded in code AND tests.
 
-## ⚠️ Environment gotcha (cost real time — fix first next session)
+**Commits (on `phase1-capture`):**
+- `a6807c1` scaffold (vitest, deps, docs, config)
+- `a0c0462` DB layer — schema, immutability triggers, WAL client, migration runner
+- `ba7f91b` hashing, normalization, source registry
+- `0dd1d54` point-in-time DAL (dedupe + revisions)
+- `4d01cfa` adapters (RSS + Binance/Bybit/CoinGecko/DefiLlama/FRED + stubs)
+- `8f672e3` scheduler + ingest_runs bookkeeping + logger
+- `c8ba232` guardrails (non-advisory filter INV3, claim-verifier stub INV4)
+- `a44075e` scripts (migrate/capture/tail/backup) + README
 
-This machine has **multiple Node installs**: git-bash `node` = **v24.18.0** (correct),
-but `npx`/`cmd`/`npm`-spawned tools default to a stray **v20.19.2**, AND there's a
-**corrupt `node` shim at `C:\Users\yash\node_modules\.bin\node`** (a package.json +
-node_modules living in the home dir) that npm puts on PATH ahead of the real node.
+**Tests:** 68 green across 9 files (immutability, point-in-time, dedupe/revisions,
+hash, normalize, sources, adapters, scheduler, guardrails). Typecheck clean.
 
-`better-sqlite3` is a native addon built for Node 24 → it **segfaults** under v20.
-So `npm test` / `npx vitest` / `npm run capture` are currently unreliable.
+**Live DoD run:** `capture --once` → 249 rows (CoinDesk 25, Cointelegraph 30, The
+Block 20, Blockworks 50, The Defiant 100; Binance funding/OI/depth, Bybit
+funding/OI, CoinGecko spot price+volume, DefiLlama stablecoin float). FRED errored
+correctly (no key) — recorded in `ingest_runs`, never faked. 2nd run wrote 0
+(idempotent). Backup snapshot verified.
 
-**Reliable commands (bypass the shims, force Node 24):**
+## ⚠️ Environment (unchanged — see also memory + CLAUDE.md)
+
+Multiple Node installs: git-bash `node` = v24 (correct); `npx`/`cmd` default to a
+stray v20; corrupt `node` shim at `C:\Users\yash\node_modules\.bin`. `better-sqlite3`
+segfaults under v20. Run tools under v24:
 ```
 NODE='/c/Program Files/nodejs/node.exe'
-"$NODE" node_modules/vitest/vitest.mjs run          # tests
-"$NODE" node_modules/typescript/bin/tsc --noEmit    # typecheck
-"$NODE" node_modules/tsx/dist/cli.mjs scripts/x.ts  # run a script under v24
+"$NODE" node_modules/vitest/vitest.mjs run
+"$NODE" node_modules/tsx/dist/cli.mjs scripts/capture.ts --once
 ```
-**Permanent fix (user action):** clean up `C:\Users\yash\node_modules` / the home
-package.json, and make Node 24 the default in cmd/nvm-windows. Once `node` is v24
-everywhere, plain `npm test` / `npm run capture` work.
+User cleanup: fix the home-dir `node_modules`/`package.json`, make Node 24 the
+cmd/nvm default → then plain `npm test` / `npm run capture` work.
 
-## Next, in order (Phase 1 remaining)
+Minor: vitest occasionally prints "Failed to terminate worker" on teardown (native
+addon in a fork) — cosmetic, tests still pass; re-run is clean.
 
-1. **hash + normalize + types + sources loader** (+ tests): `src/lib/capture/{hash,
-   normalize,types}.ts`, `config/sources.json` + `sources.ts` (zod). Tests:
-   hash determinism/dedupe, normalization idempotence, config validation.
-2. **DAL** `src/lib/capture/db/dal.ts` — `insertArticle`/`insertObservation`/
-   `insertClaim` (ON CONFLICT DO NOTHING → `{inserted}`), and **as_of-gated reads
-   only** (every read requires `asOf`, injects `captured_at <= asOf`). Tests:
-   `pointInTime.test.ts` (future rows invisible, boundary included), revision test
-   (same observed_at + different value → both land; same value → deduped).
-3. **Adapters** `src/lib/capture/adapters/*` + registry: rss, binance (funding/OI/
-   depth), bybit (funding/OI), coingecko (spot px/vol), defillama (stablecoin float),
-   fred (DXY `DTWEXBGS` + `DGS10`), stubs (ETF/institutional → throw NotImplemented).
-   Test: rss fixture → Article[].
-4. **Scheduler + logger** `src/lib/capture/{scheduler,logger}.ts` — idempotent (slot
-   dedupe via observed_at), restart-safe (reads last ingest_runs), **every failure
-   writes an ingest_runs error row** (fail-soft ≠ silent). Test: re-run same slot →
-   0 new rows.
-5. **Guardrails** `src/lib/guardrails/{outputFilter,verifier}.ts` — INV3 non-advisory
-   filter + red-team test (runs in CI now); INV4 ClaimVerifier interface + stub.
-6. **Scripts + README + backup**: `scripts/{capture,migrate,tail,backup}.ts`;
-   README with setup + the **backup job** (litestream if `LITESTREAM_REPLICA_URL`
-   else scheduled `sqlite3 .backup` to `CAPTURE_BACKUP_DIR`, copied off-machine) —
-   part of the DoD.
+## Next: Phase 2 (DO NOT START without approval)
 
-## Definition of done (from the spec)
+Per the strict build sequence, Phase 2 is the **factor state store**: percentile
+normalization of each stream against its OWN history, regime tags, one clock. It
+reads the corpus via the point-in-time DAL (extend it with the "value visible at
+as_of / latest captured_at <= as_of per slot" resolver already unit-tested).
+No UI, LLM, SERA, or extraction work until each phase is approved.
 
-`migrate` then `capture --once` lands real rows from **≥3 article sources + ≥4
-factor streams**; `capture:tail` shows them + last-success-per-source; tests pass;
-README documents run + backup. Do NOT build Phases 2–6 (factor store, mechanism
-graph, divergence, SERA, narration) or any UI/LLM calls.
-
-## Approved amendments to honor (from the user)
-
-WAL + busy_timeout ✅ done. Immutability triggers per-dialect ✅ done. Factor key
-includes content_hash ✅ done. Per-source dedupe ✅. Still to apply: **non-silent
-fail-soft** (ingest_runs error rows + tail last-success), **backup job in DoD**,
-docs notes (polled observed_at = floored slot; pin the HTML-extraction dep since a
-version bump changes hashes; DTWEXBGS = lagging free DXY proxy).
+Optional Phase 1 deepening if asked: add `FRED_API_KEY` and confirm macro rows;
+per-instrument article intervals in config; more adapter unit tests; a CI workflow
+pinned to Node 24.
 
 ## Git rules (user)
 

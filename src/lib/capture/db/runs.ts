@@ -29,7 +29,7 @@ export function successfulRun(db: DB, job: string, slot: number): RunRow | undef
     .get(job, slot) as RunRow | undefined;
 }
 
-export function startRun(db: DB, r: { job: string; source: string | null; slot: number; startedAt: number }): number {
+export function startRun(db: DB, r: { job: string; source: string | null; slot: number | null; startedAt: number }): number {
   const info = db
     .prepare("INSERT INTO ingest_runs (job, source, slot, started_at, status) VALUES (?, ?, ?, ?, 'running')")
     .run(r.job, r.source, r.slot, r.startedAt);

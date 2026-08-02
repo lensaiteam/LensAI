@@ -65,25 +65,37 @@ the PR:
 ```
 (Active gh account was `Predict-Protocol-Team`; I switched it to `lensaiteam`.)
 
-## Phase 2 — IN PROGRESS (approved with amendments)
+## Phase 2 — COMPLETE (factor state store; approved amendments + sharpenings)
 
-Done: **amendment 1 (backfill before normalize)** — `is_backfill` provenance
-(migration 0002 + DAL) and a real-data backfill job (`npm run backfill`; Binance
-funding/OI, CoinGecko prices/vol, FRED full series). Verified live: 1500 funding
-rows imported. Tests: backfillProvenance (5) + backfill (7).
+- **#1 Backfill before normalize** — `is_backfill` provenance (migration 0002 +
+  DAL) + real-data backfill job (`npm run backfill`: Binance funding/OI, CoinGecko
+  price/vol, FRED full series). Verified live: 1500 funding rows imported.
+- **#2 Derived tables** — migration 0003 `factor_percentiles` + `factor_regimes`
+  (rebuildable, NOT corpus, exempt from immutability triggers; every row stamps
+  code/rule version + params + provenance). `src/lib/factors/derivedDal.ts`.
+- **#3 as_of re-runnable** — normalizer reads through the as_of DAL; `{asOf, slot}`
+  anchor any past instant (calibration-ready).
+- **#4 Named windows + min-sample** — 90d/365d/full; below MIN_OBS=30 →
+  `insufficient_history`, never a bare number.
+- **#5 One clock + staleness** — canonical UTC hourly grid (`clock.ts`); each row
+  carries staleness (T − state observed_at).
+- **#6 Regime tags v1** — hand rules (`regimes.ts`): funding/oi (binance) +
+  dollar (fred), elevated|neutral|suppressed / strong|neutral|weak, insufficient →
+  unknown, one per asset via canonical source.
+- **Sharpenings**: two clocks (window on observed_at, access on captured_at);
+  vintage honesty (`true_pit` vs `current_vintage`); percentile carries
+  (value, window_id, n_obs, vintage); fixed named windows.
 
-Remaining Phase 2 amendments (normalize engine — next):
-2. Derived tables (percentiles, regime tags) — NOT corpus: separate tables, exempt
-   from immutability triggers, every derived row records code version + params.
-3. Everything (incl. the normalizer) reads through the as_of DAL — re-runnable
-   anchored to any past instant (enables the calibration record).
-4. Min-sample guard: percentile over < N obs -> `insufficient_history`, not a number
-   (pick + document N).
-5. One clock: canonical UTC slot grid + each stream's mapping; joined rows carry
-   own observed_at + a staleness field (FRED lags days — must be visible).
-6. Regime tags v1: small hand-written documented rule set (curation, not discovery).
+Run: `npm run normalize`. Verified live on the dev corpus — funding_rate BTC/ETH/SOL
+at 94th/83rd/100th pct (n=500, true_pit) → funding_regime elevated.
 
-Tests currently: 100 green across 13 files, Node 24. Suite/toolchain notes above.
+Tests: 123 green across ~18 files, Node 24 (`"/c/Program Files/nodejs/node.exe"
+node_modules/vitest/vitest.mjs run`).
+
+## Next (Phase 3 — DO NOT START without approval)
+
+Mechanism graph: schema + seed format for hand-curated transmission channels
+(content is human work). Per the strict build sequence, await approval.
 
 ## Git rules (user)
 

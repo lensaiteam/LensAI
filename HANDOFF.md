@@ -92,10 +92,31 @@ at 94th/83rd/100th pct (n=500, true_pit) → funding_regime elevated.
 Tests: 123 green across ~18 files, Node 24 (`"/c/Program Files/nodejs/node.exe"
 node_modules/vitest/vitest.mjs run`).
 
-## Next (Phase 3 — DO NOT START without approval)
+## Phase 3 — COMPLETE (mechanism graph)
 
-Mechanism graph: schema + seed format for hand-curated transmission channels
-(content is human work). Per the strict build sequence, await approval.
+Versioned, append-only, point-in-time graph of hand-curated channels.
+- migration 0004: `mechanism_{nodes,edges,evidence,graph_versions}` — all
+  append-only (corpus-style triggers). Directed edges; `regimes_applies/breaks`.
+- `src/lib/mechanism/`: `schema.ts` (zod + referential integrity + regime keys),
+  `loader.ts` (YAML via pinned js-yaml + non-advisory guardrail over all prose +
+  content checksum), `graph.ts` (transactional load w/ versioning rulings +
+  `getGraph({asOf})` point-in-time + node/channel lookups).
+- `config/mechanism-graph.yaml` (graph-v1): the spec's channels (basis_arb,
+  dollar_liquidity, macro_risk, liquidity_risk) — 10 nodes, 8 edges. Evidence is
+  human curation work.
+- `npm run graph:check` (CI, no DB) / `graph:check --resolve` / `graph:load`.
+- Bonus: fixed an outputFilter false-positive (i-flag ticker rule flagged
+  "short perp"/"buy spot"); regression tests added.
+Verified live: graph:check OK, graph:load loaded graph-v1. Rulings in
+CLAUDE.md + OPEN_QUESTIONS.md (Q6–Q11).
+
+Tests: 149 green across ~21 files, Node 24.
+
+## Next (Phase 4 — DO NOT START without approval)
+
+Divergence engine: pure-arithmetic flags for historically extreme factor states
+and broken cross-factor relationships, read via the as_of DAL + the point-in-time
+graph. Await approval per the build sequence.
 
 ## Git rules (user)
 

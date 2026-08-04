@@ -40,7 +40,37 @@ for a week and leave a permanent corpus hole. In capture, every fetch failure
 writes an `ingest_runs` row with `status=error`; `capture:tail` shows the last
 successful run per source so gaps are visible at a glance.
 
+### Q6 — Mechanism-graph seed format.
+**Resolved: YAML via `js-yaml` (pinned 4.1.0)**, zod-validated. Prose fields
+(mechanism/conditions) read far better in YAML than JSON.
+
+### Q7 — Mechanism-graph versioning & mutability.
+**Resolved: keep all versions; all graph tables (nodes/edges/evidence/versions)
+are append-only** under the same immutability triggers as the corpus. The seed
+file is the editable surface; a change is a new `graph_version`. Loads are
+transactional. Same version id + different checksum = hard error; same content
+checksum under a new version id = no-op + warning. Point-in-time =
+`getGraph({asOf})` picks the latest version with `loaded_at <= asOf`.
+
+### Q8 — Edge directionality.
+**Resolved: directed edges only.** A two-way (↔) relationship is two directed
+edges sharing a `channel`, each with its own polarity + mechanism.
+
+### Q9 — Edge conditions.
+**Resolved: keep `conditions` prose, PLUS optional `regimes_applies` /
+`regimes_breaks` arrays** validated against Phase 2 regime keys — so Phase 4
+never parses prose and needs no mid-phase migration.
+
+### Q10 — Evidence references.
+**Resolved: soft refs** (`type` ∈ article|claim|external, `ref` text). `graph:check
+--resolve` verifies article/claim refs against the corpus as **warnings, not
+failures** (external refs skipped).
+
+### Q11 — Curation rules.
+**Resolved: ids are permanent** (rename = add + deprecate, never reuse);
+**`strength` is a curated prior** until the calibration record exists, and every
+consumer must present it as such. Documented in the seed header + enforced by review.
+
 ## Open
 
-_None blocking Phase 1. New ambiguities get appended here with the reversible
-choice taken._
+_None blocking. New ambiguities get appended here with the reversible choice taken._

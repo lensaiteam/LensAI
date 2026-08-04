@@ -39,6 +39,9 @@ const RULES: RegimeRule[] = [
   { key: "dollar_regime", stream: "macro_dxy", source: "fred", window: "365d", scope: "market", marketAsset: "DXY", labels: ["strong", "neutral", "weak"] },
 ];
 
+/** Regime keys this rule set produces — the vocabulary Phase 3 edges validate against. */
+export const REGIME_KEYS: string[] = RULES.map((r) => r.key);
+
 function band(percentile: number, labels: [string, string, string]): string {
   return percentile >= HI ? labels[0] : percentile <= LO ? labels[2] : labels[1];
 }

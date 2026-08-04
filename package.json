@@ -17,6 +17,7 @@
     "normalize": "tsx scripts/normalize.ts",
     "graph:check": "tsx scripts/check-graph.ts",
     "graph:load": "tsx scripts/load-graph.ts",
+    "diverge": "tsx scripts/diverge.ts",
     "backup": "tsx scripts/backup.ts",
     "test": "vitest run",
     "test:watch": "vitest"

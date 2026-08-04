@@ -1,0 +1,133 @@
+# LensAI mechanism graph — hand-curated transmission channels.
+#
+# CURATION RULES (enforced by discipline + the loader):
+#   * Node/edge ids are PERMANENT. Never reuse or repurpose an id. To rename or
+#     retire, ADD the replacement and mark the old one `deprecated: true` — both
+#     stay, in a NEW graph_version.
+#   * Any change ships as a NEW `version`. DB rows are append-only; the seed file
+#     is the editable surface. Same version id with changed content is a hard error.
+#   * `strength` is a CURATED PRIOR (a human estimate), not a measured value, until
+#     the calibration record exists. Every consumer must present it as such.
+#   * `lifecycle` starts at `documented`; only calibration promotes to `validated`
+#     or demotes to `decaying`/`broken`. Dead edges stay, badged.
+#   * Prose fields (label, description, mechanism, conditions) are non-advisory —
+#     describe transmission, never what to do. The loader rejects advisory language.
+#   * `regimes_applies` / `regimes_breaks` use Phase 2 regime keys
+#     (funding_regime, oi_regime, dollar_regime), optionally "key:value".
+#   * Edges are DIRECTED. A two-way relationship is two edges sharing a `channel`.
+#
+# v1 encodes only the channels named in the product spec. Extending this graph is
+# human curation work — add nodes/edges with real `evidence` refs and bump the version.
+
+version: graph-v1
+curator: lensai-team
+note: "Spec-named transmission channels. Directed edges; evidence to be curated."
+
+nodes:
+  - { id: funding_rate,      label: "Perp funding rate",        kind: factor,  factor_stream: funding_rate,     description: "Periodic payment between perpetual longs and shorts; a lever gauge." }
+  - { id: basis_trade,       label: "Cash-and-carry basis trade", kind: concept, description: "Short perp / long spot to harvest the perp-spot basis and funding." }
+  - { id: etf_arbitrage,     label: "ETF creation/redemption arbitrage", kind: concept, description: "Authorized participants arbitrage ETF price vs underlying via create/redeem." }
+  - { id: stablecoin_float,  label: "Stablecoin float",          kind: factor,  factor_stream: stablecoin_float, description: "Aggregate circulating stablecoin supply; on-chain dry powder." }
+  - { id: spot_buying_power, label: "Spot buying power",         kind: concept, description: "Capital available to bid spot markets." }
+  - { id: dxy,               label: "US dollar index (broad)",   kind: factor,  factor_stream: macro_dxy,        description: "Trade-weighted dollar strength (DTWEXBGS proxy)." }
+  - { id: real_yields,       label: "Real yields",               kind: concept, description: "Inflation-adjusted risk-free rate; the discount-rate anchor." }
+  - { id: risk_appetite,     label: "Risk appetite",             kind: concept, description: "Aggregate willingness to hold risk assets, crypto included." }
+  - { id: market_depth,      label: "Order-book depth",          kind: factor,  factor_stream: depth,            description: "Resting liquidity within ±1%/±2% of mid." }
+  - { id: gap_risk,          label: "Gap risk",                  kind: concept, description: "Risk of large discontinuous price moves on a given flow." }
+
+edges:
+  # ── basis_arb: funding <-> basis_trade <-> etf_arbitrage (directed pairs) ──
+  - id: funding_to_basis
+    src: funding_rate
+    dst: basis_trade
+    polarity: positive
+    channel: basis_arb
+    lifecycle: documented
+    strength: moderate
+    mechanism: >
+      Elevated perp funding widens the perp-spot basis, improving the economics of
+      the cash-and-carry basis trade and drawing arbitrage capital into it.
+    conditions: "Assumes accessible perp venues and spot inventory to hedge."
+    regimes_applies: ["funding_regime:elevated"]
+
+  - id: basis_to_funding
+    src: basis_trade
+    dst: funding_rate
+    polarity: negative
+    channel: basis_arb
+    lifecycle: documented
+    strength: moderate
+    mechanism: >
+      As basis-trade capital shorts perps to harvest funding, that short pressure
+      pushes funding back down toward neutral — a self-limiting loop.
+
+  - id: basis_to_etf
+    src: basis_trade
+    dst: etf_arbitrage
+    polarity: positive
+    channel: basis_arb
+    lifecycle: documented
+    strength: weak
+    mechanism: >
+      A wide basis and creation spread make ETF create/redeem arbitrage attractive,
+      linking the basis complex to ETF primary-market activity.
+
+  - id: etf_to_basis
+    src: etf_arbitrage
+    dst: basis_trade
+    polarity: positive
+    channel: basis_arb
+    lifecycle: documented
+    strength: weak
+    mechanism: >
+      ETF creation and redemption move spot and futures, feeding back into the
+      relative pricing the basis trade depends on.
+
+  # ── dollar_liquidity: stablecoin_float -> spot_buying_power ──
+  - id: stablecoin_float_to_spot_buying_power
+    src: stablecoin_float
+    dst: spot_buying_power
+    polarity: positive
+    channel: dollar_liquidity
+    lifecycle: documented
+    strength: moderate
+    mechanism: >
+      Net new stablecoin issuance expands on-chain dry powder, increasing the
+      capital available to bid spot markets.
+    conditions: "Holds while issuance reflects inbound demand; weakens during net redemptions."
+
+  # ── macro_risk: real_yields / dxy -> risk_appetite ──
+  - id: real_yields_to_risk_appetite
+    src: real_yields
+    dst: risk_appetite
+    polarity: negative
+    channel: macro_risk
+    lifecycle: documented
+    strength: moderate
+    mechanism: >
+      Rising real yields lift the risk-free alternative and the discount rate,
+      compressing appetite for risk assets including crypto.
+
+  - id: dxy_to_risk_appetite
+    src: dxy
+    dst: risk_appetite
+    polarity: negative
+    channel: macro_risk
+    lifecycle: documented
+    strength: moderate
+    mechanism: >
+      A stronger broad dollar tightens global financial conditions and typically
+      coincides with reduced appetite for risk assets.
+    regimes_applies: ["dollar_regime:strong"]
+
+  # ── liquidity_risk: market_depth -> gap_risk ──
+  - id: market_depth_to_gap_risk
+    src: market_depth
+    dst: gap_risk
+    polarity: negative
+    channel: liquidity_risk
+    lifecycle: documented
+    strength: moderate
+    mechanism: >
+      Thinner resting depth absorbs less flow, so a given order size moves price
+      further — raising the risk of discontinuous gaps.

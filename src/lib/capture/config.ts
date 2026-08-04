@@ -36,6 +36,8 @@ export const captureConfig = Object.freeze({
   // Stubbed institutional sources — presence is checked; never fabricated.
   etfFlowsApiKey: () => optional("ETF_FLOWS_API_KEY"),
   institutionalDepthApiKey: () => optional("INSTITUTIONAL_DEPTH_API_KEY"),
+  // Bearer token gating the networked (HTTP) tool server. Empty => HTTP denied.
+  seraToolsToken: () => optional("SERA_TOOLS_TOKEN"),
   // Exposed for callers that want a clear error on a genuinely required var.
   requireEnv: required,
 });

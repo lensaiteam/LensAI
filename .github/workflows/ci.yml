@@ -30,3 +30,6 @@ jobs:
 
       - name: Test (invariants + guardrails)
         run: npm test
+
+      - name: Mechanism graph check (schema + guardrail)
+        run: npm run graph:check

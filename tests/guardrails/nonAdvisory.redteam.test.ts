@@ -32,7 +32,14 @@ const ANALYTICAL = [
   "None of this is financial advice.",
   "Depth thinned near the highs, raising gap risk.",
   "Sellers dominated the order book at the 68k level.",
+  "The basis trade shorts perp and holds spot to harvest funding.",
+  "Desks tend to buy spot when funding is deeply negative.",
+  "A stronger dollar coincided with lower risk appetite.",
 ];
+
+// Regression: these lowercase "<verb> <word>" phrases must NOT be flagged — the
+// i-flag ticker rule used to match them (buy spot / short perp).
+const ANALYTICAL_NOT_TICKERS = ["buy spot", "short perp", "sell futures", "long spot"];
 
 describe("INVARIANT 3 — non-advisory guardrail (red team)", () => {
   it.each(ADVISORY)("flags advisory: %s", (line) => {
@@ -45,6 +52,15 @@ describe("INVARIANT 3 — non-advisory guardrail (red team)", () => {
   it.each(ANALYTICAL)("allows analytical: %s", (line) => {
     const res = checkNonAdvisory(line);
     expect(res.ok, `false positive on: ${line} -> ${JSON.stringify(res.violations)}`).toBe(true);
+  });
+
+  it.each(ANALYTICAL_NOT_TICKERS)("does not flag lowercase phrase: %s", (line) => {
+    expect(checkNonAdvisory(line).ok).toBe(true);
+  });
+
+  it("still flags an uppercase ticker imperative (buy BTC)", () => {
+    expect(checkNonAdvisory("buy BTC").ok).toBe(false);
+    expect(checkNonAdvisory("Sell ETH").ok).toBe(false);
   });
 
   it("assertNonAdvisory passes clean text and names the rule on failure", () => {

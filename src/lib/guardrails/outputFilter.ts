@@ -22,8 +22,11 @@ export interface FilterResult {
 }
 
 const RULES: { rule: string; re: RegExp }[] = [
-  // Imperative trades: verb + a trade object (now / the dip / it / your / a TICKER).
-  { rule: "imperative-trade", re: /\b(buy|sell|short|dump|accumulate|hodl|ape)\s+(now|today|tonight|the dip|before|it|this|them|your|my|some|more|\$?[A-Z]{2,6}\b)/i },
+  // Imperative trades: verb + an imperative object (now / the dip / it / your …).
+  { rule: "imperative-trade", re: /\b(buy|sell|short|dump|accumulate|hodl|ape)\s+(now|today|tonight|the dip|before|it|this|them|your|my|some|more)\b/i },
+  // Verb + an UPPERCASE ticker ("buy BTC", "Sell ETH"). Case-SENSITIVE on purpose:
+  // the i-flag version wrongly matched any lowercase word ("short perp", "buy spot").
+  { rule: "imperative-trade-ticker", re: /\b([Bb]uy|[Ss]ell|[Ss]hort|[Dd]ump|[Aa]ccumulate)\s+\$?[A-Z]{2,6}\b/ },
   // Direct instruction to the reader.
   { rule: "you-should", re: /\byou\s+(should|shouldn'?t|ought to|need to|must|gotta)\s+\w+/i },
   { rule: "should-you", re: /\bshould you\s+(buy|sell|hold|invest|accumulate|short)\b/i },

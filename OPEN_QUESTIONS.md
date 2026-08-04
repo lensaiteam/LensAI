@@ -71,6 +71,15 @@ failures** (external refs skipped).
 **`strength` is a curated prior** until the calibration record exists, and every
 consumer must present it as such. Documented in the seed header + enforced by review.
 
+### Q12 — Divergence engine (Phase 4) parameters & scope.
+**Resolved:** extreme-state thresholds 0.95/0.05 on the **365d** window; co-movement
+lookback 30d; all params stamped per row (`div-v1`). **Structural signatures are in
+scope** (leverage_led/spot_led/fragile) as curated v1 rules over funding + OI
+(depth not yet a normalized scalar, ETF flows stubbed — proxies, to sharpen later).
+**Broken-relationship is graph-driven only** (no separate factor-pair seed) — one
+source of truth; dormant in graph-v1 (no factor↔factor edges) and lights up as
+curation adds them. Thin inputs ⇒ `indeterminate`, never a fabricated flag.
+
 ## Open
 
 _None blocking. New ambiguities get appended here with the reversible choice taken._

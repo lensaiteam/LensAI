@@ -112,11 +112,28 @@ CLAUDE.md + OPEN_QUESTIONS.md (Q6–Q11).
 
 Tests: 149 green across ~21 files, Node 24.
 
-## Next (Phase 4 — DO NOT START without approval)
+## Phase 4 — COMPLETE (divergence engine)
 
-Divergence engine: pure-arithmetic flags for historically extreme factor states
-and broken cross-factor relationships, read via the as_of DAL + the point-in-time
-graph. Await approval per the build sequence.
+Pure-arithmetic flags over the factor store + point-in-time graph; derived, not
+corpus (`src/lib/divergence/`, migration 0005 `factor_divergences`).
+- **extreme_state**: percentile ≥0.95 / ≤0.05 on 365d; insufficient → indeterminate.
+- **broken_relationship**: graph-driven, both-factor edges only; direction vs
+  polarity (positive=same, negative=opposite); conditional/flat/unknown →
+  indeterminate. graph-v1 has no factor↔factor edges, so honestly 0 in v1.
+- **structural_signature**: curated v1 rules leverage_led/spot_led/fragile over
+  funding + OI percentiles/regimes; thin inputs → indeterminate.
+- Vintage propagates (worst of inputs); params + code_version stamped; idempotent.
+- `npm run diverge` (self-contained: normalize + regimes + flags at one anchor).
+Verified live: fired extreme_state SOL funding 365d (100th pct); signatures
+indeterminate (OI history thin); broken 0. Tests: pure (19) + engine (5).
+
+Tests: 173 green across ~24 files, Node 24. Rulings in CLAUDE.md + OPEN_QUESTIONS Q12.
+
+## Next (Phase 5 — DO NOT START without approval)
+
+SERA-CryptoAgent integration: wrap our stores (factor state, mechanism graph,
+divergences) as tool endpoints for its embedding router. License findings
+(Apache-2.0) don't block. Await approval per the build sequence.
 
 ## Git rules (user)
 

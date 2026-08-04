@@ -80,6 +80,15 @@ scope** (leverage_led/spot_led/fragile) as curated v1 rules over funding + OI
 source of truth; dormant in graph-v1 (no factor↔factor edges) and lights up as
 curation adds them. Thin inputs ⇒ `indeterminate`, never a fabricated flag.
 
+### Q13 — SERA integration transport.
+**Resolved.** Verified from the repo: SERA has **no MCP**; tools are Python modules
+in `sera/tools/`, router embeds docstrings, env-gated, httpx. So: a read-only
+**HTTP JSON-RPC** tool server (MCP-style dispatcher, reusable) + **generated Python
+drop-in modules** (`npm run sera:gen` → `integrations/sera/tools/`) that call it,
+kept in sync with the registry. Bearer-token auth on HTTP (secure default: no token
+⇒ denied); stdio is local-only. We add modules; we do not fork SERA (Apache-2.0,
+NOTICE preserved). See `docs/SERA-INTEGRATION.md`.
+
 ## Open
 
 _None blocking. New ambiguities get appended here with the reversible choice taken._

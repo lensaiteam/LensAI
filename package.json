@@ -19,6 +19,7 @@
     "graph:load": "tsx scripts/load-graph.ts",
     "diverge": "tsx scripts/diverge.ts",
     "tools": "tsx scripts/tools-server.ts",
+    "sera:gen": "tsx scripts/gen-sera-tools.ts",
     "backup": "tsx scripts/backup.ts",
     "test": "vitest run",
     "test:watch": "vitest"

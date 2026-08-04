@@ -129,11 +129,29 @@ indeterminate (OI history thin); broken 0. Tests: pure (19) + engine (5).
 
 Tests: 173 green across ~24 files, Node 24. Rulings in CLAUDE.md + OPEN_QUESTIONS Q12.
 
-## Next (Phase 5 — DO NOT START without approval)
+## Phase 5 — COMPLETE (SERA tool layer)
 
-SERA-CryptoAgent integration: wrap our stores (factor state, mechanism graph,
-divergences) as tool endpoints for its embedding router. License findings
-(Apache-2.0) don't block. Await approval per the build sequence.
+Read-only, point-in-time tools over all stores (`src/lib/tools/`).
+- handlers.ts (7 tools: market_state / token_factor_state / divergences / mechanism
+  / factor_series / search_corpus / claims) — resolve latest computed anchor <=
+  asOf, provenance + vintage, non-advisory. registry.ts (router-facing descriptions
+  + zod + JSON schema). rpc.ts (MCP-style initialize/tools/list/tools/call).
+- transport.ts stdio + HTTP; auth.ts bearer (secure default: no token => HTTP denied).
+  `npm run tools` (stdio) / `-- --http [PORT]`.
+- SERA has NO MCP (verified): tools = Python modules in sera/tools/. `npm run sera:gen`
+  emits `integrations/sera/tools/lensai_*.py` (httpx -> our /rpc), synced from the
+  registry. docs/SERA-INTEGRATION.md has the install steps.
+Verified live: stdio server advertised all 7 tools. Tests: tools (13) + transport (6)
++ seraAdapter (3). Rulings in CLAUDE.md + OPEN_QUESTIONS Q13.
+
+Tests: 195 green across ~27 files, Node 24.
+
+## Next (Phase 6 — DO NOT START without approval)
+
+Narration layer + claim verification + guardrail enforcement (the LLM layer): the
+model writes briefs where every connection is measured / mechanical / labeled
+conjecture; numeric claims verified against the store before release (implement
+ClaimVerifier); outputFilter enforced on output. Await approval per the build sequence.
 
 ## Git rules (user)
 

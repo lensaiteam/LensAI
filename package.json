@@ -18,6 +18,7 @@
     "graph:check": "tsx scripts/check-graph.ts",
     "graph:load": "tsx scripts/load-graph.ts",
     "diverge": "tsx scripts/diverge.ts",
+    "narrate": "tsx scripts/narrate.ts",
     "tools": "tsx scripts/tools-server.ts",
     "sera:gen": "tsx scripts/gen-sera-tools.ts",
     "backup": "tsx scripts/backup.ts",

@@ -89,6 +89,16 @@ kept in sync with the registry. Bearer-token auth on HTTP (secure default: no to
 ⇒ denied); stdio is local-only. We add modules; we do not fork SERA (Apache-2.0,
 NOTICE preserved). See `docs/SERA-INTEGRATION.md`.
 
+### Q14 — Narration (Phase 6) design.
+**Resolved.** Provider-swappable behind `LlmProvider` (only `generate.ts` imports
+the Anthropic SDK); **Claude `claude-opus-5` default**, tests use MockProvider (no
+key). The model returns **structured claims** (`{text, basis, refs, numbers}`), not
+free prose, so labeling (measured/mechanical/conjecture) and numeric verification
+are mechanical. Pipeline is **fail-closed**: malformed output rejected, unverified
+numbers/advisory/fake-edge claims dropped (never softened), final `assertNonAdvisory`
+on the assembled text. Emitted briefs are logged to an **append-only** calibration
+record. Scope v1 = Market State + Token briefing (Incident mechanics is a follow-on).
+
 ## Open
 
 _None blocking. New ambiguities get appended here with the reversible choice taken._

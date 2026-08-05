@@ -146,12 +146,29 @@ Verified live: stdio server advertised all 7 tools. Tests: tools (13) + transpor
 
 Tests: 195 green across ~27 files, Node 24.
 
-## Next (Phase 6 — DO NOT START without approval)
+## Phase 6 — COMPLETE (narration) — and the BUILD SEQUENCE IS DONE
 
-Narration layer + claim verification + guardrail enforcement (the LLM layer): the
-model writes briefs where every connection is measured / mechanical / labeled
-conjecture; numeric claims verified against the store before release (implement
-ClaimVerifier); outputFilter enforced on output. Await approval per the build sequence.
+Fail-closed LLM pipeline (`src/lib/narrate/`): gather (point-in-time tool layer) →
+generate (Claude via `LlmProvider`; MockProvider for tests) → zod-validate
+(malformed fails closed) → per-claim guardrail + StoreClaimVerifier (INV-4) +
+mechanical-must-cite-edge → render → final assertNonAdvisory → append-only `briefs`
+calibration record (migration 0006). Structured claims (measured/mechanical/
+conjecture); dropped claims audited, never softened. `npm run narrate market|token
+<ASSET> [--mock]`. ClaimVerifier (Phase 1 stub) implemented as StoreClaimVerifier.
+Verified live (mock provider) on the dev corpus; real content needs ANTHROPIC_API_KEY
+(default model claude-opus-5).
+
+**All six phases complete. 208 tests, Node 24.** capture → factor store → mechanism
+graph → divergence → SERA tool layer → narration.
+
+## Next — operational (your call)
+
+1. **Run it on the box** — Phase 1 deploy kit (`deploy/RUNBOOK.md`) closes the "Phase
+   1 running on a host" DoD.
+2. **GitHub** — 40+ commits ready; blocker is a `workflow`-scoped token on the
+   `lensaiteam` account (PAT route), then push + PR.
+3. **FRED_API_KEY** — unlocks macro capture/backfill (see memory).
+4. Deepening / Incident-mechanics surface / real-LLM narrate smoke — as prioritized.
 
 ## Git rules (user)
 

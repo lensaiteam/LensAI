@@ -7,7 +7,7 @@ import { computeRegimes } from "@/lib/factors/regimes";
 import { runDivergence } from "@/lib/divergence/engine";
 import { loadSeedFromFile } from "@/lib/mechanism/loader";
 import { loadGraph } from "@/lib/mechanism/graph";
-import { gatherToken } from "@/lib/narrate/gather";
+import { gatherToken, gatherIncident } from "@/lib/narrate/gather";
 import { narrate } from "@/lib/narrate/orchestrator";
 import { MockProvider } from "@/lib/narrate/provider";
 import { DAY } from "@/lib/factors/windows";
@@ -81,5 +81,32 @@ describe("narrate pipeline (fail-closed)", () => {
 
   it("token narration requires an asset", async () => {
     await expect(narrate(db, new MockProvider(goodBrief), { surface: "token", asOf: ANCHOR })).rejects.toThrow(/requires an asset/);
+  });
+});
+
+const incidentBrief = {
+  claims: [
+    { text: "Funding sat at the top of its range going into the break.", basis: "measured", refs: ["div:extreme_state/funding_rate/binance/BTC"], numbers: [{ value: 1.0, ref: "div:extreme_state/funding_rate/binance/BTC" }] },
+    { text: "Elevated funding transmitted to the basis trade via the documented channel.", basis: "mechanical", refs: ["funding_to_basis"], numbers: [] },
+    { text: "You should sell into this.", basis: "conjecture", refs: [], numbers: [] }, // advisory -> dropped
+    { text: "The amplifier may have been thin holiday depth.", basis: "conjecture", refs: [], numbers: [] },
+  ],
+};
+
+describe("incident mechanics surface", () => {
+  it("gathers the break + candidate channels", () => {
+    const ctx = gatherIncident(db, "BTC", ANCHOR);
+    expect(ctx.surface).toBe("incident");
+    expect(ctx.contextText).toContain("THE BREAK");
+    expect(ctx.edgeIds.has("funding_to_basis")).toBe(true);
+  });
+
+  it("narrates trigger/amplifier/mechanism, dropping advisory", async () => {
+    const res = await narrate(db, new MockProvider(incidentBrief), { surface: "incident", asset: "BTC", asOf: ANCHOR });
+    expect(res.kept).toBe(3);
+    expect(res.dropped).toBe(1);
+    expect(res.text).toContain("Incident mechanics — BTC");
+    expect(res.text).toContain("Conjecture: The amplifier");
+    expect(res.text).not.toContain("should sell");
   });
 });

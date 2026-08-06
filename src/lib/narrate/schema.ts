@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+/** The three product surfaces (spec §03). */
+export type Surface = "market" | "token" | "incident";
+
 /**
  * Structured narration output. The model returns CLAIMS, not free prose, so
  * labeling (measured / mechanical / conjecture) and numeric verification are

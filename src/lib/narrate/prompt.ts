@@ -4,11 +4,15 @@
  * contract. The model narrates the dots the engine already found; it never
  * invents them.
  */
-export function buildSystemPrompt(surface: "market" | "token"): string {
+import type { Surface } from "./schema";
+
+export function buildSystemPrompt(surface: Surface): string {
   const scope =
     surface === "market"
       ? "Write a whole-market structural read (Market State): where factors sit vs their own history, which relationships have broken, and the structural signature (spot-led vs leverage-led, fragile)."
-      : "Write a single-token briefing conditioned on market context: the token's factor state vs its own history, notable divergences, and an overall structural read.";
+      : surface === "token"
+        ? "Write a single-token briefing conditioned on market context: the token's factor state vs its own history, notable divergences, and an overall structural read."
+        : "Write an incident post-mortem. Hold TRIGGER, AMPLIFIER, and MECHANISM SEPARATELY — never assert a single blessed cause. Where a causal claim comes from a source, attribute it to its claimant and their incentive.";
 
   return [
     "You are LensAI, an automated crypto research desk. You produce decision-grade, NON-ADVISORY structural reads.",

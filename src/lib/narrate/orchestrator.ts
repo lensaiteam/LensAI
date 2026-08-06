@@ -1,9 +1,9 @@
 import type { DB } from "../capture/db/client";
 import { StoreClaimVerifier } from "../guardrails/verifier";
 import { checkNonAdvisory, assertNonAdvisory } from "../guardrails/outputFilter";
-import { briefSchema, type Claim } from "./schema";
+import { briefSchema, type Claim, type Surface } from "./schema";
 import { buildSystemPrompt } from "./prompt";
-import { gatherMarket, gatherToken, type GatheredContext } from "./gather";
+import { gatherMarket, gatherToken, gatherIncident, type GatheredContext } from "./gather";
 import { renderBrief } from "./render";
 import type { LlmProvider } from "./provider";
 
@@ -23,7 +23,7 @@ export interface ClaimAudit {
 }
 
 export interface NarrateResult {
-  surface: "market" | "token";
+  surface: Surface;
   asset?: string;
   asOf: number;
   text: string;
@@ -34,7 +34,7 @@ export interface NarrateResult {
 }
 
 export interface NarrateOptions {
-  surface: "market" | "token";
+  surface: Surface;
   asset?: string;
   asOf?: number;
 }
@@ -42,7 +42,10 @@ export interface NarrateOptions {
 export async function narrate(db: DB, provider: LlmProvider, opts: NarrateOptions): Promise<NarrateResult> {
   const asOf = opts.asOf ?? Date.now();
   if (opts.surface === "token" && !opts.asset) throw new Error("token narration requires an asset");
-  const ctx: GatheredContext = opts.surface === "market" ? gatherMarket(db, asOf) : gatherToken(db, opts.asset!, asOf);
+  const ctx: GatheredContext =
+    opts.surface === "market" ? gatherMarket(db, asOf)
+    : opts.surface === "incident" ? gatherIncident(db, opts.asset, asOf)
+    : gatherToken(db, opts.asset!, asOf);
 
   const raw = await provider.generate({ system: buildSystemPrompt(opts.surface), context: ctx.contextText });
 

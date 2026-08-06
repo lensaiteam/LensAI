@@ -20,8 +20,8 @@ import { logger } from "../src/lib/capture/logger";
 async function main(): Promise<void> {
   loadLocalEnv();
   const args = process.argv.slice(2);
-  const surface = args[0] === "token" ? "token" : "market";
-  const asset = surface === "token" ? args[1] : undefined;
+  const surface = args[0] === "token" ? "token" : args[0] === "incident" ? "incident" : "market";
+  const asset = surface === "market" ? undefined : args[1];
   if (surface === "token" && !asset) {
     logger.error("usage: narrate token <ASSET>");
     process.exit(2);

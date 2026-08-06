@@ -1,11 +1,17 @@
-import type { Claim } from "./schema";
+import type { Claim, Surface } from "./schema";
 
 const DISCLAIMER =
   "This is an assessment of current market structure, not financial advice. Crypto is highly volatile and you can lose money.";
 
+const DEFAULT_TITLE: Record<Surface, string> = {
+  market: "Market State",
+  token: "Token briefing",
+  incident: "Incident mechanics",
+};
+
 /** Assemble the surviving (verified, non-advisory) claims into a brief. */
-export function renderBrief(brief: { headline?: string; claims: Claim[] }, opts: { surface: "market" | "token"; asset?: string; asOf: number }): string {
-  const title = brief.headline ?? (opts.surface === "market" ? "Market State" : `Token briefing — ${opts.asset ?? ""}`.trim());
+export function renderBrief(brief: { headline?: string; claims: Claim[] }, opts: { surface: Surface; asset?: string; asOf: number }): string {
+  const title = brief.headline ?? `${DEFAULT_TITLE[opts.surface]}${opts.asset ? ` — ${opts.asset}` : ""}`;
   const lines: string[] = [`## ${title}`, ""];
 
   const measured = brief.claims.filter((c) => c.basis !== "conjecture");

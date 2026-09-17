@@ -40,9 +40,15 @@ in the config accordingly, then run `npm run llm:eval`.
 |---|---|---|
 | `GEMINI_API_KEY` | Google AI Studio (already set for v1) | https://aistudio.google.com/apikey |
 | `GROQ_API_KEY` | Groq | https://console.groq.com/keys |
-| `CEREBRAS_API_KEY` | Cerebras Inference | https://cloud.cerebras.ai |
+| `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` | Cloudflare Workers AI (10k neurons/day — a small top-up) | https://dash.cloudflare.com → AI → Workers AI → REST API |
 | `MISTRAL_API_KEY` | Mistral La Plateforme (free "Experiment" plan) | https://console.mistral.ai |
 | `OPENROUTER_API_KEY` | OpenRouter (`:free` models only) | https://openrouter.ai/keys |
+
+**Not in the pool (checked 2026-09):** Cerebras ended its free tier (card-required
+$5/30-day trial since Jul–Aug 2026) — disabled in the config. GitHub Models was
+retired (Jul 2026). NVIDIA's API catalog and Cohere trial keys forbid production
+use. Together, DeepSeek, OpenAI, Anthropic and xAI need a card/top-up. SambaNova,
+AI21 and Fireworks are one-time expiring credits, not tiers.
 
 Free tiers may train on prompts. That is why no user identifier is ever placed in
 a prompt (`src/lib/agent/privacy.ts`) — only market data and the question text.

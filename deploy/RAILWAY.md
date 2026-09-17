@@ -25,7 +25,7 @@ Required:
 | `SESSION_JWT_SECRET` | **the same value as the web app** — it verifies the agent tokens the web app mints |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | user state (apply `db/migrations/0002_agent.sql` first) |
 | `AGENT_ALLOWED_ORIGIN` | the web origin, e.g. `https://lensai.example` |
-| one or more LLM keys | `GEMINI_API_KEY`, `GROQ_API_KEY`, `CEREBRAS_API_KEY`, `MISTRAL_API_KEY`, `OPENROUTER_API_KEY` — **one key per provider** |
+| one or more LLM keys | `GEMINI_API_KEY`, `GROQ_API_KEY`, `MISTRAL_API_KEY`, `OPENROUTER_API_KEY`, `CLOUDFLARE_API_TOKEN` (+ `CLOUDFLARE_ACCOUNT_ID`) — **one key per provider** |
 
 Backup (strongly recommended — the corpus cannot be rebuilt retroactively):
 

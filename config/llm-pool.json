@@ -6,41 +6,91 @@
       "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
       "key_env": "GEMINI_API_KEY",
       "enabled": true,
-      "models": { "strong": "gemini-3.5-flash", "small": "gemini-3.5-flash-lite" },
-      "limits": { "rpm": 8, "rpd": 200 },
-      "extra": { "strong": { "reasoning_effort": "none" } }
+      "models": {
+        "strong": "gemini-3.5-flash",
+        "small": "gemini-3.5-flash-lite"
+      },
+      "limits": {
+        "rpm": 8,
+        "rpd": 200
+      },
+      "extra": {
+        "strong": {
+          "reasoning_effort": "none"
+        }
+      }
     },
     {
       "id": "groq",
       "base_url": "https://api.groq.com/openai/v1",
       "key_env": "GROQ_API_KEY",
       "enabled": true,
-      "models": { "strong": "llama-3.3-70b-versatile", "small": "llama-3.1-8b-instant" },
-      "limits": { "rpm": 25, "rpd": 900 }
+      "models": {
+        "strong": "openai/gpt-oss-120b",
+        "small": "openai/gpt-oss-20b"
+      },
+      "limits": {
+        "rpm": 25,
+        "rpd": 900
+      }
     },
     {
       "id": "cerebras",
       "base_url": "https://api.cerebras.ai/v1",
       "key_env": "CEREBRAS_API_KEY",
-      "enabled": true,
-      "models": { "strong": "gpt-oss-120b", "small": "llama3.1-8b" },
-      "limits": { "rpm": 25, "rpd": 900 }
+      "enabled": false,
+      "models": {
+        "strong": "gpt-oss-120b",
+        "small": "llama3.1-8b"
+      },
+      "limits": {
+        "rpm": 25,
+        "rpd": 900
+      },
+      "_note": "DISABLED 2026-09: Cerebras ended its permanent free tier (July–Aug 2026); it is now a card-required $5/30-day trial, which the no-paid-tiers decision excludes."
     },
     {
       "id": "mistral",
       "base_url": "https://api.mistral.ai/v1",
       "key_env": "MISTRAL_API_KEY",
       "enabled": true,
-      "models": { "strong": "mistral-medium-latest", "small": "mistral-small-latest" },
-      "limits": { "rpm": 20, "rpd": 500 }
+      "models": {
+        "strong": "mistral-medium-latest",
+        "small": "mistral-small-latest"
+      },
+      "limits": {
+        "rpm": 20,
+        "rpd": 500
+      }
     },
     {
       "id": "openrouter",
       "base_url": "https://openrouter.ai/api/v1",
       "key_env": "OPENROUTER_API_KEY",
       "enabled": true,
-      "models": { "strong": "meta-llama/llama-3.3-70b-instruct:free", "small": "meta-llama/llama-3.3-70b-instruct:free" },
-      "limits": { "rpm": 15, "rpd": 45 }
+      "models": {
+        "strong": "nvidia/nemotron-3-super-120b-a12b:free",
+        "small": "google/gemma-4-31b-it:free"
+      },
+      "limits": {
+        "rpm": 15,
+        "rpd": 45
+      }
+    },
+    {
+      "id": "cloudflare",
+      "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+      "key_env": "CLOUDFLARE_API_TOKEN",
+      "enabled": true,
+      "models": {
+        "strong": "@cf/openai/gpt-oss-120b",
+        "small": "@cf/openai/gpt-oss-20b"
+      },
+      "limits": {
+        "rpm": 20,
+        "rpd": 40
+      },
+      "_note": "Workers AI: 10,000 neurons/day (~50K tokens on a large model) — a small top-up, not a workhorse. Needs CLOUDFLARE_ACCOUNT_ID too. Model ids unverified until `npm run llm:eval cloudflare` passes."
     }
   ]
 }

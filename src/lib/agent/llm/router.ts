@@ -1,7 +1,7 @@
 import { logger } from "../../capture/logger";
 import { assertPromptClean } from "../privacy";
 import { callOpenAiCompat, type FetchFn } from "./openaiCompat";
-import { availableProviders, loadPool, type PoolConfig } from "./pool";
+import { availableProviders, loadPool, resolveBaseUrl, type PoolConfig } from "./pool";
 import { QuotaTracker } from "./quota";
 import { MalformedCompletionError, PoolExhaustedError, RateLimitedError, type JsonLlm, type JsonRequest, type JsonResult } from "./types";
 
@@ -57,7 +57,7 @@ export class PooledLlm implements JsonLlm {
       this.quota.record(p.id);
       try {
         const out = await callOpenAiCompat(
-          { providerId: p.id, baseUrl: p.base_url, apiKey: this.getEnv(p.key_env)!, model, system, user: req.user, maxTokens: req.maxTokens ?? 2000, extraBody: p.extra?.[req.tier] },
+          { providerId: p.id, baseUrl: resolveBaseUrl(p.base_url, this.getEnv)!, apiKey: this.getEnv(p.key_env)!, model, system, user: req.user, maxTokens: req.maxTokens ?? 2000, extraBody: p.extra?.[req.tier] },
           this.fetchFn,
         );
         return { data: out.data, provider: p.id, model, inputTokens: out.inputTokens, outputTokens: out.outputTokens };

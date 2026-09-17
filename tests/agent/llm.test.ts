@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { loadPool, parsePool, availableProviders } from "@/lib/agent/llm/pool";
+import { loadPool, parsePool, availableProviders, resolveBaseUrl } from "@/lib/agent/llm/pool";
 import { QuotaTracker } from "@/lib/agent/llm/quota";
 import { PooledLlm } from "@/lib/agent/llm/router";
 import { extractJson, type FetchFn } from "@/lib/agent/llm/openaiCompat";
@@ -30,6 +30,13 @@ describe("pool config", () => {
     const p = pool.providers[0];
     expect(() => parsePool({ providers: [p, { ...p, id: "a2" }] })).toThrow(/one key per provider/);
   });
+  it("expands ${VARS} in a base url and hides the provider until they are set", () => {
+    const cf = parsePool({ providers: [{ ...pool.providers[0], base_url: "https://api.test/accounts/${ACCT_ID}/v1" }] });
+    expect(availableProviders(cf, env(["A_KEY"]))).toHaveLength(0);
+    expect(availableProviders(cf, env(["A_KEY", "ACCT_ID"]))).toHaveLength(1);
+    expect(resolveBaseUrl("https://api.test/accounts/${ACCT_ID}/v1", () => "42")).toBe("https://api.test/accounts/42/v1");
+  });
+
   it("only providers with a key are available", () => {
     expect(availableProviders(pool, env(["B_KEY"])).map((p) => p.id)).toEqual(["b"]);
   });

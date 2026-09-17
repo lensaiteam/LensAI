@@ -6,18 +6,6 @@
    Depends on the tokens in landing.css (.lp.light) and globals.css.
    ============================================================ */
 
-/* ── line-set headlines ── */
-.ln { display: block; overflow: hidden; padding-bottom: 0.09em; margin-bottom: -0.09em; }
-.ln-in { display: block; will-change: transform; }
-.display em.dim { font-style: italic; font-weight: 440; letter-spacing: -0.05em; }
-
-/* ── registration marks ── */
-.marks i { position: absolute; width: 11px; height: 11px; pointer-events: none; }
-.marks i:nth-child(1) { top: -6px; left: -6px; border-top: 1px solid var(--txt); border-left: 1px solid var(--txt); }
-.marks i:nth-child(2) { top: -6px; right: -6px; border-top: 1px solid var(--txt); border-right: 1px solid var(--txt); }
-.marks i:nth-child(3) { bottom: -6px; left: -6px; border-bottom: 1px solid var(--txt); border-left: 1px solid var(--txt); }
-.marks i:nth-child(4) { bottom: -6px; right: -6px; border-bottom: 1px solid var(--txt); border-right: 1px solid var(--txt); }
-
 /* ── claim-type tags (shared: hero brief, stance) ── */
 .bs-tag { display: inline-block; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; padding: 4px 7px; border: 1px solid var(--txt); color: var(--txt); white-space: nowrap; line-height: 1; }
 .bs-tag.mechanical { background: var(--txt); color: var(--void); }

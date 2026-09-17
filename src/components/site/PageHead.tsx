@@ -1,8 +1,10 @@
+import { LineReveal } from "@/components/landing/kit";
+
 export function PageHead({ index, kicker, title, sub }: { index: string; kicker: string; title: string; sub?: string }) {
   return (
     <header className="page-head">
       <span className="kicker">{index} / {kicker}</span>
-      <h1 className="display">{title}</h1>
+      <LineReveal className="display" lines={[title]} />
       {sub && <p className="page-sub">{sub}</p>}
     </header>
   );

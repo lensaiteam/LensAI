@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteShell } from "@/components/site/SiteShell";
 import { PageHead } from "@/components/site/PageHead";
+import { DocToc } from "@/components/site/DocToc";
 
 export const metadata: Metadata = {
   title: "Whitepaper — LensAI",
@@ -165,15 +166,20 @@ const SECTIONS: Sec[] = [
   },
 ];
 
+const slug = (h: string) => h.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const TOC = SECTIONS.map((s, i) => ({ id: s.id ?? slug(s.h), n: String(i + 1).padStart(2, "0"), label: s.h }));
+
 export default function Whitepaper() {
   return (
     <SiteShell>
       <div className="subpage lp-wrap">
         <PageHead index="02" kicker="Whitepaper" title="Read the signal, not the noise." sub="A research instrument for crypto: decision-grade analysis synthesized from live market data and current news, and deliberately never financial advice. This paper describes how it works." />
 
+        <div className="doc-wrap">
+        <DocToc items={TOC} />
         <div className="doc">
           {SECTIONS.map((s, i) => (
-            <section className="doc-sec" key={s.h} id={s.id}>
+            <section className="doc-sec" key={s.h} id={TOC[i].id}>
               <span className="doc-n mono">{String(i + 1).padStart(2, "0")}</span>
               <div className="doc-body">
                 <h2 className="display">{s.h}</h2>
@@ -186,6 +192,7 @@ export default function Whitepaper() {
               </div>
             </section>
           ))}
+        </div>
         </div>
 
         <div className="doc-cta">

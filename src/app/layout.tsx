@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Arimo } from "next/font/google";
-import { GeistSans } from "geist/font/sans";
+import localFont from "next/font/local";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Type system (Bécane reference): a neutral Helvetica-like grotesque for
-// display — Arimo is a Helvetica/Arial metric clone; the stack still prefers
-// real Helvetica Neue where installed. Geist for UI/body, JetBrains for data.
-const jbmono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
-const arimo = Arimo({ subsets: ["latin"], variable: "--font-display", display: "swap", weight: ["400", "500", "600", "700"] });
+// Type system: ONE well-drawn Swiss neo-grotesque for display + text, self-hosted so
+// it renders identically on every OS (the old stack fell through to an Arial clone
+// on Windows). Switzer is variable (100–900), which lets display sit at an in-between
+// weight instead of a blunt bold. Geist Mono carries data and placard labels.
+const switzer = localFont({
+  src: [
+    { path: "./fonts/Switzer-Variable.woff2", style: "normal", weight: "100 900" },
+    { path: "./fonts/Switzer-VariableItalic.woff2", style: "italic", weight: "100 900" },
+  ],
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "LensAI — Crypto Token Analysis",
@@ -19,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${jbmono.variable} ${arimo.variable}`}>
+    <html lang="en" className={`${switzer.variable} ${GeistMono.variable}`}>
       <body>
         <Providers>{children}</Providers>
       </body>

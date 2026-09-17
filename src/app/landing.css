@@ -57,7 +57,7 @@
 /* ── Atoms ── */
 .mono { font-family: var(--font-mono-stack); }
 .kicker { font-family: var(--font-mono-stack); font-size: 11.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mut); }
-.display { font-family: var(--font-display-stack); font-weight: 600; line-height: 1.03; letter-spacing: -0.025em; text-wrap: balance; }
+.display { font-family: var(--font-display-stack); font-weight: var(--w-display); line-height: 1.0; letter-spacing: var(--track-display); text-wrap: balance; }
 .tlink { font-family: var(--font-sans-stack); font-size: 15px; font-weight: 500; color: var(--txt); display: inline-flex; align-items: center; gap: 10px; cursor: pointer; background: none; border: none; padding: 0; position: relative; }
 .tlink::after { content: ""; position: absolute; left: 0; right: 20px; bottom: -6px; height: 1px; background: var(--txt); transform: scaleX(0); transform-origin: left; transition: transform 0.4s var(--ease); }
 .tlink:hover::after { transform: scaleX(1); }
@@ -74,8 +74,6 @@
   border-bottom: 1px solid transparent;
 }
 .lp-nav.stuck { background: var(--nav-bg); backdrop-filter: blur(16px); border-color: var(--hair-soft); }
-.tgl { font-family: var(--font-mono-stack); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sec); background: none; border: 1px solid var(--hair); padding: 6px 12px; border-radius: 100px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
-.tgl:hover { color: var(--txt); border-color: var(--sec); }
 .brand { display: flex; align-items: center; gap: 12px; color: var(--txt); font-weight: 600; font-size: 16px; letter-spacing: -0.02em; }
 .brand .glyph { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--gold); position: relative; }
 .brand .glyph::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: var(--gold); }
@@ -91,7 +89,7 @@
 .hero-lower { display: grid; grid-template-columns: 1.1fr 400px; gap: clamp(32px, 5vw, 76px); align-items: center; }
 @media (max-width: 900px) { .hero-lower { grid-template-columns: 1fr; gap: 44px; } .deck { max-width: 460px; } }
 .hero-lower .col { max-width: none; }
-.hero .col h1 { font-size: clamp(40px, 5.6vw, 84px); line-height: 1.0; letter-spacing: -0.03em; margin: 0 0 26px; }
+.hero .col h1 { font-size: clamp(40px, 5.6vw, 84px); line-height: 0.98; letter-spacing: var(--track-display); margin: 0 0 26px; }
 .hero .col h1 .dim { color: var(--mut); }
 .hero-lower p { font-size: clamp(15px, 1.2vw, 18px); color: var(--sec); line-height: 1.62; max-width: 46ch; }
 .hero-lower .cta { margin-top: 28px; }
@@ -195,7 +193,7 @@
 }
 
 /* ── Coin badges (real crypto brand colour = life) ── */
-.coin { border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; font-family: var(--font-mono-stack); font-weight: 700; color: #fff; position: relative; }
+.coin { border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; font-family: var(--font-mono-stack); font-weight: var(--w-head); color: #fff; position: relative; }
 .coin span { line-height: 1; }
 
 /* Hero coin rail — fills the lower hero + previews the feature */
@@ -220,7 +218,7 @@
 /* Intro — centered headline, a little above middle */
 .stage-intro { position: absolute; top: 20%; left: 0; right: 0; z-index: 3; text-align: center; padding: 0 24px; }
 .stage-intro .kicker { display: block; margin-bottom: clamp(16px, 2.4vh, 26px); }
-.stage-intro h1 { font-size: clamp(42px, 7.2vw, 108px); font-weight: 700; line-height: 0.97; letter-spacing: -0.035em; margin: 0; }
+.stage-intro h1 { font-size: clamp(42px, 7.2vw, 108px); font-weight: var(--w-display); line-height: 0.95; letter-spacing: var(--track-display); margin: 0; }
 .stage-intro h1 .dim { color: var(--mut); }
 .stage-hint { position: absolute; left: 0; right: 0; bottom: clamp(40px, 7vh, 74px); z-index: 3; text-align: center; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mut); pointer-events: none; }
 
@@ -246,7 +244,7 @@
 .aside-rows .up { color: var(--pos); } .aside-rows .dn { color: var(--neg); }
 .aside-sig { width: 100%; height: 32px; display: block; margin-top: 12px; }
 .aside-stat { display: flex; flex-direction: column; gap: 3px; }
-.aside-stat b { font-size: 36px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+.aside-stat b { font-size: 36px; font-weight: var(--w-head); letter-spacing: -0.03em; line-height: 1; }
 .aside-stat span { font-size: 11.5px; color: var(--sec); }
 .aside-split { display: flex; gap: 13px; margin-top: 15px; font-family: var(--font-mono-stack); font-size: 12px; }
 .aside-split .pos { color: var(--pos); } .aside-split .mix { color: var(--warn); } .aside-split .neg { color: var(--neg); }
@@ -294,7 +292,7 @@
 .coin.big span { font-size: clamp(56px, 8vw, 78px); }
 .stage-detail { position: static; }
 .stage-detail > div { max-width: 460px; margin: 0 auto; }
-.stage-detail .tk { font-size: clamp(22px, 2.4vw, 32px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+.stage-detail .tk { font-size: clamp(22px, 2.4vw, 32px); font-weight: var(--w-head); letter-spacing: -0.02em; line-height: 1.05; }
 .stage-detail .tk span { color: var(--mut); font-weight: 400; }
 .stage-detail .crux { font-weight: 400; font-size: clamp(15px, 1.35vw, 18px); line-height: 1.5; letter-spacing: -0.005em; color: var(--sec); margin: 12px auto 18px; max-width: 40ch; text-wrap: balance; }
 .stage-detail .facts { display: flex; justify-content: center; gap: clamp(16px, 2.6vw, 36px); flex-wrap: wrap; }
@@ -450,7 +448,6 @@
 .nav-pill .brand { text-transform: none; letter-spacing: -0.01em; font-size: 15px; font-weight: 600; }
 .nav-pill .navlink { font-family: var(--font-mono-stack); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--txt); }
 .nav-pill .navlink:hover { color: var(--mut); }
-.nav-pill .tgl { border-radius: 100px; }
 .nav-pill .navcta { background: var(--txt); color: var(--void); padding: 9px 16px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; font-weight: 500; }
 .nav-pill .navcta::after { display: none; }
 .lp .nav-pill .navcta .a { color: var(--void); }
@@ -479,7 +476,7 @@
 .flow-grid { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: clamp(28px, 4vw, 64px); align-items: center; }
 @media (max-width: 940px) { .flow-grid { grid-template-columns: 1fr; gap: 48px; } }
 .flow-copy .kicker { display: block; margin-bottom: 20px; }
-.flow-copy h2 { font-size: clamp(30px, 3.8vw, 56px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.0; margin: 0 0 22px; }
+.flow-copy h2 { font-size: clamp(30px, 3.8vw, 56px); font-weight: var(--w-display); letter-spacing: -0.04em; line-height: 1.0; margin: 0 0 22px; }
 .flow-copy h2 .accent { color: var(--accent); }
 .flow-copy h2 .dim { color: var(--mut); }
 .flow-copy p { font-size: clamp(15px, 1.2vw, 17.5px); line-height: 1.6; color: var(--sec); max-width: 46ch; }
@@ -511,7 +508,7 @@
 .report-brand .glyph { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--accent); position: relative; }
 .report-brand .glyph::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--accent); }
 .report-tag { font-size: 9.5px; letter-spacing: 0.1em; color: var(--mut); border: 1px solid var(--hair); padding: 3px 7px; }
-.report-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; padding: 14px 16px 6px; }
+.report-title { font-size: 15px; font-weight: var(--w-head); letter-spacing: -0.02em; padding: 14px 16px 6px; }
 .report-rows { padding: 0 16px 12px; }
 .report-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--hair-soft); }
 .report-row:first-child { border-top: none; }

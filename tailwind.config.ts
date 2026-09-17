@@ -36,7 +36,7 @@ const config: Config = {
         // No serif in the system — display uses the grotesk sans.
         serif: ["var(--font-sans)", "system-ui", "sans-serif"],
         sans: ["var(--font-sans)", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
-        mono: ["var(--font-mono)", "ui-monospace", "SF Mono", "Menlo", "monospace"],
+        mono: ["var(--font-geist-mono)", "ui-monospace", "SF Mono", "Menlo", "monospace"],
       },
       maxWidth: { content: "1180px" },
       transitionTimingFunction: { brand: "cubic-bezier(0.16,1,0.3,1)" },

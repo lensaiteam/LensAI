@@ -37,14 +37,20 @@
   --glow-aqua: rgba(51, 224, 196, 0.32);
   --glow-iris: rgba(155, 140, 255, 0.3);
 
-  /* Type. Geist (via the `geist` package) exposes --font-geist-sans; JetBrains
-     Mono (next/font) exposes --font-mono. One grotesk for display + UI. */
-  /* Single typeface system (Bécane reference): Helvetica-Neue-like for both
-     display and body. Prefer real Helvetica Neue where installed, else the
-     Arimo webfont (Helvetica/Arial metric clone). JetBrains Mono for data. */
-  --font-sans: "Helvetica Neue", Helvetica, var(--font-display), Arial, sans-serif;
+  /* Type. Switzer (self-hosted, next/font/local → --font-display) for display +
+     text; Geist Mono (→ --font-geist-mono) for data and placard labels. The webfont
+     leads the stack so every OS renders the same letterforms. */
+  --font-sans: var(--font-display), "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-sans-stack: var(--font-sans);
-  --font-mono-stack: var(--font-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-mono-stack: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Display is set at an in-between weight with tight tracking — confident without
+     shouting. Small heads carry slightly more weight so they hold at text sizes. */
+  --w-display: 540;
+  --w-head: 600;
+  --w-strong: 600;
+  --track-display: -0.046em;
+  --track-head: -0.028em;
   --font-display-stack: var(--font-sans);
   /* "serif" is retained as the display alias (now the grotesk) so heading
      classes don't need renaming — there is no serif in this system. */

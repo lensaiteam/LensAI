@@ -7,7 +7,7 @@ export const NAV_PAGES = [
   { label: "Tokenomics", href: "/tokenomics" },
 ];
 
-export function SiteNav({ light, stuck, onToggle }: { light: boolean; stuck: boolean; onToggle: () => void }) {
+export function SiteNav({ stuck }: { stuck: boolean }) {
   return (
     <nav className={`lp-nav${stuck ? " stuck" : ""}`}>
       <div className="nav-pill">
@@ -17,7 +17,6 @@ export function SiteNav({ light, stuck, onToggle }: { light: boolean; stuck: boo
           <Link key={n.href} className="navlink" href={n.href}>{n.label}</Link>
         ))}
         <span className="nav-div" />
-        <button className="tgl" onClick={onToggle}>{light ? "Dark" : "Light"}</button>
         <Link className="tlink navcta" href="/app"><span>Open the desk</span><span className="a">→</span></Link>
       </div>
     </nav>

@@ -169,7 +169,7 @@ export default function Whitepaper() {
   return (
     <SiteShell>
       <div className="subpage lp-wrap">
-        <PageHead index="01" kicker="Whitepaper" title="Read the signal, not the noise." sub="A research instrument for crypto: decision-grade analysis synthesized from live market data and current news, and deliberately never financial advice. This paper describes how it works." />
+        <PageHead index="02" kicker="Whitepaper" title="Read the signal, not the noise." sub="A research instrument for crypto: decision-grade analysis synthesized from live market data and current news, and deliberately never financial advice. This paper describes how it works." />
 
         <div className="doc">
           {SECTIONS.map((s, i) => (

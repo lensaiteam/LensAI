@@ -86,7 +86,7 @@ export default function Roadmap() {
   return (
     <SiteShell>
       <div className="subpage lp-wrap">
-        <PageHead index="02" kicker="Roadmap" title="From instrument to network." sub="The build order is deliberate: get the live pipeline and the non-advisory read right first, decouple cost from users, then widen coverage and open the layer up. This is where we are and where we're going." />
+        <PageHead index="03" kicker="Roadmap" title="From instrument to network." sub="The build order is deliberate: get the live pipeline and the non-advisory read right first, decouple cost from users, then widen coverage and open the layer up. This is where we are and where we're going." />
 
         <div className="rm-principles">
           {PRINCIPLES.map((p, i) => (

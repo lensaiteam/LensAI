@@ -40,7 +40,7 @@ export default function Careers() {
   return (
     <SiteShell>
       <div className="subpage lp-wrap">
-        <PageHead index="04" kicker="Careers" title="Build the instrument." sub="LensAI is a small team obsessed with one idea: the live-data pipeline is the product. If that resonates, we'd like to meet you." />
+        <PageHead index="05" kicker="Careers" title="Build the instrument." sub="LensAI is a small team obsessed with one idea: the live-data pipeline is the product. If that resonates, we'd like to meet you." />
 
         <h2 className="tk-h display">How we work</h2>
         <div className="rm-principles">

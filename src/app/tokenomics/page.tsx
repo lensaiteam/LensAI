@@ -49,7 +49,7 @@ export default function Tokenomics() {
   return (
     <SiteShell>
       <div className="subpage lp-wrap">
-        <PageHead index="03" kicker="Tokenomics" title="$LENS — the unit of the desk." sub="A utility token for metering reads, governing coverage and funding the live pipeline. Figures below are illustrative and subject to change before any launch." />
+        <PageHead index="04" kicker="Tokenomics" title="$LENS — the unit of the desk." sub="A utility token for metering reads, governing coverage and funding the live pipeline. Figures below are illustrative and subject to change before any launch." />
 
         <div className="tk-supply">
           <div><span className="mono">TOTAL SUPPLY</span><b>1,000,000,000</b><span className="tk-tick mono">$LENS · fixed</span></div>

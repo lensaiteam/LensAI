@@ -21,7 +21,7 @@ export default function Agents({ params }: { params: { slug: string } }) {
     <SiteShell>
       <div className="subpage lp-wrap">
         <PageHead
-          index="02"
+          index="01"
           kicker="Agents"
           title="Nine agents. One desk."
           sub={`Each agent is a way of reaching what the engine has already measured. They share one rule: every connection is measured, mechanical, or labeled conjecture — and none of them will tell you what to do. ${["None", "One", "Two", "Three", "Four", "Five", "Six"][AGENTS.filter((a) => a.calls.value === "0").length]} of the nine cost no model call per question.`}

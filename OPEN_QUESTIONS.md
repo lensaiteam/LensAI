@@ -129,8 +129,8 @@ needs the corpus. The Docker image is unverified locally (no Docker on the dev b
 **Resolved.** Supabase (`db/migrations/0002_agent.sql`), never the capture SQLite:
 the corpus and `briefs` are append-only, so anything user-derived there could not be
 erased. Hence question-specific answers are not persisted to `briefs`; only
-user-agnostic shared briefs are. The migration is written but **not yet applied** to
-the hosted project.
+user-agnostic shared briefs are. Migration **applied to the hosted project 2026-09-17**
+and verified end to end (tables, both RPCs, tenancy, cascade on account deletion).
 
 ## Open
 

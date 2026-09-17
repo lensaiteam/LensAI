@@ -1,0 +1,45 @@
+{
+  "_note": "Free-tier LLM pool (agent phase decision: NO paid tiers, ONE key per provider). Model ids and limits churn — verify each provider's current free-tier limits + commercial-use terms before go-live, then run `npm run llm:eval` to admit models. Limits here are deliberately conservative.",
+  "providers": [
+    {
+      "id": "gemini",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "key_env": "GEMINI_API_KEY",
+      "enabled": true,
+      "models": { "strong": "gemini-2.5-flash", "small": "gemini-2.5-flash-lite" },
+      "limits": { "rpm": 8, "rpd": 200 }
+    },
+    {
+      "id": "groq",
+      "base_url": "https://api.groq.com/openai/v1",
+      "key_env": "GROQ_API_KEY",
+      "enabled": true,
+      "models": { "strong": "llama-3.3-70b-versatile", "small": "llama-3.1-8b-instant" },
+      "limits": { "rpm": 25, "rpd": 900 }
+    },
+    {
+      "id": "cerebras",
+      "base_url": "https://api.cerebras.ai/v1",
+      "key_env": "CEREBRAS_API_KEY",
+      "enabled": true,
+      "models": { "strong": "gpt-oss-120b", "small": "llama3.1-8b" },
+      "limits": { "rpm": 25, "rpd": 900 }
+    },
+    {
+      "id": "mistral",
+      "base_url": "https://api.mistral.ai/v1",
+      "key_env": "MISTRAL_API_KEY",
+      "enabled": true,
+      "models": { "strong": "mistral-medium-latest", "small": "mistral-small-latest" },
+      "limits": { "rpm": 20, "rpd": 500 }
+    },
+    {
+      "id": "openrouter",
+      "base_url": "https://openrouter.ai/api/v1",
+      "key_env": "OPENROUTER_API_KEY",
+      "enabled": true,
+      "models": { "strong": "meta-llama/llama-3.3-70b-instruct:free", "small": "meta-llama/llama-3.3-70b-instruct:free" },
+      "limits": { "rpm": 15, "rpd": 45 }
+    }
+  ]
+}

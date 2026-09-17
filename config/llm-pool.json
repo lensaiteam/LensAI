@@ -6,9 +6,9 @@
       "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
       "key_env": "GEMINI_API_KEY",
       "enabled": true,
-      "models": { "strong": "gemini-2.5-flash", "small": "gemini-2.5-flash-lite" },
+      "models": { "strong": "gemini-3.5-flash", "small": "gemini-3.5-flash-lite" },
       "limits": { "rpm": 8, "rpd": 200 },
-      "extra": { "reasoning_effort": "none" }
+      "extra": { "strong": { "reasoning_effort": "none" } }
     },
     {
       "id": "groq",

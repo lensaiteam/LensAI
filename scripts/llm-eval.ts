@@ -24,13 +24,14 @@ async function main(): Promise<void> {
   let failed = false;
   for (const p of providers) {
     console.log(`\n${p.id}  (strong: ${p.models.strong} · small: ${p.models.small})`);
-    const results = await runAdmission(new PooledLlm({ pool: { providers: [p] } }));
+    const results = await runAdmission(new PooledLlm({ pool: { providers: [p] }, benchOnError: false }));
     for (const r of results) {
       console.log(`  ${r.pass ? "PASS" : "FAIL"}  ${r.name}${r.pass ? "" : `  — ${r.detail}`}`);
       if (!r.pass) failed = true;
     }
   }
-  process.exit(failed ? 1 : 0);
+  // exitCode (not exit()): lets open sockets drain — avoids a libuv assertion on Windows.
+  process.exitCode = failed ? 1 : 0;
 }
 
 main().catch((e) => {

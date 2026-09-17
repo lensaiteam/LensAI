@@ -22,6 +22,8 @@ export interface RouterOptions {
   getEnv?: (name: string) => string | undefined;
   /** Identifiers that must never appear in a prompt (wallet, email, chat id). */
   forbidden?: () => string[];
+  /** false = never bench a provider on error (the admission eval: one bad case must not starve the rest). */
+  benchOnError?: boolean;
 }
 
 export class PooledLlm implements JsonLlm {
@@ -30,6 +32,7 @@ export class PooledLlm implements JsonLlm {
   private readonly fetchFn?: FetchFn;
   private readonly getEnv: (name: string) => string | undefined;
   private readonly forbidden: () => string[];
+  private readonly benchOnError: boolean;
 
   constructor(opts: RouterOptions = {}) {
     this.pool = opts.pool ?? loadPool();
@@ -37,6 +40,7 @@ export class PooledLlm implements JsonLlm {
     this.fetchFn = opts.fetchFn;
     this.getEnv = opts.getEnv ?? ((n) => process.env[n]);
     this.forbidden = opts.forbidden ?? (() => []);
+    this.benchOnError = opts.benchOnError ?? true;
   }
 
   async generateJson(req: JsonRequest): Promise<JsonResult> {
@@ -53,14 +57,14 @@ export class PooledLlm implements JsonLlm {
       this.quota.record(p.id);
       try {
         const out = await callOpenAiCompat(
-          { providerId: p.id, baseUrl: p.base_url, apiKey: this.getEnv(p.key_env)!, model, system, user: req.user, maxTokens: req.maxTokens ?? 2000, extraBody: p.extra },
+          { providerId: p.id, baseUrl: p.base_url, apiKey: this.getEnv(p.key_env)!, model, system, user: req.user, maxTokens: req.maxTokens ?? 2000, extraBody: p.extra?.[req.tier] },
           this.fetchFn,
         );
         return { data: out.data, provider: p.id, model, inputTokens: out.inputTokens, outputTokens: out.outputTokens };
       } catch (e) {
         const msg = (e as Error).message;
         attempts.push({ provider: p.id, error: msg });
-        if (!(e instanceof MalformedCompletionError)) this.quota.cooldown(p.id, e instanceof RateLimitedError ? e.retryAfterMs : ERROR_BENCH_MS);
+        if (this.benchOnError && !(e instanceof MalformedCompletionError)) this.quota.cooldown(p.id, e instanceof RateLimitedError ? e.retryAfterMs : ERROR_BENCH_MS);
         logger.warn("llm provider failed; failing over", { provider: p.id, model, error: msg });
       }
     }

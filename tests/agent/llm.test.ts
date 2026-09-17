@@ -83,6 +83,24 @@ describe("router", () => {
     expect(quota.canUse("a", { rpm: 2, rpd: 5 })).toBe(false); // cooling down
   });
 
+  it("sends per-tier body extras and retries a transient 5xx once before failing over", async () => {
+    const tiered = parsePool({ providers: [{ ...pool.providers[0], extra: { strong: { reasoning_effort: "none" } } }] });
+    const bodies: Record<string, unknown>[] = [];
+    let n = 0;
+    const fetchFn: FetchFn = async (url, init) => {
+      bodies.push(JSON.parse(init.body) as Record<string, unknown>);
+      if (n++ === 0) return { ok: false, status: 503, headers: { get: () => null }, text: async () => "busy" };
+      return okFetch({ v: 1 })(url, init);
+    };
+    const llm = new PooledLlm({ pool: tiered, fetchFn, getEnv: env(["A_KEY"]) });
+    const r = await llm.generateJson({ system: "s", user: "u", tier: "strong" });
+    expect(r.provider).toBe("a"); // same provider, second attempt
+    expect(bodies).toHaveLength(2);
+    expect(bodies[0].reasoning_effort).toBe("none");
+    await llm.generateJson({ system: "s", user: "u", tier: "small" });
+    expect(bodies[2].reasoning_effort).toBeUndefined();
+  });
+
   it("honours exclude, and throws PoolExhaustedError when nothing is left", async () => {
     const llm = new PooledLlm({ pool, fetchFn: okFetch({}), getEnv: env(["A_KEY"]) });
     await expect(llm.generateJson({ system: "s", user: "u", tier: "small", exclude: ["a"] })).rejects.toBeInstanceOf(PoolExhaustedError);

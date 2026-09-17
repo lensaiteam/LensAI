@@ -110,6 +110,8 @@ export async function planQuestion(llm: JsonLlm, question: string, opts: { known
     if (!parsed.success) return { plan: h.plan, via: "heuristic-fallback", llmCalls: 1 };
     const known = new Set(opts.knownAssets.map((a) => a.toUpperCase()));
     const assets = parsed.data.assets.map((a) => a.toUpperCase()).filter((a) => known.has(a));
+    // A "market" read that names an asset IS a token read in market context.
+    if (parsed.data.intent === "market" && assets.length) parsed.data.intent = "token";
     return { plan: { ...parsed.data, assets, focus: parsed.data.focus ?? (parsed.data.intent === "token" || parsed.data.intent === "market" ? null : question) }, via: "model", llmCalls: 1 };
   } catch (e) {
     if (e instanceof PoolExhaustedError) return { plan: h.plan, via: "heuristic-fallback", llmCalls: 0 };

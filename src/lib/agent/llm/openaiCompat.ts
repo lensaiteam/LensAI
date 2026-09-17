@@ -26,6 +26,8 @@ export interface CompatCall {
   /** Provider-specific body extras from the pool config. */
   extraBody?: Record<string, unknown>;
   timeoutMs?: number;
+  /** Pause before the single retry of a 5xx (free tiers shed load with 503s). 0 disables the retry. */
+  retryDelayMs?: number;
 }
 
 export interface CompatResult {
@@ -45,7 +47,7 @@ export function extractJson(text: string): unknown {
 }
 
 export async function callOpenAiCompat(call: CompatCall, fetchFn: FetchFn = fetch as unknown as FetchFn): Promise<CompatResult> {
-  const res = await fetchFn(`${call.baseUrl.replace(/\/$/, "")}/chat/completions`, {
+  const send = () => fetchFn(`${call.baseUrl.replace(/\/$/, "")}/chat/completions`, {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${call.apiKey}` },
     body: JSON.stringify({
@@ -61,6 +63,13 @@ export async function callOpenAiCompat(call: CompatCall, fetchFn: FetchFn = fetc
     }),
     signal: AbortSignal.timeout(call.timeoutMs ?? 45_000),
   });
+
+  let res = await send();
+  const retryDelay = call.retryDelayMs ?? 1500;
+  if (res.status >= 500 && retryDelay > 0) {
+    await new Promise((r) => setTimeout(r, retryDelay));
+    res = await send();
+  }
 
   if (res.status === 429) {
     const ra = Number(res.headers.get("retry-after"));

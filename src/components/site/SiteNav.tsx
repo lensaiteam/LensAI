@@ -2,6 +2,7 @@
 import Link from "next/link";
 
 export const NAV_PAGES = [
+  { label: "Agents", href: "/agents" },
   { label: "Whitepaper", href: "/whitepaper" },
   { label: "Roadmap", href: "/roadmap" },
   { label: "Tokenomics", href: "/tokenomics" },

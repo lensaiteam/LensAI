@@ -4,6 +4,7 @@ const COLS: { title: string; links: { label: string; href: string; ext?: boolean
   {
     title: "Product",
     links: [
+      { label: "Agents", href: "/agents" },
       { label: "Whitepaper", href: "/whitepaper" },
       { label: "Roadmap", href: "/roadmap" },
       { label: "Tokenomics", href: "/tokenomics" },

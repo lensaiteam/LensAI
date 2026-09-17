@@ -518,3 +518,7 @@
 .rr-bar i { position: absolute; inset: 0 auto 0 0; background: var(--txt); }
 .rr-chev { color: var(--mut); font-size: 15px; line-height: 1; }
 @media (max-width: 540px) { .rr-bar { width: 44px; } }
+
+/* The site is committed to the bone-white theme: keep the page ground light even
+   where .lp does not reach (overscroll, short pages). */
+html:has(.lp.light), body:has(.lp.light) { background: #f6f6f6; }

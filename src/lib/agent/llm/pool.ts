@@ -16,6 +16,8 @@ const providerSchema = z.object({
   enabled: z.boolean().optional(),
   models: z.object({ strong: z.string().min(1), small: z.string().min(1) }),
   limits: z.object({ rpm: z.number().int().positive(), rpd: z.number().int().positive() }),
+  /** Provider-specific request-body extras (e.g. switch off hidden reasoning that eats the output budget). */
+  extra: z.record(z.unknown()).optional(),
 });
 
 export const poolSchema = z

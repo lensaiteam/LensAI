@@ -50,6 +50,14 @@ export class RateLimitedError extends Error {
   }
 }
 
+/** The provider answered, but not with usable JSON — fail over, but do NOT bench it like an outage. */
+export class MalformedCompletionError extends Error {
+  constructor(public readonly provider: string, detail: string) {
+    super(`${provider} returned a malformed completion: ${detail}`);
+    this.name = "MalformedCompletionError";
+  }
+}
+
 /** Deterministic test double: answers from a queue (or a function of the request). */
 export class MockJsonLlm implements JsonLlm {
   public calls: JsonRequest[] = [];

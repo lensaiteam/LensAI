@@ -34,7 +34,7 @@ export class PoolNarrateProvider implements LlmProvider {
   get name(): string { return `pool:${this.last}`; }
   get lastProvider(): string { return this.last; }
   async generate(req: NarrateRequest): Promise<unknown> {
-    const res = await this.llm.generateJson({ tier: "strong", system: req.system, user: req.context, shapeHint: BRIEF_SHAPE, maxTokens: 2500, exclude: this.opts.exclude, forbid: this.opts.forbid });
+    const res = await this.llm.generateJson({ tier: "strong", system: req.system, user: req.context, shapeHint: BRIEF_SHAPE, maxTokens: 4000, exclude: this.opts.exclude, forbid: this.opts.forbid });
     this.last = res.provider;
     return res.data;
   }
@@ -194,7 +194,7 @@ export async function askAgent(deps: { db: DB; llm: JsonLlm }, input: AskInput):
     try {
       stage("generating", { attempt });
       llmCalls++;
-      const res = await llm.generateJson({ tier: "strong", system, user, shapeHint: BRIEF_SHAPE, maxTokens: 2500, exclude: [...exclude], forbid: input.forbid });
+      const res = await llm.generateJson({ tier: "strong", system, user, shapeHint: BRIEF_SHAPE, maxTokens: 4000, exclude: [...exclude], forbid: input.forbid });
       lastProvider = `pool:${res.provider}`;
       exclude.push(res.provider); // a failed verification retries on a DIFFERENT provider
       const parsed = briefSchema.safeParse(res.data);

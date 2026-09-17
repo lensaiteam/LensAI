@@ -31,6 +31,8 @@ export function buildSystemPrompt(surface: Surface): string {
     "not measured facts.",
     "",
     "OUTPUT — return the structured claims object only. Each claim: {text, basis, refs, numbers}.",
-    "Keep claims atomic (one assertion each) so each can be verified independently.",
+    "Keep claims atomic (one assertion each) so each can be verified independently. At most 10 claims.",
+    "Cite a mechanism edge ONLY where a measured state in the context makes that channel relevant right now —",
+    "never recite the mechanism graph. Lead with what is unusual versus history.",
   ].join("\n");
 }

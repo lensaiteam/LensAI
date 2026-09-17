@@ -3,7 +3,7 @@ import { assertPromptClean } from "../privacy";
 import { callOpenAiCompat, type FetchFn } from "./openaiCompat";
 import { availableProviders, loadPool, type PoolConfig } from "./pool";
 import { QuotaTracker } from "./quota";
-import { PoolExhaustedError, RateLimitedError, type JsonLlm, type JsonRequest, type JsonResult } from "./types";
+import { MalformedCompletionError, PoolExhaustedError, RateLimitedError, type JsonLlm, type JsonRequest, type JsonResult } from "./types";
 
 /**
  * Quota-aware router over the free pool. For each request: take the providers
@@ -53,14 +53,14 @@ export class PooledLlm implements JsonLlm {
       this.quota.record(p.id);
       try {
         const out = await callOpenAiCompat(
-          { providerId: p.id, baseUrl: p.base_url, apiKey: this.getEnv(p.key_env)!, model, system, user: req.user, maxTokens: req.maxTokens ?? 2000 },
+          { providerId: p.id, baseUrl: p.base_url, apiKey: this.getEnv(p.key_env)!, model, system, user: req.user, maxTokens: req.maxTokens ?? 2000, extraBody: p.extra },
           this.fetchFn,
         );
         return { data: out.data, provider: p.id, model, inputTokens: out.inputTokens, outputTokens: out.outputTokens };
       } catch (e) {
         const msg = (e as Error).message;
         attempts.push({ provider: p.id, error: msg });
-        this.quota.cooldown(p.id, e instanceof RateLimitedError ? e.retryAfterMs : ERROR_BENCH_MS);
+        if (!(e instanceof MalformedCompletionError)) this.quota.cooldown(p.id, e instanceof RateLimitedError ? e.retryAfterMs : ERROR_BENCH_MS);
         logger.warn("llm provider failed; failing over", { provider: p.id, model, error: msg });
       }
     }

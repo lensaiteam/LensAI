@@ -96,7 +96,7 @@ export async function checkClaims(deps: { db: DB; llm: JsonLlm }, rawText: strin
     system: SYSTEM,
     shapeHint: SHAPE,
     user: ["FACTS:", ...facts.map((f) => `  - ${f.ref} = ${f.value}  (${f.label})`), "MECHANISM EDGES:", ...edges.map((e) => `  - ${e.id}: ${e.src} ->(${e.polarity}) ${e.dst} — ${e.mechanism}`), "", "PASTED TEXT:", text].join("\n"),
-    maxTokens: 2500,
+    maxTokens: 4000,
     forbid: opts.forbid,
   });
   const parsed = extractedSchema.safeParse(res.data);

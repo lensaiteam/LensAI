@@ -36,7 +36,8 @@ export function computeChanges(db: DB, opts: { since: number; asOf?: number; ass
   const from = resolveComputedAnchor(db, opts.since);
   const empty = { flagsOpened: [], flagsCleared: [], regimeChanges: [], movers: [] };
   if (!to) return { from, to, ...empty, text: "No factor state has been computed yet." };
-  if (!from || from.as_of === to.as_of) {
+  if (!from) return { from, to, ...empty, text: `There is no computed state at or before ${iso(opts.since)} to compare against (latest anchor ${iso(to.as_of)}).` };
+  if (from.as_of === to.as_of) {
     return { from, to, ...empty, text: `No new computed state since ${iso(opts.since)} (latest anchor ${iso(to.as_of)}).` };
   }
 

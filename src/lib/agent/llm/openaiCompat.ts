@@ -1,4 +1,4 @@
-import { RateLimitedError } from "./types";
+import { MalformedCompletionError, RateLimitedError } from "./types";
 
 /**
  * One OpenAI-compatible chat-completions call in JSON mode. Every provider in the
@@ -23,6 +23,8 @@ export interface CompatCall {
   system: string;
   user: string;
   maxTokens: number;
+  /** Provider-specific body extras from the pool config. */
+  extraBody?: Record<string, unknown>;
   timeoutMs?: number;
 }
 
@@ -55,6 +57,7 @@ export async function callOpenAiCompat(call: CompatCall, fetchFn: FetchFn = fetc
       response_format: { type: "json_object" },
       max_tokens: call.maxTokens,
       temperature: 0.2,
+      ...call.extraBody,
     }),
     signal: AbortSignal.timeout(call.timeoutMs ?? 45_000),
   });
@@ -71,9 +74,15 @@ export async function callOpenAiCompat(call: CompatCall, fetchFn: FetchFn = fetc
     usage?: { prompt_tokens?: number; completion_tokens?: number };
   };
   const content = parsed.choices?.[0]?.message?.content;
-  if (!content) throw new Error(`${call.providerId} returned an empty completion`);
+  if (!content) throw new MalformedCompletionError(call.providerId, "empty completion");
+  let data: unknown;
+  try {
+    data = extractJson(content);
+  } catch (e) {
+    throw new MalformedCompletionError(call.providerId, (e as Error).message);
+  }
   return {
-    data: extractJson(content),
+    data,
     inputTokens: parsed.usage?.prompt_tokens ?? 0,
     outputTokens: parsed.usage?.completion_tokens ?? 0,
   };

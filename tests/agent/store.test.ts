@@ -61,7 +61,7 @@ describe("user store — export, erasure, retention", () => {
     await seed(store, A);
     await seed(store, B);
     await store.deleteAll(A);
-    const gone = (await store.exportAll(A)) as Record<string, unknown[] | Record<string, unknown>>;
+    const gone = await store.exportAll(A);
     expect(gone.conversations).toEqual([]);
     expect(gone.watches).toEqual([]);
     expect(gone.apiKeys).toEqual([]);

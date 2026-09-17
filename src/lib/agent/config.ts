@@ -32,8 +32,9 @@ export const agentConfig = Object.freeze({
   perMinuteLimit: () => intOpt("AGENT_PER_MINUTE_LIMIT", 20),
   maxWatchesPerUser: () => intOpt("AGENT_MAX_WATCHES", 10),
   conversationRetentionDays: () => intOpt("AGENT_RETENTION_DAYS", 90),
-  /** Derive loop (normalize → regimes → divergence → watches) cadence. */
-  deriveIntervalMs: () => intOpt("AGENT_DERIVE_INTERVAL_MS", 15 * 60_000),
+  /** Derive loop (normalize → regimes → divergence → brief → watches) cadence.
+   *  Default = the canonical hourly grid: one anchor, one shared brief, per hour. */
+  deriveIntervalMs: () => intOpt("AGENT_DERIVE_INTERVAL_MS", 60 * 60_000),
 
   // User-state store (Supabase). Absent => in-memory store (dev only; not durable).
   supabaseUrl: () => optional("SUPABASE_URL"),

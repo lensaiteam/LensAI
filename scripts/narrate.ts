@@ -5,6 +5,8 @@ import { narrate } from "../src/lib/narrate/orchestrator";
 import { persistBrief } from "../src/lib/narrate/briefs";
 import { defaultProvider } from "../src/lib/narrate/generate";
 import { MockProvider } from "../src/lib/narrate/provider";
+import { PoolNarrateProvider } from "../src/lib/agent/ask";
+import { PooledLlm } from "../src/lib/agent/llm/router";
 import { logger } from "../src/lib/capture/logger";
 
 /**
@@ -30,7 +32,13 @@ async function main(): Promise<void> {
 
   const db = getDb();
   runMigrations(db);
-  const provider = useMock ? new MockProvider({ headline: "(mock — no claims)", claims: [] }) : defaultProvider();
+  // Default = the free-tier pool (agent decision: no paid tiers). `--anthropic`
+  // keeps the original Claude provider available as an explicit opt-in.
+  const provider = useMock
+    ? new MockProvider({ headline: "(mock — no claims)", claims: [] })
+    : args.includes("--anthropic")
+      ? defaultProvider()
+      : new PoolNarrateProvider(new PooledLlm());
 
   const res = await narrate(db, provider, { surface, asset });
   persistBrief(db, res);

@@ -21,6 +21,8 @@
     "narrate": "tsx scripts/narrate.ts",
     "tools": "tsx scripts/tools-server.ts",
     "sera:gen": "tsx scripts/gen-sera-tools.ts",
+    "serve": "tsx scripts/serve.ts",
+    "llm:eval": "tsx scripts/llm-eval.ts",
     "backup": "tsx scripts/backup.ts",
     "test": "vitest run",
     "test:watch": "vitest"

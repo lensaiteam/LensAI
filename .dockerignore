@@ -1,0 +1,25 @@
+node_modules
+.next
+.git
+data
+backups
+*.db
+*.db-wal
+*.db-shm
+.env
+.env*.local
+tests
+docs
+brand
+public
+referential
+design-prototypes
+design-reference
+integrations
+Video Frame Extractor*
+*.mp4
+*.jpeg
+*.png
+*.docx
+src/app
+src/components

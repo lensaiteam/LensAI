@@ -1,0 +1,16 @@
+# Litestream config for the container deploy (deploy/start.sh). Values come from
+# the service's environment — nothing secret lives in this file.
+#   LITESTREAM_BUCKET              bucket name (S3 / Cloudflare R2 / Backblaze B2)
+#   LITESTREAM_ENDPOINT            S3-compatible endpoint (R2: https://<account>.r2.cloudflarestorage.com)
+#   LITESTREAM_ACCESS_KEY_ID       } read by litestream directly
+#   LITESTREAM_SECRET_ACCESS_KEY   }
+dbs:
+  - path: ${CAPTURE_DB_PATH}
+    replicas:
+      - type: s3
+        bucket: ${LITESTREAM_BUCKET}
+        path: lensai/capture
+        endpoint: ${LITESTREAM_ENDPOINT}
+        region: auto
+        retention: 720h
+        snapshot-interval: 6h

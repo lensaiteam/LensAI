@@ -8,6 +8,7 @@ import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { FirstLoginModal } from "@/components/FirstLoginModal";
 import { Markdown } from "@/components/Markdown";
 import { streamPost } from "@/lib/streamClient";
+import { PREVIEW_FLAGS, PREVIEW_MESSAGES, PREVIEW_SENTIMENT, PREVIEW_SNAP, PREVIEW_WALLET } from "./preview";
 import "./app.css";
 
 const QUICK = ["BTC", "ETH", "SOL", "XRP", "DOGE", "PEPE"];
@@ -28,22 +29,20 @@ const FOLLOWUPS: { label: string; prompt: string }[] = [
 // progress (goal-gradient), and showing the work builds trust
 // (the Labor Illusion, Buell & Norton 2011).
 const ANALYZE_STEPS = [
-  "Pulling live price, volume & 24h range…",
-  "Fetching market cap & circulating supply…",
-  "Scanning headlines for catalysts…",
-  "Checking CT sentiment…",
-  "Reading the LARP tweets…",
-  "Sniffing for rug & honeypot signals…",
-  "Sizing up the tokenomics…",
-  "Counting diamond hands vs paper hands…",
-  "Weighing the bull case against the bears…",
-  "Writing it up…",
+  "Resolving the ticker…",
+  "Pulling live price, volume and 24h range…",
+  "Fetching market cap and circulating supply…",
+  "Reading recent news…",
+  "Reading sentiment across sources…",
+  "Checking structural risk flags…",
+  "Reviewing supply and unlocks…",
+  "Setting the bull case against the bear case…",
+  "Writing the read…",
 ];
 const CHAT_STEPS = [
-  "Digging through the notes…",
-  "Re-reading the sentiment…",
-  "Checking what the tape says…",
-  "Connecting the dots…",
+  "Checking what was already gathered…",
+  "Re-reading the relevant section…",
+  "Writing the answer…",
 ];
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -677,6 +676,24 @@ function RiskFlags({ flags }: { flags: RiskFlag[] }) {
 export default function ResearchTerminal() {
   const { user, freeTier, loading, signingIn, signIn, signOut, error: authError, refresh } = useAuth();
 
+  // Development only: /app?preview=thread|empty renders the terminal with a specimen
+  // fixture so it can be styled without a wallet session. Unreachable in production.
+  const [preview, setPreview] = useState<"thread" | "empty" | null>(null);
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+    const p = new URLSearchParams(window.location.search).get("preview");
+    if (p === "thread" || p === "empty") setPreview(p);
+  }, []);
+  if (preview) {
+    return (
+      <div className="app-shell flex flex-col h-screen" style={{ background: "var(--bg)" }}>
+        <DisclaimerBanner />
+        <Topbar />
+        <Terminal walletAddress={PREVIEW_WALLET} freeTierRemaining={1} onUsed={() => {}} onSignOut={() => {}} preview={preview} />
+      </div>
+    );
+  }
+
   return (
     <div className="app-shell flex flex-col h-screen" style={{ background: "var(--bg)" }}>
       <DisclaimerBanner />
@@ -703,13 +720,17 @@ export default function ResearchTerminal() {
 function Topbar() {
   return (
     <div
-      className="h-[52px] flex items-center justify-between px-4 shrink-0"
+      className="app-top h-[56px] flex items-center justify-between px-5 shrink-0"
       style={{ background: "var(--bg2)", borderBottom: "1px solid var(--border)" }}
     >
-      <Link href="/" className="flex items-center gap-2.5">
-        <span className="app-glyph" />
-        <span className="font-bold text-[14px] tracking-tight">LensAI</span>
-      </Link>
+      <div className="tb-left">
+        <Link href="/" className="flex items-center gap-2.5">
+          <span className="app-glyph" />
+          <span className="tb-brand">LensAI</span>
+        </Link>
+        <span className="tb-tag">The desk</span>
+        <Link href="/agents" className="tb-link">Agents</Link>
+      </div>
       <ConnectButton showBalance={false} chainStatus="none" accountStatus="address" />
     </div>
   );
@@ -735,14 +756,12 @@ function SignInGate({
   const { isConnected } = useAccount();
   return (
     <div className="flex-1 flex items-center justify-center p-6">
-      <div
-        className="max-w-sm w-full text-center rounded-2xl p-8"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-      >
-        <div className="flex justify-center mb-4"><span className="app-mark" /></div>
-        <h1 className="text-lg font-bold mb-1.5 tracking-tight">Sign in with your wallet</h1>
-        <p className="text-sm mb-6" style={{ color: "var(--w2)" }}>
-          Connect MetaMask and sign a message to prove ownership. No transaction, no gas, no private keys.
+      <div className="gate-sheet">
+        <span className="marks" aria-hidden="true"><i /><i /><i /><i /></span>
+        <div className="gate-top"><span><i className="gate-dot" />Signature request</span><span>No gas · no transaction</span></div>
+        <h1 className="gate-title">Sign in with your wallet.</h1>
+        <p className="gate-sub">
+          Connect a wallet and sign one message to prove you own it. Nothing is sent on-chain, and no keys ever reach us.
         </p>
         <div className="flex flex-col items-center gap-3">
           <ConnectButton showBalance={false} chainStatus="none" accountStatus="full" />
@@ -768,22 +787,25 @@ function Terminal({
   freeTierRemaining,
   onUsed,
   onSignOut,
+  preview,
 }: {
   walletAddress: string;
   freeTierRemaining: number;
   onUsed: () => void;
   onSignOut: () => void;
+  preview?: "thread" | "empty";
 }) {
-  const [messages, setMessages] = useState<Msg[]>([]);
+  const seeded = preview === "thread";
+  const [messages, setMessages] = useState<Msg[]>(seeded ? PREVIEW_MESSAGES : []);
   const [streaming, setStreaming] = useState(false);
   const [streamText, setStreamText] = useState("");
   const [thinkKind, setThinkKind] = useState<"analyze" | "chat" | null>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [ticker, setTicker] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(seeded ? "preview" : null);
+  const [ticker, setTicker] = useState<string | null>(seeded ? "SPEC" : null);
   const [asOf, setAsOf] = useState<string | null>(null);
-  const [snap, setSnap] = useState<Snap | null>(null);
-  const [riskFlags, setRiskFlags] = useState<RiskFlag[] | null>(null);
-  const [sentiment, setSentiment] = useState<Sentiment | null>(null);
+  const [snap, setSnap] = useState<Snap | null>(seeded ? PREVIEW_SNAP : null);
+  const [riskFlags, setRiskFlags] = useState<RiskFlag[] | null>(seeded ? PREVIEW_FLAGS : null);
+  const [sentiment, setSentiment] = useState<Sentiment | null>(seeded ? PREVIEW_SENTIMENT : null);
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<Session[]>([]);
@@ -1227,14 +1249,10 @@ function Composer({
 // Playful openers, re-rolled on every fresh start. [before, accent, after] —
 // the accent word gets the red. Teasing but never advisory.
 const HEADS: [string, string, string][] = [
-  ["What's going ", "under the lens", "?"],
-  ["Point the lens at ", "something", "."],
-  ["Fresh eyes. ", "New token", "."],
-  ["Who are we ", "investigating", " today?"],
-  ["Name a ", "ticker", ". Any ticker."],
-  ["New coin on the ", "slab", "."],
-  ["Let's dig into ", "something new", "."],
-  ["Line up the next ", "suspect", "."],
+  ["What goes ", "under the lens", "?"],
+  ["Point the lens at ", "a token", "."],
+  ["Name a ticker. ", "Get a read", "."],
+  ["One token, ", "both cases", "."],
 ];
 
 function EmptyState({ onAnalyze, error }: { onAnalyze: (t: string) => void; error: string | null }) {

@@ -14,7 +14,7 @@ export function DisclaimerBanner() {
   return (
     <div
       className="w-full text-[11px] px-4 py-2 flex items-center justify-center gap-3 text-center"
-      style={{ background: "rgba(255,0,0,0.045)", borderBottom: "1px solid var(--border)", color: "var(--w2)" }}
+      style={{ background: "#fbfbfb", borderBottom: "1px solid var(--border)", color: "var(--w2)", letterSpacing: "-0.005em" }}
     >
       <span><span style={{ color: "var(--gold)" }}>●</span> {TEXT}</span>
       <button

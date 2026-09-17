@@ -57,7 +57,7 @@
 /* ── Atoms ── */
 .mono { font-family: var(--font-mono-stack); }
 .kicker { font-family: var(--font-mono-stack); font-size: 11.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mut); }
-.display { font-family: var(--font-display-stack); font-weight: var(--w-display); line-height: 1.0; letter-spacing: var(--track-display); text-wrap: balance; }
+.display { font-family: var(--font-display-stack); font-weight: var(--w-display); line-height: 1.0; letter-spacing: var(--track-display); word-spacing: 0.06em; text-wrap: balance; }
 .tlink { font-family: var(--font-sans-stack); font-size: 15px; font-weight: 500; color: var(--txt); display: inline-flex; align-items: center; gap: 10px; cursor: pointer; background: none; border: none; padding: 0; position: relative; }
 .tlink::after { content: ""; position: absolute; left: 0; right: 20px; bottom: -6px; height: 1px; background: var(--txt); transform: scaleX(0); transform-origin: left; transition: transform 0.4s var(--ease); }
 .tlink:hover::after { transform: scaleX(1); }
@@ -522,3 +522,21 @@
 /* The site is committed to the bone-white theme: keep the page ground light even
    where .lp does not reach (overscroll, short pages). */
 html:has(.lp.light), body:has(.lp.light) { background: #f6f6f6; }
+
+/* ══════════════ §03 AGENT INDEX (landing) ══════════════ */
+.agx { margin-top: 44px; border-top: 1px solid var(--txt); }
+.agx-head, .agx-row { display: grid; grid-template-columns: 58px minmax(0, 1fr) 84px 96px 22px; gap: 16px; align-items: baseline; }
+.agx-head { padding: 13px 0 11px; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mut); border-bottom: 1px solid var(--hair); }
+.agx-head span:nth-child(4), .agx-calls { text-align: right; }
+.agx-row { padding: 19px 0; border-bottom: 1px solid var(--hair); color: var(--txt); transition: padding-left 0.4s var(--ease); }
+.agx-row:hover { padding-left: 10px; }
+.agx-code { font-size: 12px; letter-spacing: 0.08em; color: var(--mut); transition: color 0.3s; }
+.agx-row:hover .agx-code { color: var(--accent); }
+.agx-name b { display: block; font-weight: var(--w-head); font-size: clamp(18px, 1.6vw, 22px); letter-spacing: var(--track-head); line-height: 1.15; }
+.agx-name em { display: block; font-style: normal; font-size: 14px; line-height: 1.5; color: var(--sec); margin-top: 5px; max-width: 60ch; }
+.agx-kind { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mut); }
+.agx-calls { font-size: 13px; font-variant-numeric: tabular-nums; }
+.agx-arrow { color: var(--mut); transition: transform 0.35s var(--ease), color 0.3s; }
+.agx-row:hover .agx-arrow { transform: translateX(4px); color: var(--accent); }
+.agx-cta { margin-top: 34px; }
+@media (max-width: 620px) { .agx-head, .agx-row { grid-template-columns: 46px minmax(0, 1fr) 22px; } .agx-head span:nth-child(n+3), .agx-kind, .agx-calls { display: none; } }

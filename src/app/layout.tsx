@@ -18,9 +18,9 @@ const switzer = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "LensAI — Crypto Token Analysis",
+  title: "LensAI — The crypto research desk",
   description:
-    "AI-powered, decision-grade crypto token analysis from live market data and current news. Information, not financial advice.",
+    "A crypto research desk you can put to work: ask it, leave it watching, hand it a claim. Every connection measured, mechanical, or labeled conjecture. Information, not financial advice.",
   icons: { icon: "/logo.png" },
 };
 

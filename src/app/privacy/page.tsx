@@ -4,21 +4,26 @@ import { LegalDoc } from "@/components/site/PageHead";
 
 export const metadata: Metadata = {
   title: "Privacy Policy — LensAI",
-  description: "What LensAI stores, why, and how to delete it. Identity is a wallet address — no email, password or PII.",
+  description: "What LensAI stores, why, and how to delete it. Identity is a wallet address; contact details are held only if you turn on an alert channel.",
 };
 
 const SECTIONS = [
   { h: "Overview", p: [
     "This Privacy Policy explains what information LensAI (\"we\", \"us\") collects when you use our website and application, how we use it, and the controls you have over it. LensAI is built to hold as little about you as possible.",
-    "Your identity on LensAI is a public wallet address, proven by a signature. We do not run traditional accounts, and we do not ask for your name, email, password or payment identity to use the core product.",
+    "Your identity on LensAI is a public wallet address, proven by a signature. We do not run traditional accounts, and we do not ask for your name, password or payment identity. An email address or Telegram chat is held only if you choose to receive watch alerts through it.",
   ] },
   { h: "Information we collect", p: [
     "Account identity: your wallet address (stored lowercased), the chain you connected, and timestamps for when the account was first seen and last used.",
     "Research data: the tickers you analyze and the sessions and chat threads you create. This is the product, and it is stored so you can return to it.",
-    "Operational data: minimal technical logs such as request and token counts, model used, and whether a result was served from cache — used to run, secure and cost the service.",
+    "Agent data: the conversations you have with the agents (stored with identifiers such as addresses, emails and handles scrubbed out), the watches you create with their compiled rule and a log of when each fired, a watchlist of token symbols, your timezone if you set one, and the timestamp of the market state you last viewed.",
+    "Alert contact, only if you opt in: an email address if you turn on email alerts, or a Telegram chat id if you link the alert bot. Removing the channel removes the detail.",
+    "Saved claim checks: text you paste for checking is processed and discarded unless you choose to save the result.",
+    "API keys: if you create one, only a one-way hash is stored. The key itself is shown once and cannot be recovered.",
+    "Operational data: minimal technical logs such as request and token counts, model used, per-day usage counts that enforce fair use, and whether a result was served from cache — used to run, secure and cost the service.",
   ] },
   { h: "Information we do not collect", p: [
-    "We do not collect your name, email address, password, phone number or government identifiers.",
+    "We do not collect your name, password, phone number or government identifiers, and we hold no email address unless you turn on email alerts.",
+    "The agent service does not store IP addresses. Per-minute rate limiting is held in memory only and is never written down.",
     "We do not store your on-chain balances, holdings or portfolio. If portfolio features are ever added, they are computed live from the public chain at request time and then discarded.",
     "We do not persist the raw cryptographic signature you use to log in beyond the moment it is verified.",
   ] },
@@ -34,9 +39,12 @@ const SECTIONS = [
   { h: "Third-party services", p: [
     "To function, LensAI sends non-personal queries to third-party providers — market-data sources, news sources, and an AI model provider — to gather facts and generate analysis.",
     "These providers process the ticker and gathered data needed to answer a request, not your identity. We do not share your wallet address with them for the purpose of the analysis.",
+    "The agents use more than one AI model provider, and some of those providers may use the prompts they receive to improve their models. For that reason no identifier of yours is ever placed in a prompt: your text is scrubbed of wallet addresses, emails and handles, and our systems refuse to send any prompt that still contains one. What a provider does receive is market data together with the text of your question, or the text you paste for a claim check — so do not include personal information in either.",
+    "If you turn on alerts, the message is delivered through Telegram or an email delivery provider, which necessarily receive the chat id or email address you gave us for that purpose.",
   ] },
   { h: "Data retention", p: [
-    "We keep your account identity and research history for as long as your account exists, so the product is useful to you. Operational logs are kept only as long as needed to run and secure the service, then reduced or removed.",
+    "We keep your account identity and research history for as long as your account exists, so the product is useful to you. Agent conversations that have been idle for 90 days are deleted automatically. Operational logs are kept only as long as needed to run and secure the service, then reduced or removed.",
+    "Market briefs the desk files are public, shared outputs keyed to the state of the market, not to any person. Nothing derived from your questions is ever written into them.",
     "When you delete a session or your account, the associated data is removed as described below.",
   ] },
   { h: "Security", p: [
@@ -51,7 +59,8 @@ const SECTIONS = [
     "Because your identity is a wallet you control, you can exercise the most important right — deletion — yourself, at any time, from within the app.",
   ] },
   { h: "Deletion & controls", p: [
-    "You can delete any individual session, or your entire account, at any time. Account deletion removes your sessions, messages, watchlist and free-tier records.",
+    "You can delete any individual session, conversation, watch or saved claim check, or your entire account, at any time. Account deletion removes your sessions, messages, watchlist and free-tier records, and with them all agent data: conversations, watches and their trigger log, alert contact details, API key hashes, saved claim checks and usage counts.",
+    "You can export everything the agents hold about you as a single JSON file at any time.",
     "Disconnecting your wallet ends the current session immediately. To make additional requests, contact us at privacy@lensai.app.",
   ] },
   { h: "Children", p: [
@@ -70,8 +79,8 @@ export default function Privacy() {
     <SiteShell>
       <LegalDoc
         index="L1" kicker="Privacy Policy" title="Store the minimum."
-        updated="6 July 2026"
-        intro="LensAI is built to hold as little about you as possible. Your identity is a wallet address, proven by a signature — no email, no password, no PII. This policy explains exactly what we do and don't keep."
+        updated="17 September 2026"
+        intro="LensAI is built to hold as little about you as possible. Your identity is a wallet address, proven by a signature — no password, no name, and no email unless you ask for email alerts. This policy explains exactly what we do and don't keep."
         sections={SECTIONS}
       />
     </SiteShell>

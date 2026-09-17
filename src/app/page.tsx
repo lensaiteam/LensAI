@@ -1,4 +1,5 @@
 "use client";
+import { AGENTS } from "@/lib/site/agents";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent, useReducedMotion } from "framer-motion";
@@ -165,7 +166,7 @@ function Stage() {
           transition={{ duration: 0.5, ease: EASE }}
           style={{ pointerEvents: active ? "none" : "auto" }}
         >
-          <span className="kicker">LensAI — Crypto Intelligence</span>
+          <span className="kicker">LensAI — The research desk</span>
           <h1 className="display">Read the signal,<br /><span className="dim">not the noise.</span></h1>
         </motion.div>
 
@@ -515,10 +516,38 @@ function LandingBody() {
         </div>
       </section>
 
-      {/* §03 STANCE */}
+      {/* §03 AGENTS — a typed index into /agents */}
+      <section className="lp-wrap sec" id="agents">
+        <div className="sec-grid">
+          <Reveal className="sec-num" variant="rise">03 / Agents<span className="big">03</span></Reveal>
+          <div className="sec-body">
+            <Reveal variant="rise"><h2 className="display">Ask it. Leave it watching. <span className="dim">Hand it a claim.</span></h2></Reveal>
+            <Reveal variant="rise" delay={0.05}><p className="intro">The desk is now something you can put to work. Nine agents reach the same measured engine in different ways — and the ones that can be pure arithmetic are, so they cannot invent a number.</p></Reveal>
+            <div className="agx">
+              <div className="agx-head mono" aria-hidden="true"><span>Index</span><span>Agent</span><span>Type</span><span>Model calls</span></div>
+              {AGENTS.map((a, i) => (
+                <Reveal key={a.slug} variant="rise" delay={0.03 * i}>
+                  <Link className="agx-row" href={`/agents/${a.slug}`}>
+                    <span className="agx-code mono">{a.code}</span>
+                    <span className="agx-name"><b>{a.name}</b><em>{a.line}</em></span>
+                    <span className="agx-kind mono">{a.kind}</span>
+                    <span className="agx-calls mono">{a.calls.value}</span>
+                    <span className="agx-arrow" aria-hidden="true">→</span>
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
+            <Reveal variant="rise" delay={0.1} className="agx-cta">
+              <Link className="tlink" href="/agents"><span>Explore the agents</span><span className="a">→</span></Link>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* §04 STANCE */}
       <section className="lp-wrap sec" id="stance">
         <div className="sec-grid">
-          <Reveal className="sec-num" variant="rise">03 / Stance<span className="big">03</span></Reveal>
+          <Reveal className="sec-num" variant="rise">04 / Stance<span className="big">04</span></Reveal>
           <div className="sec-body">
             <Reveal variant="rise"><h2 className="display">We assess. <span className="dim">You decide.</span></h2></Reveal>
             <Reveal variant="rise" delay={0.05}><p className="intro">Telling you to buy or sell is unlicensed advice — so LensAI never does. Every read lands on one of three stances, with both cases on the table.</p></Reveal>
@@ -561,10 +590,10 @@ function LandingBody() {
         </div>
       </section>
 
-      {/* §04 ACCESS */}
+      {/* §05 ACCESS */}
       <section className="lp-wrap sec" id="access">
         <div className="sec-grid">
-          <Reveal className="sec-num" variant="rise">04 / Access<span className="big">04</span></Reveal>
+          <Reveal className="sec-num" variant="rise">05 / Access<span className="big">05</span></Reveal>
           <div className="sec-body">
             <Reveal variant="rise"><h2 className="display">Your keys. Your data. <span className="dim">Your call.</span></h2></Reveal>
             <div className="access-split">

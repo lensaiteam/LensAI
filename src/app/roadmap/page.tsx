@@ -38,7 +38,19 @@ const PHASES = [
     ],
   },
   {
-    q: "Phase 03", state: "next", title: "Breadth & depth",
+    q: "Phase 03", state: "active", title: "The research desk & its agents",
+    blurb: "Read the whole market, not one token at a time — then make that reading something you can put to work.",
+    points: [
+      "Built — immutable point-in-time capture across funding, basis, macro, flows, depth and news",
+      "Built — every stream normalized against its own history, regime-tagged, joined on one clock",
+      "Built — curated mechanism graph and a pure-arithmetic divergence engine",
+      "Built — fail-closed narration: every number resolves to a store row or the claim is dropped",
+      "Built — the agent API: ask, what changed, standing watches, claim check, the record, tool endpoint",
+      "In build — the desk interface for the agents, and the always-on deployment",
+    ],
+  },
+  {
+    q: "Phase 04", state: "next", title: "Breadth & depth",
     blurb: "Cover more of the market, and go deeper on the assets that deserve it.",
     points: [
       "Long-tail token coverage via strictly-capped live search",
@@ -49,17 +61,17 @@ const PHASES = [
     ],
   },
   {
-    q: "Phase 04", state: "planned", title: "The network",
-    blurb: "Open the pipeline up — to alerts, to integrations, and to the community that uses it.",
+    q: "Phase 05", state: "planned", title: "The network",
+    blurb: "Open the desk up — to integrations, and to the community that uses it.",
     points: [
-      "Public API for the gather-and-assess pipeline",
-      "Alerting when an asset's signals materially change",
+      "Typed claim extraction from the corpus — who said it, with what incentive",
+      "Outcome scoring of divergence flags in the public calibration record",
       "Community coverage requests and prioritization",
       "Token utility and governance (see tokenomics)",
     ],
   },
   {
-    q: "Phase 05", state: "planned", title: "The standard",
+    q: "Phase 06", state: "planned", title: "The standard",
     blurb: "Make LensAI the reference layer other products build on top of.",
     points: [
       "Embeddable read widgets and partner integrations",

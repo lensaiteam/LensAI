@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "How LensAI turns live market data and current news into decision-grade, non-advisory crypto analysis.",
 };
 
-type Sec = { h: string; p: string[]; list?: string[] };
+type Sec = { h: string; p: string[]; list?: string[]; id?: string };
 
 const SECTIONS: Sec[] = [
   {
@@ -101,6 +101,49 @@ const SECTIONS: Sec[] = [
     ],
   },
   {
+    h: "From instrument to desk",
+    p: [
+      "A single-token read answers one question. A research desk answers the question behind it: what is the market doing, and where does this token sit inside that? The engine underneath LensAI therefore reads six factor families together — funding, basis and yield, macro, institutional flows, market depth and news — and joins them on one clock.",
+      "Each stream is normalized against its own history, so a reading is a percentile rather than a raw number, and each is tagged with the regime it sits in. A hand-curated mechanism graph records the documented transmission channels between factors. A divergence engine — pure arithmetic — flags states that are historically extreme and relationships that have broken. The model never finds the dots; it narrates the ones the engine measured.",
+      "Everything is point-in-time. Every observation is content-hashed and appended, never updated, and every read is anchored to an as-of instant that cannot see anything captured after it. Lookahead is not discouraged; it is structurally impossible.",
+    ],
+  },
+  {
+    h: "The agents",
+    id: "agents",
+    p: [
+      "The agents are nine ways of reaching that engine: ask it about the market, a token, an incident or a mechanism; ask what changed since you last looked; leave a standing watch; hand it a claim to check; read its own record; or connect an agent of your own to its tools.",
+      "None of them is an open-ended tool loop. An agent plans once, gathers deterministically through the point-in-time tool layer, and makes at most one structured generation: a list of atomic claims, each typed as measured, mechanical or conjecture. That list then passes the same gates as every scheduled brief.",
+    ],
+    list: [
+      "Every number — including one written only in the prose — must resolve to a store row, or the claim is dropped",
+      "A mechanical claim must cite a real edge in the mechanism graph, or it is dropped",
+      "Anything that reads as an instruction is dropped by the non-advisory filter",
+      "If nothing survives, the agent retries once on a different model, then shows the measured state — it never guesses",
+    ],
+  },
+  {
+    h: "Spending model calls last",
+    p: [
+      "The state of the market is the same for every reader, so the Market State brief is generated once per hourly anchor and served to everyone. What changed since you last looked is a subtraction between two anchors. A standing watch is a rule evaluated over derived tables. The desk's track record is a read from an append-only table. None of these calls a model, which means none of them can hallucinate.",
+      "A model is spent only where language is genuinely the job: translating a plain-language watch into a rule once, extracting claims from pasted text, and answering a specific question. The models sit behind a quota-aware router with failover, and each is admitted only after passing fixed cases through the real verification gates. When capacity runs out, the agents degrade to the measured state rather than to an error.",
+    ],
+  },
+  {
+    h: "Watches and claim checks",
+    p: [
+      "A watch is said once in plain language. A small model translates it into a rule over measured state, the desk echoes that rule back in exact terms, and the user confirms it. From then on it is arithmetic: evaluated once per anchor, fired only on the transition from false to true, bounded by a cooldown, and silent when data is missing. A watch can describe a state; it cannot encode an instruction, and price-level alerts are refused.",
+      "A claim check inverts the usual trust. The model only extracts what a post asserts and maps each number to the store row that measures the same thing. The verdict — supported, contradicted with the store's value shown, or unverifiable — is computed, not judged. A causal claim counts as documented only when it maps to a real edge in the mechanism graph.",
+    ],
+  },
+  {
+    h: "What the agents keep about you",
+    p: [
+      "Agent state — conversations, watches and their trigger log, a watchlist of symbols, the anchor you last viewed, daily usage counts and hashed API keys — lives in the user database, cascades from the account, and is erased with it. An email address or Telegram chat id is held only if you turn that alert channel on.",
+      "Two boundaries are enforced in code. No user identifier ever enters a model prompt: user text is scrubbed, and the model router refuses any prompt that still carries a wallet, an email or a known identifier. And nothing derived from a user ever enters the append-only corpus or the calibration record, because what cannot be deleted must never hold what a person may ask to erase.",
+    ],
+  },
+  {
     h: "Identity & privacy",
     p: [
       "The account is a wallet address, proven by an off-chain signature (Sign-In With Ethereum). There is no transaction, no gas, and no private key ever touches our servers — and no email, password or other traditional personal information is collected.",
@@ -130,7 +173,7 @@ export default function Whitepaper() {
 
         <div className="doc">
           {SECTIONS.map((s, i) => (
-            <section className="doc-sec" key={s.h}>
+            <section className="doc-sec" key={s.h} id={s.id}>
               <span className="doc-n mono">{String(i + 1).padStart(2, "0")}</span>
               <div className="doc-body">
                 <h2 className="display">{s.h}</h2>
@@ -146,6 +189,7 @@ export default function Whitepaper() {
         </div>
 
         <div className="doc-cta">
+          <Link className="tlink" href="/agents"><span>Explore the agents</span><span className="a">→</span></Link>
           <Link className="tlink" href="/roadmap"><span>See the roadmap</span><span className="a">→</span></Link>
           <Link className="tlink" href="/tokenomics"><span>Tokenomics</span><span className="a">→</span></Link>
           <Link className="tlink" href="/app"><span>Open the desk</span><span className="a">→</span></Link>

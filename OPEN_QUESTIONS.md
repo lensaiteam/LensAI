@@ -112,10 +112,13 @@ ceiling: pooled free limits cap concurrent ad-hoc questions; per-user daily budg
 (`AGENT_DAILY_ASK_LIMIT`) + graceful degradation to the measured state absorb it.
 
 ### Q16 — INV-4 tightened: numbers in prose must be declared.
-**Resolved.** A claim whose TEXT contains a number absent from its `numbers` array is
-dropped (`undeclared-number`) — otherwise a weaker model could write "94th percentile"
-in prose with `numbers: []` and bypass verification. Duration labels ("365-day",
-"90d") are exempt. Applies to scheduled narration too (shared `auditClaims`).
+**Resolved.** A number in a claim's TEXT that is absent from its `numbers` array is
+verified against the store like any declared number; the claim is dropped
+(`undeclared-number`) only if it does NOT resolve — otherwise a weaker model could
+write "94th percentile" in prose with `numbers: []` and bypass verification. (First
+cut dropped every such claim; real free models restate true numbers in prose often
+enough that this threw away verifiable claims.) Duration labels ("365-day", "90d")
+are exempt. Applies to scheduled narration too (shared `auditClaims`).
 
 ### Q17 — Engine hosting: Railway single service vs VPS.
 **Reversible; Railway kit added, VPS kit kept.** A Railway volume attaches to one

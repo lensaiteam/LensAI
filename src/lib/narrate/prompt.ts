@@ -25,6 +25,8 @@ export function buildSystemPrompt(surface: Surface): string {
     "You may ONLY use facts present in the context below. Do not introduce numbers, tokens, or",
     "relationships that are not in the context. Every number you state must include its store `ref`",
     "from the context; unreferenced or mismatched numbers will be stripped before release.",
+    "ANY number written in a claim's `text` — in conjecture claims too — MUST also be listed in that",
+    "claim's `numbers` with its ref. If you cannot reference it, leave the number out of the text.",
     "",
     "NON-ADVISORY — never say buy, sell, 'you should', a price target, or an allocation. Describe the",
     "structure of the market, never what to do about it. Treat 'strength' values as curated priors,",

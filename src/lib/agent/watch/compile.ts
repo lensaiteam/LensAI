@@ -35,18 +35,32 @@ function buildSystem(vocab: Vocabulary): string {
     "Default window is 365d. Use ONLY the vocabulary below — never invent a stream, asset or regime.",
     "If the request asks for a price level, a trade instruction, or anything the vocabulary cannot express, return ok:false with a short reason.",
     "",
-    "STREAMS (stream/source: assets):",
-    ...vocab.streams.map((s) => `  - ${s.stream}/${s.source}: ${s.assets.join(", ")}`),
+    "STREAMS — `stream` and `source` are SEPARATE fields; never join them with a slash:",
+    ...vocab.streams.map((s) => `  - stream "${s.stream}" (source "${s.source}"): assets ${s.assets.join(", ")}`),
     "REGIMES (key: values):",
     ...vocab.regimes.map((r) => `  - ${r.key}: ${r.values.join(", ") || "(none computed yet)"}`),
   ].join("\n");
+}
+
+/** Tolerate the common slip of writing "funding_rate/binance" into `stream`: split it back out. */
+function splitJoinedStreams(data: unknown): unknown {
+  const all = (data as { rule?: { all?: unknown } } | null)?.rule?.all;
+  if (!Array.isArray(all)) return data;
+  for (const c of all as Record<string, unknown>[]) {
+    if (c && c.type === "percentile" && typeof c.stream === "string" && c.stream.includes("/")) {
+      const [stream, source] = c.stream.split("/");
+      c.stream = stream;
+      if (!c.source && source) c.source = source;
+    }
+  }
+  return data;
 }
 
 export async function compileWatch(llm: JsonLlm, text: string, vocab: Vocabulary, forbid: string[] = []): Promise<CompileResult> {
   if (!vocab.streams.length) return { ok: false, reason: "No factor state has been computed yet, so there is nothing to watch." };
 
   const res = await llm.generateJson({ tier: "small", system: buildSystem(vocab), shapeHint: SHAPE, user: `WATCH: ${scrubIdentifiers(text).slice(0, 500)}`, maxTokens: 800, forbid });
-  const parsed = compiledSchema.safeParse(res.data);
+  const parsed = compiledSchema.safeParse(splitJoinedStreams(res.data));
   if (!parsed.success) return { ok: false, reason: "The watch could not be translated into a rule. Try naming the factor and asset (e.g. \"BTC funding extreme while basis stays low\")." };
   if (!parsed.data.ok) return { ok: false, reason: parsed.data.reason };
 

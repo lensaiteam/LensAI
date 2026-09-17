@@ -5,6 +5,7 @@ import { computeChanges } from "@/lib/agent/changes";
 import { planHeuristic, findAssets } from "@/lib/agent/plan";
 import { MockJsonLlm, PoolExhaustedError } from "@/lib/agent/llm/types";
 import { listBriefs } from "@/lib/narrate/briefs";
+import { auditClaims } from "@/lib/narrate/orchestrator";
 import { checkNonAdvisory } from "@/lib/guardrails/outputFilter";
 import { buildDb, ANCHOR_A, ANCHOR_B, NOW, BTC_FUNDING_REF } from "./_fixture";
 
@@ -111,6 +112,21 @@ describe("askAgent", () => {
     const llm = new MockJsonLlm([{ intent: "market", assets: [], focus: "leverage", since_hours: null }, goodBrief]);
     await askAgent({ db, llm }, { question: "I'm 0x52908400098527886E0F7030069857D2E4169EE7 — is leverage building across the market?", now: NOW });
     for (const c of llm.calls) expect(`${c.system}${c.user}`).not.toContain("0x5290");
+  });
+});
+
+describe("INV-4 on prose numbers", () => {
+  const facts = [{ ref: BTC_FUNDING_REF, value: 0.97 }];
+  const claim = (text: string) => ({ text, basis: "conjecture" as const, refs: [], numbers: [] });
+  it("keeps an undeclared prose number that RESOLVES to the store, and cites the row", async () => {
+    const { kept, audit } = await auditClaims([claim("A 0.97 funding percentile alongside muted basis is unusual.")], { facts, edgeIds: new Set() });
+    expect(kept).toHaveLength(1);
+    expect(audit[0].refs).toContain(BTC_FUNDING_REF);
+  });
+  it("drops one that does not resolve, and ignores duration labels", async () => {
+    const { audit } = await auditClaims([claim("Funding is near the 55th percentile."), claim("Funding has been elevated across the 365-day window.")], { facts, edgeIds: new Set() });
+    expect(audit.map((a) => a.kept)).toEqual([false, true]);
+    expect(audit[0].reason).toBe("undeclared-number");
   });
 });
 

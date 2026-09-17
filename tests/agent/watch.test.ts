@@ -73,6 +73,12 @@ describe("compileWatch", () => {
     expect(r).toMatchObject({ ok: true, rule: { cooldown_hours: 12 } });
     expect(llm.calls[0].tier).toBe("small");
   });
+  it("tolerates a model that joins stream/source into one field", async () => {
+    const joined = { ok: true, rule: { all: [{ type: "percentile", stream: "funding_rate/binance", asset: "ETH", op: "lte", value: 0.05 }] } };
+    const r = await compileWatch(new MockJsonLlm([joined]), "eth funding washed out", loadVocabulary(db, NOW));
+    expect(r).toMatchObject({ ok: true, rule: { all: [{ stream: "funding_rate", source: "binance" }] } });
+  });
+
   it("refuses what the store cannot express, model refusals, and malformed output", async () => {
     const vocab = loadVocabulary(db, NOW);
     const invented = await compileWatch(new MockJsonLlm([{ ok: true, rule: { all: [{ type: "percentile", stream: "etf_flows", asset: "BTC", op: "gte", value: 0.9 }] } }]), "etf flows high", vocab);

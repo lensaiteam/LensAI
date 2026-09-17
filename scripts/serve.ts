@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { getDb } from "../src/lib/capture/db/client";
 import { runMigrations } from "../src/lib/capture/db/migrate";
 import { runForever } from "../src/lib/capture/scheduler";
+import { runBackfill } from "../src/lib/capture/backfill";
 import { loadSources } from "../src/lib/capture/sources";
 import { captureConfig } from "../src/lib/capture/config";
 import { loadSeedFromFile } from "../src/lib/mechanism/loader";
@@ -12,7 +13,7 @@ import { agentConfig } from "../src/lib/agent/config";
 import { createAgentApi, type ApiResponse } from "../src/lib/agent/api";
 import { PooledLlm } from "../src/lib/agent/llm/router";
 import { HttpNotifier } from "../src/lib/agent/notify";
-import { startLoops } from "../src/lib/agent/service";
+import { deriveCycle, startLoops } from "../src/lib/agent/service";
 import { MemoryUserStore } from "../src/lib/agent/store/memory";
 import { SupabaseUserStore } from "../src/lib/agent/store/supabase";
 import type { UserStore } from "../src/lib/agent/store/types";
@@ -116,6 +117,27 @@ const loops = startLoops({
   retentionDays: agentConfig.conversationRetentionDays(),
   telegramBotToken: agentConfig.telegramBotToken() || undefined,
 });
+
+// First boot on an empty volume: percentiles need each stream's own history (MIN_OBS),
+// so without a backfill the desk would have nothing to say for a month. The backfill is
+// idempotent (identical rows dedupe) and runs in the background — the API is up meanwhile —
+// then a derive cycle files the first real anchor. BACKFILL_ON_BOOT=0 disables it.
+const THIN_STORE = 2000;
+const observations = (db.prepare("SELECT COUNT(*) AS c FROM factor_observations").get() as { c: number }).c;
+if (agentConfig.env("BACKFILL_ON_BOOT") !== "0" && observations < THIN_STORE) {
+  logger.info("thin store — starting boot backfill", { observations });
+  void runBackfill(db, loadSources())
+    .then(async (results) => {
+      logger.info("boot backfill complete", {
+        jobs: results.length,
+        rowsWritten: results.reduce((n, r) => n + r.rowsWritten, 0),
+        errored: results.filter((r) => r.status === "error").map((r) => r.job),
+      });
+      const cycle = await deriveCycle({ db, llm, store, notifier, pregenerateMarket: agentConfig.env("AGENT_PREGENERATE_MARKET") !== "0" });
+      logger.info("derive cycle (post-backfill)", cycle);
+    })
+    .catch((e) => logger.error("boot backfill failed", { error: (e as Error).message }));
+}
 
 server.listen(agentConfig.port(), () => logger.info("lensai serve", { port: agentConfig.port(), capture: !!capture, store: store.constructor.name, pool: llm.status().filter((p) => p.configured).map((p) => p.provider) }));
 

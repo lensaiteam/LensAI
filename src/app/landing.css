@@ -34,6 +34,7 @@
   --txt: #0a0a0a;         /* off-black */
   --sec: #454545;         /* readable secondary */
   --mut: #b2b2b2;         /* muted-grey placard text */
+  --dim-display: #8d8d8d; /* the grey half of a two-tone headline: 3:1 on bone, large text only */
   --ink-3: #ffffff;       /* pure-white surface */
   --hair: #e6e6e6;        /* divider grey hairline */
   --hair-soft: #ededed;
@@ -128,7 +129,7 @@
 .sec-num .big { display: block; font-family: var(--font-sans-stack); font-weight: 500; font-size: clamp(48px, 6vw, 96px); color: var(--hair); letter-spacing: -0.04em; line-height: 0.9; margin-top: 10px; }
 @media (min-width: 761px) { .sec-num { position: sticky; top: 120px; align-self: start; } }
 .sec-body h2 { font-size: clamp(28px, 3.4vw, 50px); margin: 0 0 20px; }
-.sec-body h2 .dim { color: var(--mut); }
+.sec-body h2 .dim { color: var(--dim-display); }
 .sec-body .intro { font-size: clamp(15px, 1.2vw, 17.5px); color: var(--sec); line-height: 1.7; max-width: 58ch; }
 
 /* Numbered read list (augen 0.1/0.2 style) */
@@ -207,11 +208,13 @@
 .stage { position: relative; height: 660vh; }
 .stage-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; }
 /* Soft drifting colour auras — give the plain background quiet life. */
-.stage-sticky::before, .stage-sticky::after { content: ""; position: absolute; border-radius: 50%; filter: blur(90px); z-index: 0; pointer-events: none; }
-.stage-sticky::before { width: 600px; height: 600px; left: 12%; top: 6%; background: radial-gradient(circle, rgba(98, 126, 234, 0.26), transparent 66%); animation: drift1 19s var(--ease) infinite; }
-.stage-sticky::after { width: 540px; height: 540px; right: 10%; bottom: 2%; background: radial-gradient(circle, rgba(158, 138, 255, 0.22), transparent 66%); animation: drift2 23s var(--ease) infinite; }
-@keyframes drift1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(46px, 34px); } }
-@keyframes drift2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-40px, -30px); } }
+/* Atmosphere behind the glass card: two STATIC, pre-softened washes. No filter:blur and
+   no infinite animation — a drifting 600px blurred layer repaints every frame (it is the
+   most expensive thing on the page on integrated GPUs) and the saturated lavender read
+   as a stock gradient against a bone-white gallery. */
+.stage-sticky::before, .stage-sticky::after { content: ""; position: absolute; border-radius: 50%; z-index: 0; pointer-events: none; }
+.stage-sticky::before { width: 900px; height: 900px; left: 4%; top: -8%; background: radial-gradient(circle, rgba(104, 122, 170, 0.085), transparent 62%); }
+.stage-sticky::after { width: 820px; height: 820px; right: 2%; bottom: -14%; background: radial-gradient(circle, rgba(120, 128, 150, 0.075), transparent 62%); }
 @media (prefers-reduced-motion: reduce) { .stage-sticky::before, .stage-sticky::after { animation: none; } }
 .stage-tint { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; }
 
@@ -540,3 +543,10 @@ html:has(.lp.light), body:has(.lp.light) { background: #f6f6f6; }
 .agx-row:hover .agx-arrow { transform: translateX(4px); color: var(--accent); }
 .agx-cta { margin-top: 34px; }
 @media (max-width: 620px) { .agx-head, .agx-row { grid-template-columns: 46px minmax(0, 1fr) 22px; } .agx-head span:nth-child(n+3), .agx-kind, .agx-calls { display: none; } }
+
+/* Two-tone headlines: the grey half stays legible (large-text contrast). */
+.lp.light .display .dim, .lp.light h1 .dim, .lp.light h2 .dim { color: var(--dim-display); }
+
+/* Nav: mark the page you are on (a real state, not decoration). */
+.nav-pill .navlink { position: relative; }
+.nav-pill .navlink[aria-current="page"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -7px; height: 1.5px; background: var(--accent); }

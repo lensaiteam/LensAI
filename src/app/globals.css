@@ -196,3 +196,7 @@ html.lenis body {
   border-radius: 4px;
   font-size: 12px;
 }
+
+/* RainbowKit ships its own rounded system font; keep the wallet UI in the site's face. */
+[data-rk] { --rk-fonts-body: var(--font-sans-stack) !important; }
+[data-rk] button { letter-spacing: -0.01em; }

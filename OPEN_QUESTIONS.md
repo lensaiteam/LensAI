@@ -99,6 +99,39 @@ numbers/advisory/fake-edge claims dropped (never softened), final `assertNonAdvi
 on the assembled text. Emitted briefs are logged to an **append-only** calibration
 record. Scope v1 = Market State + Token briefing (Incident mechanics is a follow-on).
 
+### Q15 — Agent LLM: free-tier pool instead of a paid model.
+**Decision (2026-09-17), reversible.** No paid tiers; pool free providers, **one
+key each** (multi-account stacking is out — ToS). Consequence taken in the design:
+no open tool loop (free models are unreliable at it) — plan → deterministic gather →
+ONE structured generation → the existing fail-closed gates; everything that can be
+arithmetic is (changes, watches, track record); generic reads are one shared brief
+per anchor. Supersedes Q14's "Claude default" for the running system: `narrate` now
+defaults to the pool, `--anthropic` remains an opt-in. **Reversal is a config edit**
+(`config/llm-pool.json` takes any OpenAI-compatible endpoint, paid or free). Known
+ceiling: pooled free limits cap concurrent ad-hoc questions; per-user daily budget
+(`AGENT_DAILY_ASK_LIMIT`) + graceful degradation to the measured state absorb it.
+
+### Q16 — INV-4 tightened: numbers in prose must be declared.
+**Resolved.** A claim whose TEXT contains a number absent from its `numbers` array is
+dropped (`undeclared-number`) — otherwise a weaker model could write "94th percentile"
+in prose with `numbers: []` and bypass verification. Duration labels ("365-day",
+"90d") are exempt. Applies to scheduled narration too (shared `auditClaims`).
+
+### Q17 — Engine hosting: Railway single service vs VPS.
+**Reversible; Railway kit added, VPS kit kept.** A Railway volume attaches to one
+service, so capture + derive + agent API run as ONE process (`npm run serve`,
+`Dockerfile`, `deploy/RAILWAY.md`) with litestream → R2 for off-box backup. The
+systemd/VPS kit in `deploy/` still works unchanged. This does **not** force the
+Postgres lift (Q: capture store) — that triggers only when a second service/host
+needs the corpus. The Docker image is unverified locally (no Docker on the dev box).
+
+### Q18 — Where agent user state lives.
+**Resolved.** Supabase (`db/migrations/0002_agent.sql`), never the capture SQLite:
+the corpus and `briefs` are append-only, so anything user-derived there could not be
+erased. Hence question-specific answers are not persisted to `briefs`; only
+user-agnostic shared briefs are. The migration is written but **not yet applied** to
+the hosted project.
+
 ## Open
 
 _None blocking. New ambiguities get appended here with the reversible choice taken._

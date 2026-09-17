@@ -26,3 +26,31 @@ here. `src/lib/capture/adapters/stubs.ts` throws `NotImplemented` for each.
 
 Coarse ±1%/±2% depth from exchange public endpoints (Binance) covers the depth
 factor for now; the institutional feed is an upgrade, not a blocker.
+
+## Free LLM pool — the agent (decision: NO paid tiers, ONE key per provider)
+
+The agent and narration run on a pool of free tiers (`config/llm-pool.json`). Any
+one key is enough to start; more keys = more daily capacity and real failover.
+**Never create a second account on the same provider to stack limits** — that
+violates their terms and gets keys banned. Before go-live, check each provider's
+current free-tier limits and commercial-use terms (they change), set the limits
+in the config accordingly, then run `npm run llm:eval`.
+
+| Key | Provider | Where to get it |
+|---|---|---|
+| `GEMINI_API_KEY` | Google AI Studio (already set for v1) | https://aistudio.google.com/apikey |
+| `GROQ_API_KEY` | Groq | https://console.groq.com/keys |
+| `CEREBRAS_API_KEY` | Cerebras Inference | https://cloud.cerebras.ai |
+| `MISTRAL_API_KEY` | Mistral La Plateforme (free "Experiment" plan) | https://console.mistral.ai |
+| `OPENROUTER_API_KEY` | OpenRouter (`:free` models only) | https://openrouter.ai/keys |
+
+Free tiers may train on prompts. That is why no user identifier is ever placed in
+a prompt (`src/lib/agent/privacy.ts`) — only market data and the question text.
+
+## Agent service — alert channels + backup (all optional, all free tiers)
+
+| Key | Used for | Where to get it |
+|---|---|---|
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_NAME` | Watch alerts via Telegram | @BotFather |
+| `RESEND_API_KEY`, `ALERT_FROM_EMAIL` | Watch alerts via email (needs a verified sending domain) | https://resend.com |
+| `LITESTREAM_BUCKET`, `LITESTREAM_ENDPOINT`, `LITESTREAM_ACCESS_KEY_ID`, `LITESTREAM_SECRET_ACCESS_KEY` | Off-box corpus replication on the container deploy | Cloudflare R2 / Backblaze B2 |

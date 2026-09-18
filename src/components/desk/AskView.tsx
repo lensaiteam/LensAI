@@ -92,7 +92,7 @@ export function AskView({ conversationId, initialQuestion = "", onConversation, 
 
   return (
     <>
-      <div className="dk-wrap">
+      <div className="dk-wrap ask">
         <div className="dk-top">
           <div>
             <span className="dk-kick">A01 · A04 · A08 / Ask</span>

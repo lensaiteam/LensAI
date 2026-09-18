@@ -12,11 +12,11 @@ export type DeskView = "ask" | "changes" | "watches" | "claims" | "account";
 
 /** The register, in the same index as the public agents page. */
 const REGISTER: { id: DeskView; code: string; name: string; sub: string; calls: string }[] = [
-  { id: "ask", code: "A01", name: "Ask", sub: "Market state, a token in it, a mechanism, an incident, the record", calls: "0 to 1" },
+  { id: "ask", code: "A01", name: "Ask", sub: "Market state, a token, a mechanism, the record", calls: "0 to 1" },
   { id: "changes", code: "A05", name: "What changed", sub: "Arithmetic between two anchors", calls: "0" },
-  { id: "watches", code: "A06", name: "Watches", sub: "Standing conditions, alerted on the edge", calls: "1 once" },
+  { id: "watches", code: "A06", name: "Watches", sub: "Standing conditions, alerted on change", calls: "1 once" },
   { id: "claims", code: "A07", name: "Claim check", sub: "Paste a post, get verdicts", calls: "1" },
-  { id: "account", code: "A09", name: "Account and keys", sub: "Channels, tool endpoint, export, erase", calls: "0" },
+  { id: "account", code: "A09", name: "Account and keys", sub: "Channels, keys, export, erase", calls: "0" },
 ];
 
 export function Desk({ onSignOut }: { onSignOut: () => void }) {

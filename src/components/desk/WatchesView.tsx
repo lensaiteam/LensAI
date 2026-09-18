@@ -142,14 +142,14 @@ export function WatchesView({ onSpent, goAccount }: { onSpent: () => void; goAcc
             maxLength={500}
             aria-label="Watch description"
           />
-          <div className="dk-row between">
-            <div className="dk-chips">
-              {EXAMPLES.map((x) => (
-                <button key={x} type="button" className="dk-chip" onClick={() => { setText(x); setCompiled(null); }}>
-                  {x}
-                </button>
-              ))}
-            </div>
+          <div className="dk-chips" style={{ marginTop: 12 }}>
+            {EXAMPLES.map((x) => (
+              <button key={x} type="button" className="dk-chip" onClick={() => { setText(x); setCompiled(null); }}>
+                {x}
+              </button>
+            ))}
+          </div>
+          <div className="dk-row end" style={{ marginTop: 14 }}>
             <Btn onClick={compile} disabled={busy || text.trim().length < 3}>{busy && !compiled ? "Compiling" : "Compile"}</Btn>
           </div>
 

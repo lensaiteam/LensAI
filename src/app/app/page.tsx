@@ -8,8 +8,13 @@ import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { FirstLoginModal } from "@/components/FirstLoginModal";
 import { Markdown } from "@/components/Markdown";
 import { streamPost } from "@/lib/streamClient";
+import { Desk } from "@/components/desk/Desk";
+import { enablePreview } from "@/lib/agentClient";
 import { PREVIEW_FLAGS, PREVIEW_MESSAGES, PREVIEW_SENTIMENT, PREVIEW_SNAP, PREVIEW_WALLET } from "./preview";
 import "./app.css";
+import "./desk.css";
+
+type Surface = "desk" | "read";
 
 const QUICK = ["BTC", "ETH", "SOL", "XRP", "DOGE", "PEPE"];
 
@@ -675,21 +680,27 @@ function RiskFlags({ flags }: { flags: RiskFlag[] }) {
 
 export default function ResearchTerminal() {
   const { user, freeTier, loading, signingIn, signIn, signOut, error: authError, refresh } = useAuth();
+  const [surface, setSurface] = useState<Surface>("desk");
 
-  // Development only: /app?preview=thread|empty renders the terminal with a specimen
+  // Development only: /app?preview=desk|thread|empty renders a surface on a specimen
   // fixture so it can be styled without a wallet session. Unreachable in production.
-  const [preview, setPreview] = useState<"thread" | "empty" | null>(null);
+  const [preview, setPreview] = useState<"desk" | "thread" | "empty" | null>(null);
   useEffect(() => {
     if (process.env.NODE_ENV !== "development") return;
     const p = new URLSearchParams(window.location.search).get("preview");
-    if (p === "thread" || p === "empty") setPreview(p);
+    if (p === "desk") enablePreview();
+    if (p === "desk" || p === "thread" || p === "empty") setPreview(p);
   }, []);
   if (preview) {
     return (
       <div className="app-shell flex flex-col h-screen" style={{ background: "var(--bg)" }}>
         <DisclaimerBanner />
-        <Topbar />
-        <Terminal walletAddress={PREVIEW_WALLET} freeTierRemaining={1} onUsed={() => {}} onSignOut={() => {}} preview={preview} />
+        <Topbar surface={preview === "desk" ? "desk" : "read"} setSurface={() => {}} />
+        {preview === "desk" ? (
+          <Desk onSignOut={() => {}} />
+        ) : (
+          <Terminal walletAddress={PREVIEW_WALLET} freeTierRemaining={1} onUsed={() => {}} onSignOut={() => {}} preview={preview} />
+        )}
       </div>
     );
   }
@@ -697,7 +708,7 @@ export default function ResearchTerminal() {
   return (
     <div className="app-shell flex flex-col h-screen" style={{ background: "var(--bg)" }}>
       <DisclaimerBanner />
-      <Topbar />
+      <Topbar surface={surface} setSurface={setSurface} />
       {loading ? (
         <Center>Loading…</Center>
       ) : !user ? (
@@ -705,19 +716,23 @@ export default function ResearchTerminal() {
       ) : (
         <>
           <FirstLoginModal walletAddress={user.walletAddress} />
-          <Terminal
-            walletAddress={user.walletAddress}
-            freeTierRemaining={freeTier?.remaining ?? 0}
-            onUsed={refresh}
-            onSignOut={signOut}
-          />
+          {surface === "desk" ? (
+            <Desk onSignOut={signOut} />
+          ) : (
+            <Terminal
+              walletAddress={user.walletAddress}
+              freeTierRemaining={freeTier?.remaining ?? 0}
+              onUsed={refresh}
+              onSignOut={signOut}
+            />
+          )}
         </>
       )}
     </div>
   );
 }
 
-function Topbar() {
+function Topbar({ surface, setSurface }: { surface: Surface; setSurface: (s: Surface) => void }) {
   return (
     <div
       className="app-top h-[56px] flex items-center justify-between px-5 shrink-0"
@@ -729,7 +744,11 @@ function Topbar() {
           <span className="tb-brand">LensAI</span>
         </Link>
         <span className="tb-tag">The desk</span>
-        <Link href="/agents" className="tb-link">Agents</Link>
+        <div className="dk-mode" role="group" aria-label="Surface">
+          <button type="button" className={surface === "desk" ? "on" : ""} onClick={() => setSurface("desk")}>Agents</button>
+          <button type="button" className={surface === "read" ? "on" : ""} onClick={() => setSurface("read")}>Token read</button>
+        </div>
+        <Link href="/agents" className="tb-link">Register</Link>
       </div>
       <ConnectButton showBalance={false} chainStatus="none" accountStatus="address" />
     </div>

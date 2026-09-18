@@ -1,0 +1,8 @@
+# The default Netlify address stays reachable after a custom domain is attached.
+# Sign-in is bound to the site's domain and the desk to its origin, so both only
+# work on the real one. Send every request on the default address there.
+[[redirects]]
+  from = "https://lensai-prototype.netlify.app/*"
+  to = "https://scanbylens.xyz/:splat"
+  status = 301
+  force = true

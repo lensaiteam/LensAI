@@ -115,7 +115,7 @@ The v2 rebuild starts with **capture**: an append-only, point-in-time corpus of
 articles + factor observations. It is a **separate subsystem from the web app** —
 it does NOT touch Supabase; the corpus is a local **SQLite** file (`better-sqlite3`,
 WAL) that is the moat. See [`lensai-research-desk-spec.md`](./lensai-research-desk-spec.md) for the architecture and the
-five invariants, and [`HANDOFF.md`](./HANDOFF.md) for status.
+five invariants.
 
 ```
 config/sources.json              source registry (RSS feeds + factor providers) — add a source with DATA only

@@ -121,7 +121,7 @@ export function Hero() {
           <motion.span className="kicker" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.1 }}>LensAI · The research desk</motion.span>
           <LineReveal className="display hx-title" lines={["Read the signal,", <em key="n" className="dim">not the noise.</em>]} />
           <motion.p className="hx-sub" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.45 }}>
-            A crypto research desk that reads funding, basis, macro, flows, depth and news <b>together</b>, and shows its work. Ask it. Leave it watching. Hand it a claim.
+            A crypto research desk that reads funding, basis, macro, flows, depth and news <b>together</b>, and shows its work. Ask it a question, leave it watching a condition, or hand it a claim to check.
           </motion.p>
           <motion.div className="hx-cta" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.58 }}>
             <Link className="mast-cta hx-primary" href="/app"><span>Open the desk</span><span className="a" aria-hidden="true">→</span></Link>

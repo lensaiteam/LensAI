@@ -1274,7 +1274,7 @@ function EmptyState({ onAnalyze, error }: { onAnalyze: (t: string) => void; erro
         {head[2]}
       </h1>
       <p className="hero-sub">
-        Type a ticker and LensAI reads the live market, the news, and the crowd: a decision-grade,
+        Type a ticker and LensAI reads the live market, the news, and the crowd, then writes a plain,
         non-advisory take in seconds.
       </p>
 

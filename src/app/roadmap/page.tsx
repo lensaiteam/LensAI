@@ -17,7 +17,7 @@ const PRINCIPLES = [
 const PHASES = [
   {
     q: "Phase 01", state: "shipped", title: "The instrument",
-    blurb: "Prove the core loop: sign in without friction, gather live data, and return an honest, attributed read.",
+    blurb: "Prove the core loop: sign in without friction, gather live data, and return an attributed read.",
     points: [
       "Wallet sign-in (SIWE): a signature, no gas, no PII",
       "Live market pipeline (primary source + fallback)",
@@ -39,7 +39,7 @@ const PHASES = [
   },
   {
     q: "Phase 03", state: "active", title: "The research desk & its agents",
-    blurb: "Read the whole market, not one token at a time, then make that reading something you can put to work.",
+    blurb: "Read the whole market, not one token at a time, then make that reading something you can use.",
     points: [
       "Built: immutable point-in-time capture across funding, basis, macro, flows, depth and news",
       "Built: every stream normalized against its own history, regime-tagged, joined on one clock",

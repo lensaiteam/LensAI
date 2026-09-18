@@ -8,7 +8,7 @@ const rise = { initial: { opacity: 0, y: 16 }, whileInView: { opacity: 1, y: 0 }
 
 const VALUES = [
   ["W.1", "The join is the product", "Anyone can chart a factor. We are obsessed with the part that compounds: the normalized history, the immutable corpus, the curated graph, the calibration record."],
-  ["W.2", "Honest by default", "We surface uncertainty instead of hiding it. A labeled conjecture beats a confident guess, in the product and in the way we work."],
+  ["W.2", "Say what we don't know", "We show uncertainty instead of hiding it. A labeled conjecture beats a confident guess, in the product and in the way we work."],
   ["W.3", "Small team, real ownership", "You own outcomes end to end. Fewer people, more surface area, more trust."],
   ["W.4", "Ship, then sharpen", "We put things in front of users early and let reality tell us what to refine next."],
 ] as const;

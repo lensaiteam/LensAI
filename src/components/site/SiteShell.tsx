@@ -12,7 +12,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
     <SmoothScroll>
       <div className="lp light">
         <SiteNav />
-        {children}
+        <main>{children}</main>
         <SiteFooter />
       </div>
     </SmoothScroll>

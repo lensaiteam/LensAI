@@ -6,7 +6,7 @@ import { DocToc } from "@/components/site/DocToc";
 
 export const metadata: Metadata = {
   title: "Whitepaper · LensAI",
-  description: "How LensAI turns live market data and current news into decision-grade, non-advisory crypto analysis.",
+  description: "How LensAI turns live market data and current news into clear, non-advisory crypto analysis.",
 };
 
 type Sec = { h: string; p: string[]; list?: string[]; id?: string };
@@ -15,7 +15,7 @@ const SECTIONS: Sec[] = [
   {
     h: "Abstract",
     p: [
-      "LensAI is a research instrument for crypto. A user enters a ticker and receives a thorough, decision-grade analysis of that token, synthesized from live market data plus current news and sentiment. The output is designed to help a person judge whether a token currently looks attractive or risky, and it is explicitly not financial advice.",
+      "LensAI is a research instrument for crypto. A user enters a ticker and receives a thorough analysis of that token, synthesized from live market data plus current news and sentiment. The output is designed to help a person judge whether a token currently looks attractive or risky, and it is explicitly not financial advice.",
       "This document describes how the system works: the live-data pipeline that grounds every answer, the non-advisory design that keeps the product on the right side of a hard regulatory line, the cost architecture that keeps it viable at scale, and the privacy model that stores almost nothing about the people who use it.",
     ],
   },
@@ -71,7 +71,7 @@ const SECTIONS: Sec[] = [
       "Recent developments: catalysts and incidents, each attributed",
       "Sentiment: the overall tone of coverage and social signal",
       "Risk flags: liquidity, volatility and security indicators",
-      "Overall read: an honest POSITIVE / MIXED / NEGATIVE synthesis, both cases named",
+      "Overall read: a POSITIVE / MIXED / NEGATIVE synthesis with both cases named",
     ],
   },
   {
@@ -160,7 +160,7 @@ const SECTIONS: Sec[] = [
   {
     h: "Limitations",
     p: [
-      "LensAI is only as good as the data it can gather. Third-party sources can be delayed, incomplete or wrong; obscure assets may have thin coverage; and sentiment is a read of tone, not a guarantee of outcome. The system is built to surface these limits honestly rather than paper over them.",
+      "LensAI is only as good as the data it can gather. Third-party sources can be delayed, incomplete or wrong; obscure assets may have thin coverage; and sentiment is a read of tone, not a guarantee of outcome. The system is built to show these limits rather than paper over them.",
       "Crypto is highly volatile and you can lose money. LensAI provides information and analysis to support your own research. The decision is always yours.",
     ],
   },
@@ -173,11 +173,11 @@ export default function Whitepaper() {
   return (
     <SiteShell>
       <div className="subpage lp-wrap">
-        <PageHead index="02" kicker="Whitepaper" title="Read the signal, not the noise." sub="A research instrument for crypto: decision-grade analysis synthesized from live market data and current news, and deliberately never financial advice. This paper describes how it works." />
+        <PageHead index="02" kicker="Whitepaper" title="Read the signal, not the noise." sub="A research instrument for crypto: analysis built from live market data and current news, and deliberately never financial advice. This paper describes how it works." />
 
         <div className="doc-wrap">
         <DocToc items={TOC} />
-        <div className="doc">
+        <article className="doc">
           {SECTIONS.map((s, i) => (
             <section className="doc-sec" key={s.h} id={TOC[i].id}>
               <span className="doc-n mono">{String(i + 1).padStart(2, "0")}</span>
@@ -192,7 +192,7 @@ export default function Whitepaper() {
               </div>
             </section>
           ))}
-        </div>
+        </article>
         </div>
 
         <div className="doc-cta">

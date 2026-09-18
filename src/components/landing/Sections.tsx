@@ -76,7 +76,7 @@ const NEVER = ["Buy.", "Sell.", "You should.", "Price target.", "Allocate 10%."]
 const TYPES = [
   { tag: "measured", h: "Measured", p: "A number or a state read directly from the store, and traceable back to the row it came from." },
   { tag: "mechanical", h: "Mechanical", p: "A documented transmission channel. It must cite the edge in the mechanism graph, or it does not ship." },
-  { tag: "conjecture", h: "Conjecture", p: "Anything else. It is allowed: labeled, in plain sight, never dressed as a finding." },
+  { tag: "conjecture", h: "Conjecture", p: "Anything else. It is allowed, as long as it is labeled and never dressed up as a finding." },
 ] as const;
 
 export function Stance() {

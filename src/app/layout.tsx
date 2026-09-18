@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-import { Providers } from "./providers";
+import { MotionRoot } from "./motion";
 
 // Type system: ONE well-drawn Swiss neo-grotesque for display + text, self-hosted so
 // it renders identically on every OS (the old stack fell through to an Arial clone
@@ -18,9 +18,9 @@ const switzer = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "LensAI — The crypto research desk",
+  title: "LensAI · The crypto research desk",
   description:
-    "A crypto research desk you can put to work: ask it, leave it watching, hand it a claim. Every connection measured, mechanical, or labeled conjecture. Information, not financial advice.",
+    "A crypto research desk. Ask it a question, leave it watching a condition, or hand it a claim to check. Every connection it draws is measured, mechanical, or labeled conjecture. Information, not financial advice.",
   icons: { icon: "/logo.png" },
 };
 
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${switzer.variable} ${GeistMono.variable}`}>
       <body>
-        <Providers>{children}</Providers>
+        <MotionRoot>{children}</MotionRoot>
       </body>
     </html>
   );

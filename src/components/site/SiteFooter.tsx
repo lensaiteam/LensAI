@@ -40,7 +40,7 @@ export function SiteFooter() {
       <div className="foot-inner lp-wrap">
         <div className="foot-brand">
           <Link className="brand" href="/"><span className="glyph" />LensAI</Link>
-          <p>A crypto research desk you can put to work: ask it, leave it watching, hand it a claim. Every connection measured, mechanical, or labeled conjecture. Information and analysis, not financial advice.</p>
+          <p>A crypto research desk. Ask it a question, leave it watching a condition, or hand it a claim to check. Every connection it draws is measured, mechanical, or labeled conjecture. Information and analysis, not financial advice.</p>
         </div>
         <div className="foot-cols">
           {COLS.map((col) => (

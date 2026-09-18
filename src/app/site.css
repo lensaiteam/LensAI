@@ -153,6 +153,9 @@
 .pl-asks { list-style: none; display: flex; flex-direction: column; gap: 9px; }
 .pl-asks li { font-size: 15.5px; letter-spacing: -0.01em; color: var(--txt); }
 .pl-asks li.mono { font-size: 12.5px; letter-spacing: 0; color: var(--sec); }
+.pl-asks li a { color: inherit; text-decoration: underline; text-decoration-color: var(--hair); text-underline-offset: 4px; transition: text-decoration-color 0.25s var(--ease), color 0.25s var(--ease); }
+.pl-asks li a:hover { text-decoration-color: #ff0000; color: #ff0000; }
+.pl-links { display: flex; gap: 22px; flex-wrap: wrap; }
 
 .pl-foot { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--hair-soft); }
 .pl-status { display: inline-flex; align-items: center; gap: 9px; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sec); }

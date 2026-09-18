@@ -46,7 +46,7 @@ const PHASES = [
       "Built: curated mechanism graph and a pure-arithmetic divergence engine",
       "Built: fail-closed narration: every number resolves to a store row or the claim is dropped",
       "Built: the agent API: ask, what changed, standing watches, claim check, the record, tool endpoint",
-      "In build: the desk interface for the agents, and the always-on deployment",
+      "Built: the desk interface for the agents, and the always-on deployment",
     ],
   },
   {

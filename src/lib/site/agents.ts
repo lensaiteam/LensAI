@@ -208,3 +208,10 @@ export const AGENTS: AgentSpec[] = [
 ];
 
 export const agentBySlug = (slug: string): AgentSpec | undefined => AGENTS.find((a) => a.slug === slug);
+
+/** Where this agent lives in the desk (`/app`). Ask-type agents open the composer with a question ready. */
+export function deskHref(agent: AgentSpec, question?: string): string {
+  const view = agent.slug === "what-changed" ? "changes" : agent.slug === "watch" ? "watches" : agent.slug === "claim-check" ? "claims" : agent.slug === "tool-endpoint" ? "account" : "ask";
+  const q = view === "ask" ? (question ?? agent.asks[0]) : undefined;
+  return `/app?view=${view}${q ? `&q=${encodeURIComponent(q)}` : ""}`;
+}

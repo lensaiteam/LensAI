@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { AGENTS, FACTORS, KINDS, STEPS, type AgentSpec, type KindId } from "@/lib/site/agents";
+import { AGENTS, FACTORS, KINDS, STEPS, deskHref, type AgentSpec, type KindId } from "@/lib/site/agents";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 type Filter = KindId | "all";
@@ -163,13 +163,24 @@ function Placard({ agent }: { agent: AgentSpec }) {
       <section className="pl-sec">
         <h3 className="pl-h mono">{agent.kind === "connect" ? "Call it" : "Say to it"}</h3>
         <ul className="pl-asks">
-          {agent.asks.map((q) => <li key={q} className={agent.kind === "connect" ? "mono" : ""}>{agent.kind === "connect" ? q : `“${q}”`}</li>)}
+          {agent.asks.map((q) =>
+            agent.kind === "connect" ? (
+              <li key={q} className="mono">{q}</li>
+            ) : (
+              <li key={q}>
+                <Link href={deskHref(agent, q)} title="Open in the desk with this question">{`“${q}”`}</Link>
+              </li>
+            ),
+          )}
         </ul>
       </section>
 
       <footer className="pl-foot">
-        <span className="pl-status mono"><i aria-hidden="true" />In the agent API · desk interface in build</span>
-        <Link className="tlink" href="/whitepaper#agents"><span>How the agents work</span><span className="a">→</span></Link>
+        <span className="pl-status mono"><i aria-hidden="true" />Live in the desk</span>
+        <span className="pl-links">
+          <Link className="tlink" href={deskHref(agent)}><span>Open in the desk</span><span className="a">→</span></Link>
+          <Link className="tlink" href="/whitepaper#agents"><span>How it works</span><span className="a">→</span></Link>
+        </span>
       </footer>
     </article>
   );

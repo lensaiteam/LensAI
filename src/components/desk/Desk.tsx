@@ -29,6 +29,8 @@ export function Desk({ onSignOut }: { onSignOut: () => void }) {
   const [convs, setConvs] = useState<Conversation[]>([]);
   const [conv, setConv] = useState<string | null>(() => (typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("conv")));
   const [usage, setUsage] = useState<Usage | null>(null);
+  // ?q= arrives from the public agents register: the composer opens with it ready.
+  const [initialQuestion] = useState<string>(() => (typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("q") ?? ""));
 
   const refreshUsage = useCallback(() => {
     agentFetch<Usage>("/v1/usage").then(setUsage).catch(() => {});
@@ -113,7 +115,7 @@ export function Desk({ onSignOut }: { onSignOut: () => void }) {
       </aside>
 
       <main className="dk-main">
-        {view === "ask" && <AskView conversationId={conv} onConversation={(id) => { setConv(id); refreshConvs(); }} onSpent={spent} />}
+        {view === "ask" && <AskView conversationId={conv} initialQuestion={initialQuestion} onConversation={(id) => { setConv(id); refreshConvs(); }} onSpent={spent} />}
         {view === "changes" && <ChangesView />}
         {view === "watches" && <WatchesView onSpent={spent} goAccount={() => setView("account")} />}
         {view === "claims" && <ClaimsView onSpent={spent} />}

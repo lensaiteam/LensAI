@@ -15,9 +15,9 @@ const OPENERS: { label: string; q: string }[] = [
 
 type Turn = { id: string; role: "user" | "assistant"; content: string; meta: AnswerMeta | null };
 
-export function AskView({ conversationId, onConversation, onSpent }: { conversationId: string | null; onConversation: (id: string) => void; onSpent: () => void }) {
+export function AskView({ conversationId, initialQuestion = "", onConversation, onSpent }: { conversationId: string | null; initialQuestion?: string; onConversation: (id: string) => void; onSpent: () => void }) {
   const [turns, setTurns] = useState<Turn[]>([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(initialQuestion.slice(0, 1000));
   const [stage, setStage] = useState<Stage | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

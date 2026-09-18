@@ -67,8 +67,7 @@
 .rule { height: 1px; background: var(--hair); }
 
 .brand { display: flex; align-items: center; gap: 12px; color: var(--txt); font-weight: 600; font-size: 16px; letter-spacing: -0.02em; }
-.brand .glyph { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--gold); position: relative; }
-.brand .glyph::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: var(--gold); }
+.brand .glyph { width: 24px; height: 24px; object-fit: contain; display: block; }
 
 /* ══════════════ NUMBERED SECTIONS ══════════════ */
 .sec { padding: clamp(90px, 15vh, 190px) 0; border-top: 1px solid var(--hair-soft); }
@@ -130,8 +129,6 @@
 .lp .tlink .a { color: var(--accent); }
 
 /* Red punctuation — used sparingly. */
-.lp .brand .glyph { border-color: var(--accent); }
-.lp .brand .glyph::after { background: var(--accent); }
 .lp .stage-counter { color: var(--accent); }
 .lp .deck-top .live, .lp .read .live { color: var(--accent); }
 

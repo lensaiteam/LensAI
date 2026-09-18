@@ -740,7 +740,7 @@ function Topbar({ surface, setSurface }: { surface: Surface; setSurface: (s: Sur
     >
       <div className="tb-left">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="app-glyph" />
+          <img className="app-glyph" src="/brand/mark-96.png" alt="" width={24} height={24} />
           <span className="tb-brand">LensAI</span>
         </Link>
         <span className="tb-tag">The desk</span>

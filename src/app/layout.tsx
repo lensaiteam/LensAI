@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "LensAI · The crypto research desk",
   description:
     "A crypto research desk. Ask it a question, leave it watching a condition, or hand it a claim to check. Every connection it draws is measured, mechanical, or labeled conjecture. Information, not financial advice.",
-  icons: { icon: "/logo.png" },
+  icons: { icon: "/logo.png", apple: "/brand/apple-icon.png" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

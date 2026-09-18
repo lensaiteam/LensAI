@@ -68,7 +68,7 @@ export function SiteNav() {
     <>
       <header className={`mast${stuck ? " stuck" : ""}${hidden && !open ? " away" : ""}${open ? " open" : ""}`}>
         <div className="mast-in">
-          <Link className="brand" href="/" aria-label="LensAI home"><span className="glyph" />LensAI</Link>
+          <Link className="brand" href="/" aria-label="LensAI home"><img className="glyph" src="/brand/mark-96.png" alt="" width={24} height={24} />LensAI</Link>
           <span className="mast-tag mono" aria-hidden="true">Research desk</span>
 
           <nav className="mast-links" aria-label="Primary">

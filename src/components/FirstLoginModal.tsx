@@ -18,7 +18,7 @@ export function FirstLoginModal({ walletAddress }: { walletAddress: string }) {
         className="max-w-md w-full p-7"
         style={{ background: "var(--panel)", border: "1px solid var(--border2)" }}
       >
-        <div className="app-glyph mb-4" />
+        <img className="app-glyph mb-4" src="/brand/mark.png" alt="" width={44} height={44} />
         <h2 className="text-lg font-bold mb-2 tracking-tight">Before you start</h2>
         <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--w2)" }}>
           LensAI provides <strong className="text-[var(--w)]">information and analysis, not financial advice</strong>.

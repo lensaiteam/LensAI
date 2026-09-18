@@ -53,8 +53,7 @@
 }
 
 /* Brand marks — red ring + dot, matching the site glyph. */
-.app-glyph { width: 22px; height: 22px; border: 1.5px solid #ff0000; border-radius: 50%; position: relative; display: inline-block; flex-shrink: 0; }
-.app-glyph::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: #ff0000; }
+.app-glyph { width: 24px; height: 24px; object-fit: contain; display: inline-block; flex-shrink: 0; }
 .app-mark { width: 46px; height: 46px; border: 2px solid #ff0000; border-radius: 50%; position: relative; display: inline-block; }
 .app-mark::after { content: ""; position: absolute; inset: 13px; border-radius: 50%; background: #ff0000; }
 

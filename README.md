@@ -127,13 +127,13 @@ scripts/                         migrate · capture · tail · backup
 
 ## ⚠️ Node 24 required
 
-`better-sqlite3` is a native addon built for **Node 24**. This dev machine also has
-a stray Node 20 that `npx`/`cmd` default to (plus a stale `node` shim in a
-user-level `node_modules/.bin`), which **segfaults** the addon. Until that's
-cleaned up, run the tools under Node 24 explicitly:
+`better-sqlite3` is a native addon whose binary is built for **Node 24**. Under any
+other major version it fails to load or crashes on the first query. If a machine has
+more than one Node installed, make sure `node`, `npm` and `npx` all resolve to v24, or
+call the v24 binary explicitly:
 
 ```bash
-NODE='/c/Program Files/nodejs/node.exe'   # the v24 binary
+NODE=/path/to/node24                      # the v24 binary
 "$NODE" node_modules/tsx/dist/cli.mjs scripts/migrate.ts
 "$NODE" node_modules/vitest/vitest.mjs run        # tests
 ```

@@ -193,7 +193,6 @@ async function main(): Promise<void> {
       agent_watches_created: r.agent_watches_created,
       agent_triggers: r.agent_triggers,
       agent_claim_checks: r.agent_claim_checks,
-      agent_model_calls: r.agent_model_calls,
       feedback_up: r.feedback_up,
       feedback_down: r.feedback_down,
     };
@@ -222,7 +221,6 @@ async function main(): Promise<void> {
     ["agent_watches_active", aWatches.filter((w) => w.status === "active").length],
     ["agent_triggers", aTriggers.length],
     ["agent_claim_checks", aClaims.length],
-    ["agent_model_calls", sum("agent_model_calls")],
     ["feedback_up", sum("feedback_up")],
     ["feedback_down", sum("feedback_down")],
     ["first_day", sortedDays[0] ?? ""],

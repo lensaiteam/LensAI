@@ -82,7 +82,7 @@ export function CareersView() {
                         <div>
                           <span className="mono rl-cap">We look for</span>
                           <ul>{r.looks.map((l) => <li key={l}>{l}</li>)}</ul>
-                          <a className="mast-cta" href={`mailto:careers@lensai.app?subject=${encodeURIComponent(r.title)}`}><span>Apply for this role</span><span className="a" aria-hidden="true">→</span></a>
+                          <a className="mast-cta" href={`mailto:careers@scanbylens.xyz?subject=${encodeURIComponent(r.title)}`}><span>Apply for this role</span><span className="a" aria-hidden="true">→</span></a>
                         </div>
                       </div>
                     </motion.div>
@@ -124,7 +124,7 @@ export function CareersView() {
         <span className="mono">No role that fits?</span>
         <h3 className="display">Tell us what you&apos;d build.</h3>
         <p>We still want to hear from exceptional people. Say what you would make here, and why LensAI.</p>
-        <a className="mast-cta" href="mailto:careers@lensai.app?subject=General%20application"><span>Write to us</span><span className="a" aria-hidden="true">→</span></a>
+        <a className="mast-cta" href="mailto:careers@scanbylens.xyz?subject=General%20application"><span>Write to us</span><span className="a" aria-hidden="true">→</span></a>
       </motion.aside>
 
       <div className="doc-cta">

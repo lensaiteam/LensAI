@@ -23,7 +23,7 @@ const SECTIONS = [
     "Where paid features exist, prices and what they include are shown before purchase. Credits and subscriptions are consumed as described at the point of sale. Any blockchain or network fees are your responsibility.",
   ] },
   { h: "Refunds", p: [
-    "Except where required by law, payments for usage already consumed are non-refundable. If you believe you were charged in error, contact billing@lensai.app and we will review in good faith.",
+    "Except where required by law, payments for usage already consumed are non-refundable. If you believe you were charged in error, contact billing@scanbylens.xyz and we will review in good faith.",
   ] },
   { h: "Prohibited conduct", p: [
     "You agree not to misuse the Service, including by: automated scraping beyond published limits; circumventing rate limits, the free tier or security controls; probing or attacking the infrastructure; uploading malicious content; or using the Service to violate any law or the rights of others.",
@@ -48,7 +48,7 @@ const SECTIONS = [
     "You may stop using the Service and delete your account at any time. We may suspend or terminate your access for breach of these terms, suspected abuse, or where required by law. Provisions that by their nature should survive termination will survive.",
   ] },
   { h: "Dispute resolution", p: [
-    "The parties will first attempt to resolve any dispute informally by contacting legal@lensai.app. If a dispute cannot be resolved informally, it will be handled in accordance with the governing law and venue below, subject to any mandatory rights you have as a consumer.",
+    "The parties will first attempt to resolve any dispute informally by contacting legal@scanbylens.xyz. If a dispute cannot be resolved informally, it will be handled in accordance with the governing law and venue below, subject to any mandatory rights you have as a consumer.",
   ] },
   { h: "Governing law", p: [
     "These terms are governed by the laws of the jurisdiction in which LensAI is established, without regard to conflict-of-law rules, and subject to any mandatory consumer protections in your place of residence.",
@@ -60,7 +60,7 @@ const SECTIONS = [
     "If any provision is found unenforceable, the remaining provisions stay in effect. These terms, together with the Terms of Use and Privacy Policy, are the entire agreement between you and LensAI regarding the Service.",
   ] },
   { h: "Contact", p: [
-    "Questions about these terms can be sent to legal@lensai.app.",
+    "Questions about these terms can be sent to legal@scanbylens.xyz.",
   ] },
 ];
 

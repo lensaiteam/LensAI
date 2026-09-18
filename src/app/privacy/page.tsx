@@ -61,7 +61,7 @@ const SECTIONS = [
   { h: "Deletion & controls", p: [
     "You can delete any individual session, conversation, watch or saved claim check, or your entire account, at any time. Account deletion removes your sessions, messages, watchlist and free-tier records, and with them all agent data: conversations, watches and their trigger log, alert contact details, API key hashes, saved claim checks and usage counts.",
     "You can export everything the agents hold about you as a single JSON file at any time.",
-    "Disconnecting your wallet ends the current session immediately. To make additional requests, contact us at privacy@lensai.app.",
+    "Disconnecting your wallet ends the current session immediately. To make additional requests, contact us at privacy@scanbylens.xyz.",
   ] },
   { h: "Children", p: [
     "LensAI is not directed to children and is not intended for anyone under the age of majority in their jurisdiction. We do not knowingly collect data from children.",
@@ -70,7 +70,7 @@ const SECTIONS = [
     "We may update this policy as the product evolves or the law changes. Material changes will be reflected by updating the date at the top of this page. Continued use after an update constitutes acceptance of the revised policy.",
   ] },
   { h: "Contact", p: [
-    "Questions or requests regarding this policy can be sent to privacy@lensai.app.",
+    "Questions or requests regarding this policy can be sent to privacy@scanbylens.xyz.",
   ] },
 ];
 

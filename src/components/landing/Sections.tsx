@@ -136,7 +136,7 @@ export function Access() {
           <div className="sign-sheet">
             <Marks />
             <div className="sign-top mono"><span><i className="bs-dot" aria-hidden="true" />Signature request</span><span>Specimen</span></div>
-            <p className="sign-line">lensai.app wants you to sign in with your Ethereum account:</p>
+            <p className="sign-line">scanbylens.xyz wants you to sign in with your Ethereum account:</p>
             <code className="sign-addr mono">0x7a3f…9c2e</code>
             <ul className="sign-meta mono">
               <li>No transaction</li><li>No gas fee</li><li>No keys ever stored</li>

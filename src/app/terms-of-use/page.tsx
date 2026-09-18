@@ -60,7 +60,7 @@ const SECTIONS = [
     "These terms are governed by the laws of the jurisdiction in which LensAI is established, without regard to conflict-of-law rules, and subject to any mandatory consumer protections that apply where you live.",
   ] },
   { h: "Contact", p: [
-    "Questions about these terms can be sent to legal@lensai.app.",
+    "Questions about these terms can be sent to legal@scanbylens.xyz.",
   ] },
 ];
 

@@ -12,7 +12,7 @@ export default function Careers() {
   return (
     <SiteShell>
       <div className="subpage lp-wrap">
-        <PageHead index="05" kicker="Careers" title="Build the instrument." sub="LensAI is a small team building a crypto research desk that shows its work. If a wrong number bothers you more than a missing one, we'd like to meet you." />
+        <PageHead index="06" kicker="Careers" title="Build the instrument." sub="LensAI is a small team building a crypto research desk that shows its work. If a wrong number bothers you more than a missing one, we'd like to meet you." />
         <CareersView />
       </div>
     </SiteShell>

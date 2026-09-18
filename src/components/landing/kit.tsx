@@ -22,7 +22,7 @@ export function LineReveal({ lines, as: Tag = "h1", className, delay = 0 }: { li
 }
 
 /** A number that counts up to its value the first time it is seen. */
-export function CountUp({ to, pad = 0, className, delay = 0 }: { to: number; pad?: number; className?: string; delay?: number }) {
+export function CountUp({ to, pad = 0, className, delay = 0, group = false }: { to: number; pad?: number; className?: string; delay?: number; group?: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
   const seen = useInView(ref, { once: true, margin: "0px 0px -8% 0px" });
   const reduce = useReducedMotion();
@@ -33,7 +33,7 @@ export function CountUp({ to, pad = 0, className, delay = 0 }: { to: number; pad
     const controls = animate(0, to, { duration: 1.3, ease: EASE, delay, onUpdate: (x) => setV(Math.round(x)) });
     return () => controls.stop();
   }, [seen, to, reduce, delay]);
-  return <span ref={ref} className={className}>{String(v).padStart(pad, "0")}</span>;
+  return <span ref={ref} className={className}>{group ? v.toLocaleString("en-US") : String(v).padStart(pad, "0")}</span>;
 }
 
 /** Registration marks at the corners of a sheet — the print-room motif. */

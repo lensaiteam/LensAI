@@ -304,3 +304,49 @@
 .cx-steps { list-style: none; }
 .cx-steps li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 8px; }
 .cx-steps li > .mono { font-size: 12px; color: var(--accent); padding-top: 4px; }
+
+/* ── Analytics: the ledger ── */
+.led-facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0; margin: clamp(36px, 6vh, 60px) 0 0; padding: 0; border-top: 1px solid var(--txt); }
+.led-facts li { flex: 1 1 0; min-width: 140px; padding: 14px 16px 0 0; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mut); font-family: var(--font-mono-stack); }
+.led-facts li + li { padding-left: 16px; border-left: 1px solid var(--hair); }
+.led-facts b { display: block; font-weight: 400; font-size: clamp(26px, 2.6vw, 34px); letter-spacing: -0.03em; color: var(--txt); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+@media (max-width: 720px) { .led-facts li { flex-basis: 45%; padding-bottom: 12px; } .led-facts li + li { border-left: 0; padding-left: 0; } .led-facts li:nth-child(even) { border-left: 1px solid var(--hair); padding-left: 16px; } }
+.led-blk { margin-top: clamp(48px, 7vh, 84px); }
+.led-note { margin: 18px 0 22px; font-size: clamp(14.5px, 1.1vw, 16px); line-height: 1.6; color: var(--sec); max-width: 64ch; }
+.led-fig { margin: 0; }
+.led-fig figcaption { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mut); padding-bottom: 10px; }
+.led-fig figcaption b { color: var(--txt); font-weight: 500; }
+.led-svg { display: block; width: 100%; height: clamp(150px, 22vw, 220px); overflow: visible; }
+.led-grid { stroke: var(--hair); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.led-bar { fill: #dcdcdc; }
+.led-area { fill: rgba(10, 10, 10, 0.06); }
+.led-line { fill: none; stroke: var(--txt); stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; animation: led-draw 1.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+.led-dot { fill: var(--accent); }
+@keyframes led-draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .led-line { animation: none; stroke-dashoffset: 0; } }
+.led-axis { display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--txt); font-size: 10.5px; letter-spacing: 0.08em; color: var(--mut); }
+.led-tbl-wrap { overflow-x: auto; margin-top: 22px; }
+.led-tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
+.led-tbl th { font-size: 10px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mut); text-align: left; padding: 0 18px 10px 0; border-bottom: 1px solid var(--txt); white-space: nowrap; }
+.led-tbl td { padding: 12px 18px 12px 0; border-bottom: 1px solid var(--hair); color: var(--txt); vertical-align: middle; }
+.led-tbl .n, .led-tbl th.n { text-align: right; font-family: var(--font-mono-stack); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.led-tbl td.n { font-size: 14px; }
+.led-spark { display: block; }
+.led-spark path { fill: none; stroke: var(--txt); stroke-width: 1.2; }
+.led-rank { list-style: none; margin: 22px 0 0; padding: 0; border-top: 1px solid var(--txt); }
+.led-rank li { display: grid; grid-template-columns: 34px 90px minmax(0, 1fr) 80px 120px; gap: 14px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--hair); font-size: 15px; }
+.led-rank-n { font-size: 11px; letter-spacing: 0.1em; color: var(--mut); }
+.led-rank-t { font-weight: 500; letter-spacing: -0.01em; }
+.led-rank-bar { display: block; height: 8px; background: var(--hair-soft, #efefef); position: relative; }
+.led-rank-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--txt); }
+.led-rank .n { text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; }
+.led-rank-w { font-size: 11px; letter-spacing: 0.04em; color: var(--mut); text-align: right; }
+.led-foot { margin-top: clamp(40px, 6vh, 64px); padding-top: 18px; border-top: 1px solid var(--hair); font-size: 11px; letter-spacing: 0.04em; color: var(--mut); line-height: 1.7; }
+.led-empty { margin-top: clamp(40px, 6vh, 64px); padding-top: 22px; border-top: 1px solid var(--txt); max-width: 60ch; }
+.led-empty .mono { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+.led-empty p { margin-top: 12px; font-size: 16px; line-height: 1.6; color: var(--sec); }
+@media (max-width: 720px) {
+  .led-rank li { grid-template-columns: 28px 64px minmax(0, 1fr) 64px; }
+  .led-rank-w { display: none; }
+  .led-tbl { font-size: 14px; }
+}

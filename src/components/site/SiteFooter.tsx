@@ -8,6 +8,7 @@ const COLS: { title: string; links: { label: string; href: string; ext?: boolean
       { label: "Whitepaper", href: "/whitepaper" },
       { label: "Roadmap", href: "/roadmap" },
       { label: "Tokenomics", href: "/tokenomics" },
+      { label: "Analytics", href: "/analytics" },
       { label: "Open the desk", href: "/app" },
     ],
   },

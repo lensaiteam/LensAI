@@ -10,6 +10,7 @@ export const NAV_PAGES = [
   { index: "02", label: "Whitepaper", href: "/whitepaper" },
   { index: "03", label: "Roadmap", href: "/roadmap" },
   { index: "04", label: "Tokenomics", href: "/tokenomics" },
+  { index: "05", label: "Analytics", href: "/analytics" },
 ];
 
 const EASE = [0.16, 1, 0.3, 1] as const;

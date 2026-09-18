@@ -155,3 +155,28 @@
 .close2 { padding: clamp(110px, 18vh, 220px) 0 clamp(80px, 12vh, 150px); border-top: 1px solid var(--hair-soft); position: relative; z-index: 1; }
 .close2 h2 { font-size: clamp(48px, 9.5vw, 168px); line-height: 0.92; margin: 0; }
 .close2-cta { display: flex; align-items: center; gap: clamp(20px, 2.6vw, 34px); flex-wrap: wrap; margin-top: clamp(34px, 5vh, 56px); }
+
+/* ── 06 / The people: two founder placards on one rule ── */
+.team { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--txt); margin-top: clamp(28px, 4vh, 44px); }
+.founder { padding: 26px 0 8px; }
+.founder + .founder { border-left: 1px solid var(--hair); padding-left: clamp(24px, 3vw, 44px); }
+.founder:first-child { padding-right: clamp(24px, 3vw, 44px); }
+.founder-top { display: flex; justify-content: space-between; gap: 12px; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mut); padding-bottom: 14px; border-bottom: 1px solid var(--hair); }
+.founder-top span:first-child { color: var(--accent); }
+.founder-body { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 22px; align-items: start; margin-top: 20px; }
+.founder-photo { width: 112px; height: 112px; object-fit: cover; display: block; border: 1px solid var(--hair); background: #fff; filter: grayscale(1); transition: filter 0.6s var(--ease); }
+.founder:hover .founder-photo { filter: none; }
+.founder-mono { display: grid; place-items: center; font-family: var(--font-mono-stack); font-size: 26px; letter-spacing: 0.04em; color: var(--txt); }
+.founder-name { font-size: clamp(22px, 2vw, 28px); font-weight: var(--w-head); letter-spacing: var(--track-head); margin: 0 0 8px; }
+.founder-bio { font-size: 15px; line-height: 1.6; color: var(--sec); margin: 0 0 16px; max-width: 44ch; }
+.founder-links { display: flex; gap: 22px; flex-wrap: wrap; }
+.founder-links .tlink { font-size: 13.5px; }
+@media (max-width: 860px) {
+  .team { grid-template-columns: 1fr; }
+  .founder + .founder { border-left: 0; padding-left: 0; border-top: 1px solid var(--hair); }
+  .founder:first-child { padding-right: 0; }
+}
+@media (max-width: 480px) {
+  .founder-body { grid-template-columns: 1fr; }
+  .founder-photo { width: 96px; height: 96px; }
+}

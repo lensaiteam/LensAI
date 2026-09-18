@@ -70,6 +70,13 @@
 .doc-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
 .doc-list li { position: relative; padding-left: 20px; font-size: clamp(15px, 1.2vw, 17px); line-height: 1.55; color: var(--sec); }
 .doc-list li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; background: var(--accent); }
+.doc-table-wrap { overflow-x: auto; margin: 18px 0 14px; }
+.doc-table { width: 100%; border-collapse: collapse; font-size: clamp(13.5px, 1.05vw, 15px); }
+.doc-table th { font-size: 10px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mut); text-align: left; padding: 0 16px 9px 0; border-bottom: 1px solid var(--txt); white-space: nowrap; }
+.doc-table td { padding: 10px 16px 10px 0; border-bottom: 1px solid var(--hair); color: var(--sec); line-height: 1.45; vertical-align: top; }
+.doc-table td:first-child { color: var(--txt); font-weight: 500; white-space: nowrap; }
+.doc-table tr:last-child td { border-bottom: 1px solid var(--txt); }
+.doc-table td.num { font-family: var(--font-mono-stack); font-size: 0.92em; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* ── Roadmap principles + phase blurb ── */
 .rm-principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--hair); border: 1px solid var(--hair); margin: clamp(40px, 6vh, 64px) 0; }

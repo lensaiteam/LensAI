@@ -9,7 +9,8 @@ export const metadata: Metadata = {
   description: "How LensAI turns live market data and current news into clear, non-advisory crypto analysis.",
 };
 
-type Sec = { h: string; p: string[]; list?: string[]; id?: string };
+type Table = { cols: string[]; rows: string[][] };
+type Sec = { h: string; p: string[]; list?: string[]; table?: Table; after?: string[]; id?: string };
 
 const SECTIONS: Sec[] = [
   {
@@ -158,6 +159,63 @@ const SECTIONS: Sec[] = [
     ],
   },
   {
+    h: "Revenue model",
+    id: "revenue",
+    p: [
+      "The desk earns from usage, never from advice. Every line below meters something the engine already does, so revenue grows with reads while the cost of serving them stays decoupled from the number of readers.",
+    ],
+    list: [
+      "Metered reads. The first analyses and desk questions are free. Beyond that, token briefings, forced refreshes and specific desk questions are metered in $LENS credits. Shared briefs, what changed, watches and the track record stay free, because they cost the engine nothing.",
+      "Access tiers. Staking $LENS raises rate limits, opens the deeper history windows and gives early access to new coverage. Staked supply is locked, not spent.",
+      "API and tool endpoint. Keys for other agents and integrations are metered per call, on the same read surface as the desk.",
+      "Desk seats for teams. Research teams and funds get shared watches, the institutional depth feed when it lands, and a higher daily budget, billed as a subscription.",
+      "Data licensing. The normalized cross-factor history, the point-in-time corpus and the calibration record are the assets that cannot be rebuilt retroactively. Licensed, point-in-time access to them is the long-term line.",
+    ],
+    after: [
+      "On the cost side the expensive work is shared: popular assets are pre-computed, one market brief is filed per hour for everyone, and most desk agents are pure arithmetic. Serving one more reader costs close to nothing, so margin widens with scale rather than narrowing.",
+      "Revenue flows in a fixed order: pipeline costs first (live data, news, compute), then a published share to the treasury, which funds coverage and buys back $LENS under governance. Shares and figures are illustrative until launch, and nothing in this paper is an offer to sell tokens.",
+    ],
+  },
+  {
+    h: "The $LENS token",
+    id: "token",
+    p: [
+      "Fixed supply of 1,000,000,000 $LENS, minted once, with no emissions. Distribution happens only by unlocking allocated supply on the schedules below; no new tokens are ever created. The token is a utility and coordination layer: it meters reads, gates access tiers and carries governance. It is not required for the basics, and it is not a claim on revenue.",
+    ],
+    table: {
+      cols: ["Allocation", "Share", "Tokens", "Purpose"],
+      rows: [
+        ["Community & rewards", "40%", "400,000,000", "Usage rewards, contribution, coverage bounties"],
+        ["Treasury", "20%", "200,000,000", "Pipeline funding, data sources, buybacks under governance"],
+        ["Team", "18%", "180,000,000", "The people building the desk"],
+        ["Liquidity", "12%", "120,000,000", "Seeding markets at listing, managed by the treasury"],
+        ["Early backers", "10%", "100,000,000", "Pre-launch capital"],
+        ["Total", "100%", "1,000,000,000", "Fixed. No emissions."],
+      ],
+    },
+  },
+  {
+    h: "Vesting and unlock schedule",
+    id: "vesting",
+    p: [
+      "Every allocation vests on a published schedule, measured in months from listing. Cliffs apply to the team, the backers and the treasury alike, so no insider unlocks ahead of the community.",
+    ],
+    table: {
+      cols: ["Allocation", "Cliff", "Linear release", "At listing", "Fully vested"],
+      rows: [
+        ["Community & rewards", "none", "48 months, about 8.3M per month", "0", "month 48"],
+        ["Treasury", "12 months", "linear thereafter, spend by proposal", "0", "set by governance"],
+        ["Team", "12 months", "36 months", "0", "month 48"],
+        ["Liquidity", "none", "none", "120,000,000", "at listing"],
+        ["Early backers", "12 months", "24 months", "0", "month 36"],
+      ],
+    },
+    after: [
+      "What that means for circulating supply, treasury excluded: 120M (12%) at listing, all of it liquidity. 220M (22%) at month 12, when the cliffs end and the team, backers and treasury begin their linear schedules. 430M (43%) at month 24. 640M (64%) at month 36, when the backers are fully vested. 800M (80%) at month 48, when the team and the community complete. The treasury's 200M unlocks on the governance schedule after its own cliff.",
+      "The schedule is published before listing and enforced on-chain by vesting contracts, so it cannot be shortened after the fact.",
+    ],
+  },
+  {
     h: "Limitations",
     p: [
       "LensAI is only as good as the data it can gather. Third-party sources can be delayed, incomplete or wrong; obscure assets may have thin coverage; and sentiment is a read of tone, not a guarantee of outcome. The system is built to show these limits rather than paper over them.",
@@ -189,6 +247,21 @@ export default function Whitepaper() {
                     {s.list.map((li) => <li key={li}>{li}</li>)}
                   </ul>
                 )}
+                {s.table && (
+                  <div className="doc-table-wrap">
+                    <table className="doc-table">
+                      <thead>
+                        <tr>{s.table.cols.map((c) => <th key={c} className="mono">{c}</th>)}</tr>
+                      </thead>
+                      <tbody>
+                        {s.table.rows.map((r) => (
+                          <tr key={r[0]}>{r.map((c, k) => <td key={k} className={/^[\d,.%]+$/.test(c) ? "num" : undefined}>{c}</td>)}</tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                {s.after?.map((para, k) => <p key={`a${k}`}>{para}</p>)}
               </div>
             </section>
           ))}

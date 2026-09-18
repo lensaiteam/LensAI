@@ -31,7 +31,7 @@ Backup (strongly recommended — the corpus cannot be rebuilt retroactively):
 
 | Variable | Value |
 |---|---|
-| `LITESTREAM_BUCKET` | bucket name (Cloudflare R2 has a free tier) |
+| `LITESTREAM_BUCKET` | bucket name (any S3-compatible store, e.g. Cloudflare R2) |
 | `LITESTREAM_ENDPOINT` | R2: `https://<account-id>.r2.cloudflarestorage.com` |
 | `LITESTREAM_ACCESS_KEY_ID`, `LITESTREAM_SECRET_ACCESS_KEY` | bucket credentials |
 

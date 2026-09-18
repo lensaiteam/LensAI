@@ -2,8 +2,8 @@ import { z } from "zod";
 import { PoolExhaustedError, type JsonLlm } from "./llm/types";
 
 /**
- * Question planning. The agent never runs an open tool loop (free models are
- * unreliable at that); it PLANS once, then gathers deterministically through the
+ * Question planning. The agent never runs an open tool loop (the engine, not the
+ * model, is the intelligence); it PLANS once, then gathers deterministically through the
  * point-in-time tool layer. Cheap regex heuristics answer the common shapes with
  * zero model calls; only genuinely ambiguous questions spend a small-model call,
  * and if the pool is exhausted the heuristic guess is used.

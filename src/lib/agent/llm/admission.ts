@@ -9,7 +9,7 @@ import type { Vocabulary } from "../watch/rule";
 import type { JsonLlm } from "./types";
 
 /**
- * Model ADMISSION: free models are swapped and retired without notice, so a model
+ * Model ADMISSION: pooled models are swapped and retired without notice, so a model
  * earns its place in the pool by passing fixed cases through the REAL code paths
  * (planner, watch compiler, narration + the fail-closed claim gates) on a static
  * fixture. Run per provider via `npm run llm:eval`; re-run whenever

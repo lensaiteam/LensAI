@@ -4,11 +4,11 @@ import { PooledLlm } from "../src/lib/agent/llm/router";
 import { runAdmission } from "../src/lib/agent/llm/admission";
 
 /**
- * Admission eval for the free LLM pool — runs the fixed cases against EACH
+ * Admission eval for the model provider pool — runs the fixed cases against EACH
  * configured provider in isolation and prints a pass table.
  *   llm:eval              every provider that has a key
  *   llm:eval groq gemini  only these
- * Costs ~6 requests per provider from its free quota. Exit code 1 if any
+ * Costs ~6 requests per provider from its quota. Exit code 1 if any
  * provider fails a case (disable it in config/llm-pool.json or swap its model).
  */
 async function main(): Promise<void> {
@@ -17,7 +17,7 @@ async function main(): Promise<void> {
   const pool = loadPool();
   const providers = availableProviders(pool).filter((p) => !only.length || only.includes(p.id));
   if (!providers.length) {
-    console.log("No provider has a key set. See KEYS_NEEDED.md (free LLM pool).");
+    console.log("No provider has a key set. See KEYS_NEEDED.md (model providers).");
     process.exit(2);
   }
 

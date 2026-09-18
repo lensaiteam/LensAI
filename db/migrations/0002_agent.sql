@@ -65,7 +65,7 @@ create table if not exists agent_watch_triggers (
   delivered boolean not null default false
 );
 
--- USAGE (quota for the finite free LLM pool) --------------------------
+-- USAGE (per-user model-call budget) ----------------------------------
 create table if not exists agent_usage_daily (
   wallet_address text not null references users(wallet_address) on delete cascade,
   kind           text not null,

@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Rate limit exceeded", resetAt: rl.resetAt }, { status: 429 });
   }
 
-  // 1. Cache check — served for ~$0 and does NOT consume a free credit (§5.3).
+  // 1. Cache check — served without a model call and does NOT consume a free credit (§5.3).
   const cached = await getCachedToken(ticker);
   if (cached) {
     const sessionId = await createSession(wallet, ticker);

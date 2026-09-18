@@ -31,8 +31,8 @@ export const TOP_TOKENS = [
  * provider gateway, so this runs on whatever LLM_PROVIDER selects.
  *
  * Note: on Anthropic in production this loop is a candidate for the Batch API
- * (§4.4, 50% off) inside the Anthropic adapter; on the Gemini dev/free tier a
- * batch discount is moot, so we issue regular calls with a concurrency cap.
+ * (§4.4, 50% off) inside the Anthropic adapter; on Gemini we issue regular calls
+ * with a concurrency cap.
  */
 async function precomputeOne(ticker: string): Promise<boolean> {
   try {
@@ -95,7 +95,7 @@ export interface PrecomputeResult {
 
 /**
  * Refresh a batch of tokens into token_cache with a bounded concurrency (keeps
- * us under free-tier rate limits). Never throws — per-token failures are counted.
+ * us under provider rate limits). Never throws — per-token failures are counted.
  */
 export async function runPrecompute(
   tokens: string[] = TOP_TOKENS,

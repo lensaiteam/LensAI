@@ -5,29 +5,25 @@ AI-powered, **non-advisory** crypto token analysis. Enter a ticker → get a dec
 in the same thread. Auth is wallet sign-in (SIWE) — no email, no password, no private keys.
 
 > LensAI provides information and analysis, **not financial advice**. It never says buy/sell.
-> See the spec for the full product spec — it is the source of truth.
+> The full v2 product spec is [`lensai-research-desk-spec.md`](./lensai-research-desk-spec.md).
 
 ## Stack
 
 - **Next.js 14** (App Router) · TypeScript · TailwindCSS
 - **wagmi + viem + RainbowKit** for wallet connect; **SIWE (EIP-4361)** for the ownership proof
 - **Supabase (Postgres)** as datastore only — access via **service-role, server-side** (Path B, §9)
-- **LLM provider is swappable** (`src/lib/ai/provider`) — selected by `LLM_PROVIDER`. Dev default is
-  **Google Gemini Flash** (free tier, $0 dev); **Anthropic Claude** (Sonnet 4.6 / Haiku 4.5) is the
-  production swap-in. No provider/model name appears outside the provider module.
-
-  > Gemini's free tier is rate-limited and dev-oriented. For production, set `LLM_PROVIDER=anthropic`
-  > (or another adapter) — a config change, not a refactor.
+- **LLM provider is swappable** (`src/lib/ai/provider`) — selected by `LLM_PROVIDER` (`gemini` or
+  `anthropic`). No provider/model name appears outside the provider module; switching is a config
+  change, not a refactor.
 - **Coinbase** (price/volume/24h/7d) + **CoinGecko** fallback (market cap / supply / resolution)
 
 ## Architecture (the cost-minimizing core, §4)
 
 1. **Per-ticker cache** (`token_cache`, 30-min TTL) — first requester runs the pipeline; everyone
-   else is served for ~$0 with an "as of" timestamp.
+   else is served from cache with an "as of" timestamp.
 2. **Top-token precompute** with **pre-fetched news** — fixed cost regardless of user count. Runs
    through the provider gateway with a concurrency cap. See `/api/cron/precompute` +
-   `scripts/precompute.ts`. (On Anthropic in production this loop is a candidate for the Batch API's
-   50% discount inside the Anthropic adapter; on the Gemini free tier a batch discount is moot.)
+   `scripts/precompute.ts`.
 3. **Structured fields**, not just prose — `sentiment / tokenomics / risk_flags / news_digest` are
    stored so follow-ups resolve **without a model call or web search** (§5.4).
 4. **Free tier**: 2 free analyses/wallet, enforced server-side; cache hits don't consume a credit.
@@ -118,7 +114,7 @@ In production, schedule this every 30–60 min (e.g. Vercel Cron) against `/api/
 The v2 rebuild starts with **capture**: an append-only, point-in-time corpus of
 articles + factor observations. It is a **separate subsystem from the web app** —
 it does NOT touch Supabase; the corpus is a local **SQLite** file (`better-sqlite3`,
-WAL) that is the moat. See the spec for the architecture and the
+WAL) that is the moat. See [`lensai-research-desk-spec.md`](./lensai-research-desk-spec.md) for the architecture and the
 five invariants, and [`HANDOFF.md`](./HANDOFF.md) for status.
 
 ```

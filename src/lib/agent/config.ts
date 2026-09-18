@@ -26,7 +26,7 @@ export const agentConfig = Object.freeze({
   sessionSecret: () => required("SESSION_JWT_SECRET"),
   /** Browser origin allowed to call the service (CORS). Empty => no CORS headers. */
   allowedOrigin: () => optional("AGENT_ALLOWED_ORIGIN"),
-  /** Per-user ad-hoc LLM questions per UTC day (the free pool is finite). */
+  /** Per-user ad-hoc LLM questions per UTC day (the model budget is finite). */
   dailyAskLimit: () => intOpt("AGENT_DAILY_ASK_LIMIT", 25),
   /** Per-user requests per minute (in-memory; no IPs are stored). */
   perMinuteLimit: () => intOpt("AGENT_PER_MINUTE_LIMIT", 20),

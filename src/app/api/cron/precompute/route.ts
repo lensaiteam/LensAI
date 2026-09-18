@@ -16,7 +16,7 @@ const Body = z.object({
  * Background top-token refresh (spec §4.2–4.3). Protected by CRON_SECRET.
  * Runs through the provider gateway with a concurrency cap. Schedule this every
  * 30–60 min (e.g. Vercel Cron). Keep the token set small enough to finish within
- * maxDuration on the free tier — chunk across calls if needed.
+ * the host's maxDuration — chunk across calls if needed.
  *
  *   POST { tokens?: string[], concurrency?: number }  ->  { total, written, failed }
  */

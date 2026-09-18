@@ -1,5 +1,5 @@
 {
-  "_note": "Free-tier LLM pool (agent phase decision: NO paid tiers, ONE key per provider). Model ids and limits churn — verify each provider's current free-tier limits + commercial-use terms before go-live, then run `npm run llm:eval` to admit models. Limits here are deliberately conservative.",
+  "_note": "Model provider pool for the agent (ONE key per provider). Model ids and limits churn — verify each provider's current limits + terms before go-live, then run `npm run llm:eval` to admit models. Limits here are deliberately conservative.",
   "providers": [
     {
       "id": "gemini",
@@ -47,7 +47,7 @@
         "rpm": 25,
         "rpd": 900
       },
-      "_note": "DISABLED 2026-09: Cerebras ended its permanent free tier (July–Aug 2026); it is now a card-required $5/30-day trial, which the no-paid-tiers decision excludes."
+      "_note": "DISABLED 2026-09: not admitted under the current provider policy — re-evaluate before enabling."
     },
     {
       "id": "mistral",
@@ -90,7 +90,7 @@
         "rpm": 20,
         "rpd": 40
       },
-      "_note": "Workers AI: 10,000 neurons/day (~50K tokens on a large model) — a small top-up, not a workhorse. Needs CLOUDFLARE_ACCOUNT_ID too. Model ids unverified until `npm run llm:eval cloudflare` passes."
+      "_note": "Workers AI: a small daily allowance — a top-up, not a workhorse. Needs CLOUDFLARE_ACCOUNT_ID too. Model ids unverified until `npm run llm:eval cloudflare` passes."
     }
   ]
 }

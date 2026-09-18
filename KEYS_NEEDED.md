@@ -27,33 +27,28 @@ here. `src/lib/capture/adapters/stubs.ts` throws `NotImplemented` for each.
 Coarse ±1%/±2% depth from exchange public endpoints (Binance) covers the depth
 factor for now; the institutional feed is an upgrade, not a blocker.
 
-## Free LLM pool — the agent (decision: NO paid tiers, ONE key per provider)
+## Model providers — the agent
 
-The agent and narration run on a pool of free tiers (`config/llm-pool.json`). Any
-one key is enough to start; more keys = more daily capacity and real failover.
-**Never create a second account on the same provider to stack limits** — that
-violates their terms and gets keys banned. Before go-live, check each provider's
-current free-tier limits and commercial-use terms (they change), set the limits
-in the config accordingly, then run `npm run llm:eval`.
+The agent and narration route model calls across a configurable provider pool
+(`config/llm-pool.json`) with quota-aware failover. Any one key is enough to
+start; more keys add daily capacity and real failover. **One key per provider** —
+never stack accounts on the same provider; that violates their terms. Before
+go-live, check each provider's current limits and terms (they change), set the
+limits in the config accordingly, then run `npm run llm:eval` to admit models.
 
 | Key | Provider | Where to get it |
 |---|---|---|
 | `GEMINI_API_KEY` | Google AI Studio (already set for v1) | https://aistudio.google.com/apikey |
 | `GROQ_API_KEY` | Groq | https://console.groq.com/keys |
-| `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` | Cloudflare Workers AI (10k neurons/day — a small top-up) | https://dash.cloudflare.com → AI → Workers AI → REST API |
-| `MISTRAL_API_KEY` | Mistral La Plateforme (free "Experiment" plan) | https://console.mistral.ai |
-| `OPENROUTER_API_KEY` | OpenRouter (`:free` models only) | https://openrouter.ai/keys |
+| `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` | Cloudflare Workers AI (small daily allowance — a top-up) | https://dash.cloudflare.com → AI → Workers AI → REST API |
+| `MISTRAL_API_KEY` | Mistral La Plateforme | https://console.mistral.ai |
+| `OPENROUTER_API_KEY` | OpenRouter | https://openrouter.ai/keys |
 
-**Not in the pool (checked 2026-09):** Cerebras ended its free tier (card-required
-$5/30-day trial since Jul–Aug 2026) — disabled in the config. GitHub Models was
-retired (Jul 2026). NVIDIA's API catalog and Cohere trial keys forbid production
-use. Together, DeepSeek, OpenAI, Anthropic and xAI need a card/top-up. SambaNova,
-AI21 and Fireworks are one-time expiring credits, not tiers.
+Prompts leave our infrastructure and providers may retain them. That is why no user
+identifier is ever placed in a prompt (`src/lib/agent/privacy.ts`) — only market
+data and the question text.
 
-Free tiers may train on prompts. That is why no user identifier is ever placed in
-a prompt (`src/lib/agent/privacy.ts`) — only market data and the question text.
-
-## Agent service — alert channels + backup (all optional, all free tiers)
+## Agent service — alert channels + backup (all optional)
 
 | Key | Used for | Where to get it |
 |---|---|---|

@@ -6,7 +6,7 @@ import { QuotaTracker } from "./quota";
 import { MalformedCompletionError, PoolExhaustedError, RateLimitedError, type JsonLlm, type JsonRequest, type JsonResult } from "./types";
 
 /**
- * Quota-aware router over the free pool. For each request: take the providers
+ * Quota-aware router over the provider pool. For each request: take the providers
  * that have a key, are not cooling down and have rpm/rpd headroom; try the one
  * with the MOST headroom first; on any failure fail over to the next. A 429 cools
  * the provider down; another error benches it briefly. One request = one model

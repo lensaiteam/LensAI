@@ -1,6 +1,6 @@
 /**
- * The prompt privacy boundary (agent phase decision). Free LLM tiers may train on
- * prompts, so NO user identifier may ever reach a provider: not the wallet, not an
+ * The prompt privacy boundary (agent phase decision). Prompts leave our
+ * infrastructure and providers may retain them, so NO user identifier may ever reach a provider: not the wallet, not an
  * email, not a Telegram id. Two layers:
  *   - scrubIdentifiers(): applied to user-supplied text (questions, pasted claims)
  *     before it is placed in a prompt — identifiers become neutral placeholders.

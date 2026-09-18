@@ -6,7 +6,7 @@ import { assertNonAdvisory } from "../guardrails/outputFilter";
 
 /**
  * "What changed since I last looked?" — pure arithmetic between two computed
- * anchors (no model call, so it costs nothing from the free pool and cannot
+ * anchors (no model call, so it spends no model budget and cannot
  * hallucinate). The only per-user input is a timestamp; the point-in-time derived
  * tables do the rest.
  */

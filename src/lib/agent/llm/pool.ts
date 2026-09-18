@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 
 /**
- * Config-driven free-tier provider pool (config/llm-pool.json). Free models and
+ * Config-driven provider pool (config/llm-pool.json). Models and
  * limits churn, so adding/retiring a provider or model is a JSON edit, not code.
  * Every provider speaks the OpenAI-compatible chat-completions shape.
  */

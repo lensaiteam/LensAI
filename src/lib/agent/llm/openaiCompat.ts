@@ -26,7 +26,7 @@ export interface CompatCall {
   /** Provider-specific body extras from the pool config. */
   extraBody?: Record<string, unknown>;
   timeoutMs?: number;
-  /** Pause before the single retry of a 5xx (free tiers shed load with 503s). 0 disables the retry. */
+  /** Pause before the single retry of a 5xx (providers shed load with 503s). 0 disables the retry. */
   retryDelayMs?: number;
 }
 

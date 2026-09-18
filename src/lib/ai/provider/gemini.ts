@@ -4,7 +4,7 @@ import { env } from "../../env";
 import type { LLMProvider, LLMRequest, LLMResult } from "./types";
 
 /**
- * Google Gemini adapter (dev-oriented free tier). Maps the provider-neutral
+ * Google Gemini adapter. Maps the provider-neutral
  * request onto Gemini's generateContentStream:
  *   - system prompt  -> config.systemInstruction
  *   - messages       -> contents (assistant -> "model")

@@ -6,8 +6,10 @@ truth, only ways to reach the truth the engine already computed.
 
 ## Shape: plan → gather → one generation → gates
 
-The agent does **not** run an open tool-calling loop. Free models are unreliable
-at that, and the engine doesn't need it:
+The agent does **not** run an open tool-calling loop. The intelligence is the
+engine's — measured state, mechanism graph, verified claims — so the model only
+narrates what the engine already computed. An open loop across a heterogeneous
+model pool would add unreliability without adding truth:
 
 ```
 question ─▶ plan ─▶ gather (point-in-time tool layer) ─▶ ONE structured generation
@@ -26,9 +28,9 @@ question ─▶ plan ─▶ gather (point-in-time tool layer) ─▶ ONE structu
   nothing survives, the agent retries once on a **different** provider, then falls
   back to the measured state. It never guesses and never errors at the user.
 
-## Free-pool economics
+## Model-call economics
 
-Ruling: free tiers only, **one key per provider**, never multiple accounts.
+The model pool is finite and shared. **One key per provider**, never multiple accounts.
 
 | Request | Model calls |
 |---|---|
@@ -74,7 +76,7 @@ account deletion erases all of it. Export: `GET /v1/export`. Erase: `DELETE /v1/
 | conversations (scrubbed text, as_of, claim audit) | history; auto-purged after 90 idle days |
 | watches + trigger log | the feature |
 | watchlist (symbols only), timezone, last-seen anchor | personalisation, "what changed" |
-| daily usage counters | the free pool is finite |
+| daily usage counters | the model budget is finite |
 | API key **hashes** | tool endpoint; the key is shown once |
 | claim-check submissions (scrubbed) | only when the user chooses `save` |
 | answer feedback | calibration |

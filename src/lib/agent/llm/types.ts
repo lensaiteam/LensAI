@@ -1,7 +1,7 @@
 /**
  * The agent's LLM seam. Everything the agent asks of a model is ONE structured
  * JSON generation (plan / claims / rule / extraction) — never an open tool loop —
- * so any free model that can emit JSON is usable, and the fail-closed
+ * so any pooled model that can emit JSON is usable, and the fail-closed
  * verify + guardrail gates downstream keep a weak model from shipping a wrong
  * number. Returns `unknown`: callers zod-validate.
  */

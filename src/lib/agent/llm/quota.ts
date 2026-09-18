@@ -1,5 +1,5 @@
 /**
- * Per-provider quota tracking for the free pool: a sliding one-minute window
+ * Per-provider quota tracking for the pool: a sliding one-minute window
  * (rpm), a UTC-day counter (rpd), and a cooldown set when a provider returns 429.
  * In-memory by design — a restart forgets today's count, which only makes the
  * tracker optimistic until the provider's own 429 corrects it (the cooldown).

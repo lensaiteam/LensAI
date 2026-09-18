@@ -19,7 +19,7 @@ import { loadVocabulary } from "./watch/rule";
  * ONE structured generation → the same fail-closed gates as scheduled narration
  * (numbers resolve, mechanical claims cite a real edge, non-advisory) → render.
  *
- * Free-pool economics: generic reads are served from the shared per-anchor brief
+ * Model-call economics: generic reads are served from the shared per-anchor brief
  * (market state is identical for every user, so it is generated once); "what
  * changed" and the track record are pure arithmetic; and when the pool is
  * exhausted the agent degrades to the measured state rather than failing.

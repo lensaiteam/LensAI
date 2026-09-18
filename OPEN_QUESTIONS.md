@@ -99,16 +99,17 @@ numbers/advisory/fake-edge claims dropped (never softened), final `assertNonAdvi
 on the assembled text. Emitted briefs are logged to an **append-only** calibration
 record. Scope v1 = Market State + Token briefing (Incident mechanics is a follow-on).
 
-### Q15 — Agent LLM: free-tier pool instead of a paid model.
-**Decision (2026-09-17), reversible.** No paid tiers; pool free providers, **one
-key each** (multi-account stacking is out — ToS). Consequence taken in the design:
-no open tool loop (free models are unreliable at it) — plan → deterministic gather →
+### Q15 — Agent LLM: a multi-provider pool instead of a single vendor.
+**Decision (2026-09-17), reversible.** Route model calls across a configurable
+provider pool, **one key per provider** (multi-account stacking is out — ToS).
+Consequence taken in the design: no open tool loop (the pool is heterogeneous, and
+the engine, not the model, is the intelligence) — plan → deterministic gather →
 ONE structured generation → the existing fail-closed gates; everything that can be
 arithmetic is (changes, watches, track record); generic reads are one shared brief
 per anchor. Supersedes Q14's "Claude default" for the running system: `narrate` now
 defaults to the pool, `--anthropic` remains an opt-in. **Reversal is a config edit**
-(`config/llm-pool.json` takes any OpenAI-compatible endpoint, paid or free). Known
-ceiling: pooled free limits cap concurrent ad-hoc questions; per-user daily budget
+(`config/llm-pool.json` takes any OpenAI-compatible endpoint). Known
+ceiling: pooled provider limits cap concurrent ad-hoc questions; per-user daily budget
 (`AGENT_DAILY_ASK_LIMIT`) + graceful degradation to the measured state absorb it.
 
 ### Q16 — INV-4 tightened: numbers in prose must be declared.
@@ -116,7 +117,7 @@ ceiling: pooled free limits cap concurrent ad-hoc questions; per-user daily budg
 verified against the store like any declared number; the claim is dropped
 (`undeclared-number`) only if it does NOT resolve — otherwise a weaker model could
 write "94th percentile" in prose with `numbers: []` and bypass verification. (First
-cut dropped every such claim; real free models restate true numbers in prose often
+cut dropped every such claim; pooled models restate true numbers in prose often
 enough that this threw away verifiable claims.) Duration labels ("365-day", "90d")
 are exempt. Applies to scheduled narration too (shared `auditClaims`).
 

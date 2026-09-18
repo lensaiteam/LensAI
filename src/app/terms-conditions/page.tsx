@@ -3,7 +3,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { LegalDoc } from "@/components/site/PageHead";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions — LensAI",
+  title: "Terms & Conditions · LensAI",
   description: "The contractual terms governing accounts, payments and liability on LensAI.",
 };
 

@@ -109,7 +109,7 @@ function parseMarket(h: Headers): Snap | null {
 }
 
 function fmtUSD(n: number | null): string {
-  if (n == null) return "—";
+  if (n == null) return "n/a";
   const a = Math.abs(n);
   if (a >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
   if (a >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
@@ -118,7 +118,7 @@ function fmtUSD(n: number | null): string {
   return `$${n.toFixed(2)}`;
 }
 function fmtNum(n: number | null): string {
-  if (n == null) return "—";
+  if (n == null) return "n/a";
   const a = Math.abs(n);
   if (a >= 1e12) return `${(n / 1e12).toFixed(2)}T`;
   if (a >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
@@ -127,7 +127,7 @@ function fmtNum(n: number | null): string {
   return `${Math.round(n)}`;
 }
 function pct(n: number | null): { t: string; cls: string } {
-  if (n == null) return { t: "—", cls: "" };
+  if (n == null) return { t: "n/a", cls: "" };
   return { t: `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`, cls: n >= 0 ? "up" : "down" };
 }
 
@@ -560,19 +560,19 @@ function SnapshotGrid({ snap }: { snap: Snap }) {
     <div className="snap">
       <div className="snap-cell">
         <span className="snap-k">Price</span>
-        <span className="snap-v">{snap.price || "—"}</span>
+        <span className="snap-v">{snap.price || "n/a"}</span>
         {snap.c24 != null && <span className={`snap-d ${c24.cls}`}>{c24.t} 24h</span>}
       </div>
       <div className="snap-cell">
         <span className="snap-k">24h</span>
         <span className={`snap-v ${c24.cls}`}>
-          <CountStat value={snap.c24} format={(n) => (n == null ? "—" : `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`)} />
+          <CountStat value={snap.c24} format={(n) => (n == null ? "n/a" : `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`)} />
         </span>
       </div>
       <div className="snap-cell">
         <span className="snap-k">7d</span>
         <span className={`snap-v ${c7.cls}`}>
-          <CountStat value={snap.c7} format={(n) => (n == null ? "—" : `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`)} />
+          <CountStat value={snap.c7} format={(n) => (n == null ? "n/a" : `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`)} />
         </span>
       </div>
       <div className="snap-cell">
@@ -1227,7 +1227,7 @@ function Composer({
                 onSend();
               }
             }}
-            placeholder="Ask a follow-up — “is it a rug?”, unlocks, sentiment, news…"
+            placeholder="Ask a follow-up: “is it a rug?”, unlocks, sentiment, news…"
             disabled={disabled}
           />
           <button className="send-btn" onClick={() => onSend()} disabled={disabled || !input.trim()} aria-label="Send">
@@ -1274,7 +1274,7 @@ function EmptyState({ onAnalyze, error }: { onAnalyze: (t: string) => void; erro
         {head[2]}
       </h1>
       <p className="hero-sub">
-        Type a ticker and LensAI reads the live market, the news, and the crowd — a decision-grade,
+        Type a ticker and LensAI reads the live market, the news, and the crowd: a decision-grade,
         non-advisory take in seconds.
       </p>
 

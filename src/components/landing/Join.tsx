@@ -40,7 +40,7 @@ export function Join() {
     <Sec n="01" label="The join" id="join">
       <LineReveal as="h2" className="display" lines={["Anyone can chart a factor.", <span key="d" className="dim">The join is the product.</span>]} />
       <motion.p className="intro" initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}>
-        This is the desk&apos;s mechanism graph, drawn exactly as it is curated: {NODES.length} nodes, {EDGES.length} directed edges, {CHANNELS.length} documented channels. A claim may call a link mechanical only if it cites one of these edges. Everything else must be measured — or say it is conjecture.
+        This is the desk&apos;s mechanism graph, drawn exactly as it is curated: {NODES.length} nodes, {EDGES.length} directed edges, {CHANNELS.length} documented channels. A claim may call a link mechanical only if it cites one of these edges. Everything else must be measured, or say it is conjecture.
       </motion.p>
 
       <div className="jn">

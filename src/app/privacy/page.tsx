@@ -3,7 +3,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { LegalDoc } from "@/components/site/PageHead";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — LensAI",
+  title: "Privacy Policy · LensAI",
   description: "What LensAI stores, why, and how to delete it. Identity is a wallet address; contact details are held only if you turn on an alert channel.",
 };
 
@@ -19,7 +19,7 @@ const SECTIONS = [
     "Alert contact, only if you opt in: an email address if you turn on email alerts, or a Telegram chat id if you link the alert bot. Removing the channel removes the detail.",
     "Saved claim checks: text you paste for checking is processed and discarded unless you choose to save the result.",
     "API keys: if you create one, only a one-way hash is stored. The key itself is shown once and cannot be recovered.",
-    "Operational data: minimal technical logs such as request and token counts, model used, per-day usage counts that enforce fair use, and whether a result was served from cache — used to run, secure and cost the service.",
+    "Operational data: minimal technical logs such as request and token counts, model used, per-day usage counts that enforce fair use, and whether a result was served from cache. These are used to run, secure and cost the service.",
   ] },
   { h: "Information we do not collect", p: [
     "We do not collect your name, password, phone number or government identifiers, and we hold no email address unless you turn on email alerts.",
@@ -37,9 +37,9 @@ const SECTIONS = [
     "We do not embed third-party advertising or analytics trackers that profile you across the web.",
   ] },
   { h: "Third-party services", p: [
-    "To function, LensAI sends non-personal queries to third-party providers — market-data sources, news sources, and an AI model provider — to gather facts and generate analysis.",
+    "To function, LensAI sends non-personal queries to third-party providers (market-data sources, news sources, and an AI model provider) to gather facts and generate analysis.",
     "These providers process the ticker and gathered data needed to answer a request, not your identity. We do not share your wallet address with them for the purpose of the analysis.",
-    "The agents use more than one AI model provider, and some of those providers may use the prompts they receive to improve their models. For that reason no identifier of yours is ever placed in a prompt: your text is scrubbed of wallet addresses, emails and handles, and our systems refuse to send any prompt that still contains one. What a provider does receive is market data together with the text of your question, or the text you paste for a claim check — so do not include personal information in either.",
+    "The agents use more than one AI model provider, and some of those providers may use the prompts they receive to improve their models. For that reason no identifier of yours is ever placed in a prompt: your text is scrubbed of wallet addresses, emails and handles, and our systems refuse to send any prompt that still contains one. What a provider does receive is market data together with the text of your question, or the text you paste for a claim check, so do not include personal information in either.",
     "If you turn on alerts, the message is delivered through Telegram or an email delivery provider, which necessarily receive the chat id or email address you gave us for that purpose.",
   ] },
   { h: "Data retention", p: [
@@ -56,7 +56,7 @@ const SECTIONS = [
   ] },
   { h: "Your rights", p: [
     "Depending on where you live, you may have rights to access, correct, export or delete your data, and to object to or restrict certain processing.",
-    "Because your identity is a wallet you control, you can exercise the most important right — deletion — yourself, at any time, from within the app.",
+    "Because your identity is a wallet you control, you can exercise the most important right, deletion, yourself at any time, from within the app.",
   ] },
   { h: "Deletion & controls", p: [
     "You can delete any individual session, conversation, watch or saved claim check, or your entire account, at any time. Account deletion removes your sessions, messages, watchlist and free-tier records, and with them all agent data: conversations, watches and their trigger log, alert contact details, API key hashes, saved claim checks and usage counts.",
@@ -80,7 +80,7 @@ export default function Privacy() {
       <LegalDoc
         index="L1" kicker="Privacy Policy" title="Store the minimum."
         updated="17 September 2026"
-        intro="LensAI is built to hold as little about you as possible. Your identity is a wallet address, proven by a signature — no password, no name, and no email unless you ask for email alerts. This policy explains exactly what we do and don't keep."
+        intro="LensAI is built to hold as little about you as possible. Your identity is a wallet address, proven by a signature. No password, no name, and no email unless you ask for email alerts. This policy explains exactly what we do and don't keep."
         sections={SECTIONS}
       />
     </SiteShell>

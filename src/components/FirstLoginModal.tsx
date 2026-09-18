@@ -22,7 +22,7 @@ export function FirstLoginModal({ walletAddress }: { walletAddress: string }) {
         <h2 className="text-lg font-bold mb-2 tracking-tight">Before you start</h2>
         <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--w2)" }}>
           LensAI provides <strong className="text-[var(--w)]">information and analysis, not financial advice</strong>.
-          It never tells you to buy or sell — it assesses whether current signals look positive, mixed, or negative.
+          It never tells you to buy or sell. It assesses whether current signals look positive, mixed, or negative.
         </p>
         <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--w2)" }}>
           Crypto is highly volatile and you can lose money. Always do your own research.

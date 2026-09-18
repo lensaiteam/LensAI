@@ -5,7 +5,7 @@ import { PageHead } from "@/components/site/PageHead";
 import { DocToc } from "@/components/site/DocToc";
 
 export const metadata: Metadata = {
-  title: "Whitepaper — LensAI",
+  title: "Whitepaper · LensAI",
   description: "How LensAI turns live market data and current news into decision-grade, non-advisory crypto analysis.",
 };
 
@@ -15,7 +15,7 @@ const SECTIONS: Sec[] = [
   {
     h: "Abstract",
     p: [
-      "LensAI is a research instrument for crypto. A user enters a ticker and receives a thorough, decision-grade analysis of that token, synthesized from live market data plus current news and sentiment. The output is designed to help a person judge whether a token currently looks attractive or risky — and it is explicitly not financial advice.",
+      "LensAI is a research instrument for crypto. A user enters a ticker and receives a thorough, decision-grade analysis of that token, synthesized from live market data plus current news and sentiment. The output is designed to help a person judge whether a token currently looks attractive or risky, and it is explicitly not financial advice.",
       "This document describes how the system works: the live-data pipeline that grounds every answer, the non-advisory design that keeps the product on the right side of a hard regulatory line, the cost architecture that keeps it viable at scale, and the privacy model that stores almost nothing about the people who use it.",
     ],
   },
@@ -23,13 +23,13 @@ const SECTIONS: Sec[] = [
     h: "The problem",
     p: [
       "A language model does not know the current price of any token, its market cap today, or what happened this morning. Ask it directly and it will confidently narrate a stale, invented market. The facts that matter in crypto change by the minute, and a model's training data is frozen months in the past.",
-      "The naive fix — let the model \"search the web\" on every request — is expensive, slow, and inconsistent. It also conflates two very different jobs: gathering current facts, and reasoning over them. LensAI separates the two. The model is a reasoning engine; the pipeline supplies the facts.",
+      "The naive fix, letting the model \"search the web\" on every request, is expensive, slow, and inconsistent. It also conflates two very different jobs: gathering current facts, and reasoning over them. LensAI separates the two. The model is a reasoning engine; the pipeline supplies the facts.",
     ],
   },
   {
-    h: "Core principle — the pipeline is the product",
+    h: "Core principle: the pipeline is the product",
     p: [
-      "The single most important idea in LensAI is that the live-data pipeline, not the model, is the moat. Any capable model can reason well over good evidence. What is hard — and what compounds over time — is gathering the right evidence cheaply, reliably, and fast for tens of thousands of assets.",
+      "The single most important idea in LensAI is that the live-data pipeline, not the model, is the moat. Any capable model can reason well over good evidence. What is hard, and what compounds over time, is gathering the right evidence cheaply, reliably, and fast for tens of thousands of assets.",
       "Because the pipeline is model-agnostic, the underlying model can be swapped, upgraded or tiered without changing what makes LensAI valuable. The product improves as the pipeline improves.",
     ],
   },
@@ -56,22 +56,22 @@ const SECTIONS: Sec[] = [
   {
     h: "News, developments & sentiment",
     p: [
-      "Quantitative data alone tells you what a token is doing, not why. Alongside market data, the pipeline pulls recent developments — catalysts, launches, partnerships, incidents — and reads the overall tone of coverage.",
+      "Quantitative data alone tells you what a token is doing, not why. Alongside market data, the pipeline pulls recent developments (catalysts, launches, partnerships, incidents) and reads the overall tone of coverage.",
       "For popular assets this news is pre-fetched by a background job and shared across all requests, so the marginal cost of a read is near zero. For the long tail, a strictly capped live search fills the gap. Every factual claim that reaches the user is attributed to its source.",
     ],
   },
   {
     h: "The analysis",
     p: [
-      "Gathered evidence is compressed to extracted numbers and a handful of attributed summaries — never raw dumps — and passed to the model under a strict template. The output is a briefing, not a number, with six sections:",
+      "Gathered evidence is compressed to extracted numbers and a handful of attributed summaries, never raw dumps, and passed to the model under a strict template. The output is a briefing, not a number, with six sections:",
     ],
     list: [
-      "Snapshot — price, market cap, volume, moves and supply",
-      "Tokenomics — supply model, concentration and unlock risk",
-      "Recent developments — catalysts and incidents, each attributed",
-      "Sentiment — the overall tone of coverage and social signal",
-      "Risk flags — liquidity, volatility and security indicators",
-      "Overall read — an honest POSITIVE / MIXED / NEGATIVE synthesis, both cases named",
+      "Snapshot: price, market cap, volume, moves and supply",
+      "Tokenomics: supply model, concentration and unlock risk",
+      "Recent developments: catalysts and incidents, each attributed",
+      "Sentiment: the overall tone of coverage and social signal",
+      "Risk flags: liquidity, volatility and security indicators",
+      "Overall read: an honest POSITIVE / MIXED / NEGATIVE synthesis, both cases named",
     ],
   },
   {
@@ -88,7 +88,7 @@ const SECTIONS: Sec[] = [
     ],
     list: [
       "A per-ticker cache serves repeat requests within a short window for almost nothing.",
-      "A background job pre-computes the top assets on a schedule, so popular tokens are always warm — a fixed cost regardless of user count.",
+      "A background job pre-computes the top assets on a schedule, so popular tokens are always warm, a fixed cost regardless of user count.",
       "Pre-fetched news removes the per-search fee for popular assets.",
       "Non-interactive pre-computation runs through a batch tier at a discount.",
       "Context is trimmed aggressively, and output is capped by a strict template.",
@@ -97,15 +97,15 @@ const SECTIONS: Sec[] = [
   {
     h: "Follow-ups from stored data",
     p: [
-      "The initial pipeline gathers more than it displays — sentiment, news, tokenomics and risk flags are all pulled up front and stored as structured fields. Most follow-up questions (\"what's the sentiment?\", \"what's the supply?\") can therefore be answered by reading a field back out, with no new model call and no new search.",
+      "The initial pipeline gathers more than it displays: sentiment, news, tokenomics and risk flags are all pulled up front and stored as structured fields. Most follow-up questions (\"what's the sentiment?\", \"what's the supply?\") can therefore be answered by reading a field back out, with no new model call and no new search.",
       "This is per-asset stored data, not per-user stored answers. The underlying facts about a token are the same for everyone and safe to re-serve; a user's private conversation is never replayed to anyone else.",
     ],
   },
   {
     h: "From instrument to desk",
     p: [
-      "A single-token read answers one question. A research desk answers the question behind it: what is the market doing, and where does this token sit inside that? The engine underneath LensAI therefore reads six factor families together — funding, basis and yield, macro, institutional flows, market depth and news — and joins them on one clock.",
-      "Each stream is normalized against its own history, so a reading is a percentile rather than a raw number, and each is tagged with the regime it sits in. A hand-curated mechanism graph records the documented transmission channels between factors. A divergence engine — pure arithmetic — flags states that are historically extreme and relationships that have broken. The model never finds the dots; it narrates the ones the engine measured.",
+      "A single-token read answers one question. A research desk answers the question behind it: what is the market doing, and where does this token sit inside that? The engine underneath LensAI therefore reads six factor families together (funding, basis and yield, macro, institutional flows, market depth and news) and joins them on one clock.",
+      "Each stream is normalized against its own history, so a reading is a percentile rather than a raw number, and each is tagged with the regime it sits in. A hand-curated mechanism graph records the documented transmission channels between factors. A divergence engine, pure arithmetic, flags states that are historically extreme and relationships that have broken. The model never finds the dots; it narrates the ones the engine measured.",
       "Everything is point-in-time. Every observation is content-hashed and appended, never updated, and every read is anchored to an as-of instant that cannot see anything captured after it. Lookahead is not discouraged; it is structurally impossible.",
     ],
   },
@@ -117,10 +117,10 @@ const SECTIONS: Sec[] = [
       "None of them is an open-ended tool loop. An agent plans once, gathers deterministically through the point-in-time tool layer, and makes at most one structured generation: a list of atomic claims, each typed as measured, mechanical or conjecture. That list then passes the same gates as every scheduled brief.",
     ],
     list: [
-      "Every number — including one written only in the prose — must resolve to a store row, or the claim is dropped",
+      "Every number, including one written only in the prose, must resolve to a store row, or the claim is dropped",
       "A mechanical claim must cite a real edge in the mechanism graph, or it is dropped",
       "Anything that reads as an instruction is dropped by the non-advisory filter",
-      "If nothing survives, the agent retries once on a different model, then shows the measured state — it never guesses",
+      "If nothing survives, the agent retries once on a different model, then shows the measured state. It never guesses",
     ],
   },
   {
@@ -134,21 +134,21 @@ const SECTIONS: Sec[] = [
     h: "Watches and claim checks",
     p: [
       "A watch is said once in plain language. A small model translates it into a rule over measured state, the desk echoes that rule back in exact terms, and the user confirms it. From then on it is arithmetic: evaluated once per anchor, fired only on the transition from false to true, bounded by a cooldown, and silent when data is missing. A watch can describe a state; it cannot encode an instruction, and price-level alerts are refused.",
-      "A claim check inverts the usual trust. The model only extracts what a post asserts and maps each number to the store row that measures the same thing. The verdict — supported, contradicted with the store's value shown, or unverifiable — is computed, not judged. A causal claim counts as documented only when it maps to a real edge in the mechanism graph.",
+      "A claim check inverts the usual trust. The model only extracts what a post asserts and maps each number to the store row that measures the same thing. The verdict (supported, contradicted with the store's value shown, or unverifiable) is computed, not judged. A causal claim counts as documented only when it maps to a real edge in the mechanism graph.",
     ],
   },
   {
     h: "What the agents keep about you",
     p: [
-      "Agent state — conversations, watches and their trigger log, a watchlist of symbols, the anchor you last viewed, daily usage counts and hashed API keys — lives in the user database, cascades from the account, and is erased with it. An email address or Telegram chat id is held only if you turn that alert channel on.",
+      "Agent state (conversations, watches and their trigger log, a watchlist of symbols, the anchor you last viewed, daily usage counts and hashed API keys) lives in the user database, cascades from the account, and is erased with it. An email address or Telegram chat id is held only if you turn that alert channel on.",
       "Two boundaries are enforced in code. No user identifier ever enters a model prompt: user text is scrubbed, and the model router refuses any prompt that still carries a wallet, an email or a known identifier. And nothing derived from a user ever enters the append-only corpus or the calibration record, because what cannot be deleted must never hold what a person may ask to erase.",
     ],
   },
   {
     h: "Identity & privacy",
     p: [
-      "The account is a wallet address, proven by an off-chain signature (Sign-In With Ethereum). There is no transaction, no gas, and no private key ever touches our servers — and no email, password or other traditional personal information is collected.",
-      "Research history is treated as sensitive, because the tickers a person studies hint at their holdings and intentions. On-chain balances are never stored, and deletion — of a single session or the whole account — is a first-class, one-action path.",
+      "The account is a wallet address, proven by an off-chain signature (Sign-In With Ethereum). There is no transaction, no gas, and no private key ever touches our servers, and no email, password or other traditional personal information is collected.",
+      "Research history is treated as sensitive, because the tickers a person studies hint at their holdings and intentions. On-chain balances are never stored, and deletion, of a single session or the whole account, is a first-class, one-action path.",
     ],
   },
   {
@@ -161,7 +161,7 @@ const SECTIONS: Sec[] = [
     h: "Limitations",
     p: [
       "LensAI is only as good as the data it can gather. Third-party sources can be delayed, incomplete or wrong; obscure assets may have thin coverage; and sentiment is a read of tone, not a guarantee of outcome. The system is built to surface these limits honestly rather than paper over them.",
-      "Crypto is highly volatile and you can lose money. LensAI provides information and analysis to support your own research — the decision is always yours.",
+      "Crypto is highly volatile and you can lose money. LensAI provides information and analysis to support your own research. The decision is always yours.",
     ],
   },
 ];

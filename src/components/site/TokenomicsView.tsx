@@ -18,7 +18,7 @@ const ALLOC = [
 /** Vesting, in months from listing. `linear: null` = the schedule states "then linear" without a length. */
 const HORIZON = 48;
 const VEST = [
-  { label: "Community & rewards", cliff: 0, linear: 48, note: "Released over 48 months against usage and contribution — no upfront unlock." },
+  { label: "Community & rewards", cliff: 0, linear: 48, note: "Released over 48 months against usage and contribution, with no upfront unlock." },
   { label: "Treasury", cliff: 12, linear: null, note: "Governance-controlled; spend requires a proposal. 12-month cliff, then linear." },
   { label: "Team", cliff: 12, linear: 36, note: "12-month cliff, then linear over the following 36 months. Fully aligned to the long build." },
   { label: "Liquidity", cliff: 0, linear: 0, note: "Unlocked at listing to seed healthy markets; paired and managed by the treasury." },
@@ -26,7 +26,7 @@ const VEST = [
 ] as const;
 
 const UTILITY = [
-  ["U.1", "Reads & credits", "Beyond the free tier, analyses and force-refreshes are metered in $LENS — the network's unit of work."],
+  ["U.1", "Reads & credits", "Beyond the free tier, analyses and force-refreshes are metered in $LENS, the network's unit of work."],
   ["U.2", "Governance", "Holders steer coverage priorities, the pre-compute list, and treasury spend on data sources."],
   ["U.3", "Treasury flywheel", "A share of usage revenue funds the pipeline and buys back into the treasury, decoupling cost from users."],
   ["U.4", "Access tiers", "Staking unlocks higher rate limits, deeper history and early access to new coverage and features."],
@@ -34,14 +34,14 @@ const UTILITY = [
 
 const FLOW = [
   ["Usage", "Users spend credits on reads, refreshes and API calls."],
-  ["Pipeline", "Revenue funds live data, news and compute — the real cost of coverage."],
+  ["Pipeline", "Revenue funds live data, news and compute, the real cost of coverage."],
   ["Treasury", "A share flows to the treasury and buys back $LENS, controlled by governance."],
   ["Holders", "Value returns to the network via rewards, access and a growing treasury."],
 ] as const;
 
 const FAQ = [
   ["Is there a token today?", "No. $LENS is a planned, future component described here for transparency. Everything on this page is illustrative and subject to change before any launch."],
-  ["Is $LENS required to use LensAI?", "No. The core product works without it — the first analyses are free, and the token is a utility and coordination layer, not a paywall on the basics."],
+  ["Is $LENS required to use LensAI?", "No. The core product works without it. The first analyses are free, and the token is a utility and coordination layer, not a paywall on the basics."],
   ["Will supply inflate?", "No. Supply is fixed at one billion with no emissions. Distribution happens by unlocking allocated supply on published schedules, not by minting new tokens."],
   ["How is this not financial advice?", "It isn't advice, and $LENS is not offered here for sale. This page explains a planned design; it is not a solicitation or a promise of value."],
 ] as const;
@@ -120,7 +120,7 @@ export function TokenomicsView() {
             );
           })}
           <div className="vs-legend mono" aria-hidden="true">
-            <span><i className="c" />cliff — nothing unlocks</span>
+            <span><i className="c" />cliff: nothing unlocks</span>
             <span><i className="v" />linear unlock</span>
             <span><i className="o" />linear, length set by governance</span>
             <span><i className="t" />unlocked at listing</span>

@@ -4,7 +4,7 @@ import { PageHead } from "@/components/site/PageHead";
 import { CareersView } from "@/components/site/CareersView";
 
 export const metadata: Metadata = {
-  title: "Careers — LensAI",
+  title: "Careers · LensAI",
   description: "Build the research desk. Roles, how we work, and how to apply at LensAI.",
 };
 

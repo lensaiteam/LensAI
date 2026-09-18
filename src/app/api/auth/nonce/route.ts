@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const NOT_CONFIGURED =
-  "LensAI backend isn't configured yet. Add Supabase credentials (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) to .env.local and restart — see README.";
+  "LensAI backend isn't configured yet. Add Supabase credentials (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) to .env.local and restart. See README.";
 
 // POST /api/auth/nonce -> { nonce }
 export async function POST(req: NextRequest) {

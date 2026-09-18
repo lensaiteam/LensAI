@@ -21,9 +21,9 @@ const TAPE = [
 type Basis = "measured" | "mechanical" | "conjecture";
 const CLAIMS: { basis: Basis; text: string; ref: string; dropped?: string }[] = [
   { basis: "measured", text: "BTC perp funding sits at the 94th percentile of its own 365-day history.", ref: "pctl:funding_rate/binance/BTC/365d" },
-  { basis: "measured", text: "Resting depth is thin — 7th percentile, flagged as a historical extreme.", ref: "div:extreme_state/market_depth" },
+  { basis: "measured", text: "Resting depth is thin: 7th percentile, flagged as a historical extreme.", ref: "div:extreme_state/market_depth" },
   { basis: "mechanical", text: "Elevated funding widens the carry spread and draws basis-trade capital.", ref: "edge:funding_to_basis" },
-  { basis: "measured", text: "Basis has followed it up, to the 88th percentile.", ref: "pctl:basis/binance/BTC/365d", dropped: "Dropped — the store reads P42. The number did not resolve." },
+  { basis: "measured", text: "Basis has followed it up, to the 88th percentile.", ref: "pctl:basis/binance/BTC/365d", dropped: "Dropped: the store reads P42. The number did not resolve." },
   { basis: "conjecture", text: "Basis has not followed funding; with depth this thin, an unwind would travel further than usual.", ref: "labeled conjecture" },
 ];
 const DROP_AT = CLAIMS.length; // the strike lands after every claim has been set
@@ -92,7 +92,7 @@ function Brief() {
 
 function Tape() {
   return (
-    <div className="tape6" role="group" aria-label="The tape — six factor families, specimen readings">
+    <div className="tape6" role="group" aria-label="The tape: six factor families, specimen readings">
       <div className="t6-cap mono">
         <span>The tape</span>
         <em>six families · each against its own history · specimen readings</em>
@@ -118,10 +118,10 @@ export function Hero() {
     <section className="hx">
       <div className="hx-in lp-wrap">
         <div className="hx-copy">
-          <motion.span className="kicker" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.1 }}>LensAI — The research desk</motion.span>
+          <motion.span className="kicker" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.1 }}>LensAI · The research desk</motion.span>
           <LineReveal className="display hx-title" lines={["Read the signal,", <em key="n" className="dim">not the noise.</em>]} />
           <motion.p className="hx-sub" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.45 }}>
-            A crypto research desk that reads funding, basis, macro, flows, depth and news <b>together</b> — and shows its work. Ask it. Leave it watching. Hand it a claim.
+            A crypto research desk that reads funding, basis, macro, flows, depth and news <b>together</b>, and shows its work. Ask it. Leave it watching. Hand it a claim.
           </motion.p>
           <motion.div className="hx-cta" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.58 }}>
             <Link className="mast-cta hx-primary" href="/app"><span>Open the desk</span><span className="a" aria-hidden="true">→</span></Link>

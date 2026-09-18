@@ -20,7 +20,7 @@ export function Method() {
     <Sec n="02" label="Method" id="method">
       <LineReveal as="h2" className="display" lines={["The model never", <span key="d" className="dim">finds the dots.</span>]} />
       <motion.p className="intro" {...rise} transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}>
-        Six steps, in strict order. The first four are arithmetic and storage. A model appears only at step five — and step six exists to check it.
+        Six steps, in strict order. The first four are arithmetic and storage. A model appears only at step five, and step six exists to check it.
       </motion.p>
 
       <div className="mt" ref={ref}>
@@ -48,7 +48,7 @@ export function AgentsIndex() {
     <Sec n="03" label="Agents" id="agents">
       <LineReveal as="h2" className="display" lines={["Ask it. Leave it watching.", <span key="d" className="dim">Hand it a claim.</span>]} />
       <motion.p className="intro" {...rise} transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}>
-        Nine agents reach the same measured engine in different ways — and the ones that can be pure arithmetic are, so they cannot invent a number.
+        Nine agents reach the same measured engine in different ways, and the ones that can be pure arithmetic are, so they cannot invent a number.
       </motion.p>
       <div className="agx">
         <div className="agx-head mono" aria-hidden="true"><span>Index</span><span>Agent</span><span>Type</span><span>Model calls</span></div>
@@ -74,9 +74,9 @@ export function AgentsIndex() {
 /* ── 04 · STANCE — what it will never say ───────────────────────────────────── */
 const NEVER = ["Buy.", "Sell.", "You should.", "Price target.", "Allocate 10%."];
 const TYPES = [
-  { tag: "measured", h: "Measured", p: "A number or a state read directly from the store — and traceable back to the row it came from." },
+  { tag: "measured", h: "Measured", p: "A number or a state read directly from the store, and traceable back to the row it came from." },
   { tag: "mechanical", h: "Mechanical", p: "A documented transmission channel. It must cite the edge in the mechanism graph, or it does not ship." },
-  { tag: "conjecture", h: "Conjecture", p: "Anything else. It is allowed — labeled, in plain sight, never dressed as a finding." },
+  { tag: "conjecture", h: "Conjecture", p: "Anything else. It is allowed: labeled, in plain sight, never dressed as a finding." },
 ] as const;
 
 export function Stance() {
@@ -99,7 +99,7 @@ export function Stance() {
       </ul>
 
       <div className="ty">
-        <div className="ty-cap mono">What it says instead — every claim is one of three</div>
+        <div className="ty-cap mono">What it says instead: every claim is one of three</div>
         {TYPES.map((t, i) => (
           <motion.div key={t.tag} className="ty-row" {...rise} transition={{ duration: 0.7, ease: EASE, delay: 0.05 * i }}>
             <span className={`bs-tag mono ${t.tag}`}>{t.tag}</span>

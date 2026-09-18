@@ -8,16 +8,16 @@ const rise = { initial: { opacity: 0, y: 16 }, whileInView: { opacity: 1, y: 0 }
 
 const VALUES = [
   ["W.1", "The join is the product", "Anyone can chart a factor. We are obsessed with the part that compounds: the normalized history, the immutable corpus, the curated graph, the calibration record."],
-  ["W.2", "Honest by default", "We surface uncertainty instead of hiding it — a labeled conjecture beats a confident guess, in the product and in the way we work."],
+  ["W.2", "Honest by default", "We surface uncertainty instead of hiding it. A labeled conjecture beats a confident guess, in the product and in the way we work."],
   ["W.3", "Small team, real ownership", "You own outcomes end to end. Fewer people, more surface area, more trust."],
   ["W.4", "Ship, then sharpen", "We put things in front of users early and let reality tell us what to refine next."],
 ] as const;
 
 const ROLES = [
   { code: "R01", title: "Data Pipeline Engineer", team: "Engineering", type: "Remote · Full-time", blurb: "Own capture and the factor store: append-only ingest, point-in-time reads, percentile normalization, and the cost architecture that keeps a read near-free at scale. Correctness and no-lookahead are your KPIs.", looks: ["Has shipped data systems where a wrong number is worse than no number", "Comfortable in TypeScript and SQL; opinions about immutability", "Writes the test that proves the invariant before the feature"] },
-  { code: "R02", title: "Frontend Engineer", team: "Product", type: "Remote · Full-time", blurb: "Build the desk: the agents' interface, streaming reads, and motion that only ever demonstrates something true. A research UI that feels like an instrument, not a dashboard.", looks: ["Strong eye for type, rhythm and interaction detail", "React and the platform — transforms, observers, accessibility", "Cares that it runs at 60fps on an integrated GPU"] },
+  { code: "R02", title: "Frontend Engineer", team: "Product", type: "Remote · Full-time", blurb: "Build the desk: the agents' interface, streaming reads, and motion that only ever demonstrates something true. A research UI that feels like an instrument, not a dashboard.", looks: ["Strong eye for type, rhythm and interaction detail", "React and the platform: transforms, observers, accessibility", "Cares that it runs at 60fps on an integrated GPU"] },
   { code: "R03", title: "Applied ML / Prompt Engineer", team: "Research", type: "Remote · Contract", blurb: "Tune narration under the fail-closed gates: structured claims, attribution, the admission evals that decide which models earn a place in the pool. You measure quality, not vibes.", looks: ["Builds evals before prompts", "Skeptical of model output by temperament", "Can explain a failure mode in one paragraph"] },
-  { code: "R04", title: "Product Designer", team: "Design", type: "Remote · Full-time", blurb: "Define the visual and interaction language across the site and the desk. Editorial, restrained and alive — you set the bar, and you hold it.", looks: ["A portfolio with a point of view, not a template", "Information design: tables, states, density", "Writes — copy is design material here"] },
+  { code: "R04", title: "Product Designer", team: "Design", type: "Remote · Full-time", blurb: "Define the visual and interaction language across the site and the desk. Editorial, restrained and alive. You set the bar, and you hold it.", looks: ["A portfolio with a point of view, not a template", "Information design: tables, states, density", "Writes: copy is design material here"] },
 ] as const;
 
 const HOW = [
@@ -28,7 +28,7 @@ const HOW = [
 ] as const;
 
 const PROCESS = [
-  ["Intro", "A short call to trade context — what you've built, what we're building."],
+  ["Intro", "A short call to trade context: what you've built, what we're building."],
   ["Deep dive", "A working session on a real problem in your area. No trick questions, no take-home marathons."],
   ["Meet the team", "Conversations with the people you'd work with day to day."],
   ["Offer", "A clear, written offer with transparent compensation and equity."],

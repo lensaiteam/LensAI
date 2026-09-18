@@ -11,8 +11,8 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const a = agentBySlug(params.slug);
-  if (!a) return { title: "Agents — LensAI" };
-  return { title: `${a.name} — LensAI agents`, description: a.line };
+  if (!a) return { title: "Agents · LensAI" };
+  return { title: `${a.name} · LensAI agents`, description: a.line };
 }
 
 export default function Agents({ params }: { params: { slug: string } }) {
@@ -24,7 +24,7 @@ export default function Agents({ params }: { params: { slug: string } }) {
           index="01"
           kicker="Agents"
           title="Nine agents. One desk."
-          sub={`Each agent is a way of reaching what the engine has already measured. They share one rule: every connection is measured, mechanical, or labeled conjecture — and none of them will tell you what to do. ${["None", "One", "Two", "Three", "Four", "Five", "Six"][AGENTS.filter((a) => a.calls.value === "0").length]} of the nine cost no model call per question.`}
+          sub={`Each agent is a way of reaching what the engine has already measured. They share one rule: every connection is measured, mechanical, or labeled conjecture, and none of them will tell you what to do. ${["None", "One", "Two", "Three", "Four", "Five", "Six"][AGENTS.filter((a) => a.calls.value === "0").length]} of the nine cost no model call per question.`}
         />
         <AgentExplorer initialSlug={params.slug} />
       </div>

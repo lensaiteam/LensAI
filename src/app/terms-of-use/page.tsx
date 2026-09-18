@@ -3,7 +3,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { LegalDoc } from "@/components/site/PageHead";
 
 export const metadata: Metadata = {
-  title: "Terms of Use — LensAI",
+  title: "Terms of Use · LensAI",
   description: "The rules for using LensAI: informational only, not financial advice.",
 };
 
@@ -31,7 +31,7 @@ const SECTIONS = [
     "You are responsible for the wallet you connect and for keeping its keys and seed phrase secure. We will never ask for your private keys or seed phrase.",
   ] },
   { h: "Accounts", p: [
-    "Your account is your connected wallet, and signing the login message authorizes a session only — never a transaction. You are responsible for all activity conducted through your wallet on the Service.",
+    "Your account is your connected wallet, and signing the login message authorizes a session only, never a transaction. You are responsible for all activity conducted through your wallet on the Service.",
   ] },
   { h: "Third-party data & content", p: [
     "The Service relies on third-party sources for market data and news. That content is provided by others, may be delayed, incomplete or inaccurate, and is attributed where surfaced. We do not endorse and are not responsible for third-party content.",

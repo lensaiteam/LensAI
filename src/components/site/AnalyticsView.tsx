@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CountUp, LineReveal } from "@/components/landing/kit";
 import type { DailyStat, PlatformStats } from "@/lib/stats";
+import { DUNE_DASHBOARD_URL } from "@/lib/site/links";
 
 /**
  * The ledger: the platform counted from its own records. Server-rendered SVG,
@@ -49,6 +50,7 @@ function Series({ values, days, label, area, bars }: { values: number[]; days: s
           peak <b>{fmt(Math.max(0, ...values))}</b> on {days[peakI] ?? "n/a"}
         </span>
       </figcaption>
+      <div className="led-plot">
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="led-svg" role="img" aria-label={`${label} over time`}>
         {[0.25, 0.5, 0.75].map((f) => (
           <line key={f} x1="0" x2={W} y1={y(max * f)} y2={y(max * f)} className="led-grid" />
@@ -58,8 +60,9 @@ function Series({ values, days, label, area, bars }: { values: number[]; days: s
         ))}
         {area && <path d={areaPath(values)} className="led-area" />}
         <path d={linePath(values)} className="led-line" pathLength={1} />
-        <circle cx={(values.length - 1) * step} cy={y(values[values.length - 1] ?? 0)} r="3" className="led-dot" />
       </svg>
+      <span className="led-end" style={{ left: "100%", top: `${(y(values[values.length - 1] ?? 0) / H) * 100}%` }} aria-hidden="true" />
+      </div>
       <div className="led-axis mono">
         <span>{days[0] ? dayLabel(days[0]) : ""}</span>
         <span>{days[Math.floor(days.length / 2)] ? dayLabel(days[Math.floor(days.length / 2)]) : ""}</span>
@@ -127,6 +130,12 @@ export function AnalyticsView({ stats }: { stats: PlatformStats }) {
         <li><b><CountUp to={totals.agent_watches_active} group /></b>watches standing</li>
         <li><b><CountUp to={totals.agent_claim_checks} group /></b>claims checked</li>
       </ul>
+      {DUNE_DASHBOARD_URL && (
+        <p className="led-verify">
+          Don&apos;t take the desk&apos;s word for it. The same figures are published as open tables on Dune, where anyone can run the queries.{" "}
+          <a href={DUNE_DASHBOARD_URL} target="_blank" rel="noreferrer">Verify them on Dune →</a>
+        </p>
+      )}
 
       <section className="led-blk">
         <Head n="L.1" title="Activity, by day" />
@@ -208,6 +217,7 @@ export function AnalyticsView({ stats }: { stats: PlatformStats }) {
       <p className="led-foot mono">
         Computed {new Date(stats.generated_at).toISOString().replace("T", " ").slice(0, 16)}Z from the platform&apos;s own records · aggregates only · refreshed hourly ·{" "}
         <Link className="dk-link" href="/privacy">what is kept</Link>
+        {DUNE_DASHBOARD_URL && (<>{" · "}<a className="dk-link" href={DUNE_DASHBOARD_URL} target="_blank" rel="noreferrer">verify on Dune</a></>)}
       </p>
     </div>
   );

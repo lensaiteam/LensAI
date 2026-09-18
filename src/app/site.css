@@ -316,12 +316,16 @@
 .led-fig { margin: 0; }
 .led-fig figcaption { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mut); padding-bottom: 10px; }
 .led-fig figcaption b { color: var(--txt); font-weight: 500; }
+.led-plot { position: relative; }
 .led-svg { display: block; width: 100%; height: clamp(150px, 22vw, 220px); overflow: visible; }
+.led-end { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); transform: translate(-50%, -50%); pointer-events: none; }
 .led-grid { stroke: var(--hair); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .led-bar { fill: #dcdcdc; }
 .led-area { fill: rgba(10, 10, 10, 0.06); }
-.led-line { fill: none; stroke: var(--txt); stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; animation: led-draw 1.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
-.led-dot { fill: var(--accent); }
+/* The line is drawn with pathLength=1 and a dash offset. No non-scaling-stroke here: Chrome
+   measures the dash in screen units when it is set, and a stretched (preserveAspectRatio none)
+   path then stops part-way. The stroke scales slightly instead, which is invisible at 1px. */
+.led-line { fill: none; stroke: var(--txt); stroke-width: 1; stroke-dasharray: 1; stroke-dashoffset: 1; animation: led-draw 1.8s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
 @keyframes led-draw { to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: reduce) { .led-line { animation: none; stroke-dashoffset: 0; } }
 .led-axis { display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--txt); font-size: 10.5px; letter-spacing: 0.08em; color: var(--mut); }
@@ -341,6 +345,9 @@
 .led-rank-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--txt); }
 .led-rank .n { text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; }
 .led-rank-w { font-size: 11px; letter-spacing: 0.04em; color: var(--mut); text-align: right; }
+.led-verify { margin-top: 18px; font-size: 14px; line-height: 1.6; color: var(--sec); }
+.led-verify a { color: var(--txt); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--hair); }
+.led-verify a:hover { color: var(--accent); text-decoration-color: var(--accent); }
 .led-foot { margin-top: clamp(40px, 6vh, 64px); padding-top: 18px; border-top: 1px solid var(--hair); font-size: 11px; letter-spacing: 0.04em; color: var(--mut); line-height: 1.7; }
 .led-empty { margin-top: clamp(40px, 6vh, 64px); padding-top: 22px; border-top: 1px solid var(--txt); max-width: 60ch; }
 .led-empty .mono { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }

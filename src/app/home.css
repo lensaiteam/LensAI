@@ -180,3 +180,13 @@
   .founder-body { grid-template-columns: 1fr; }
   .founder-photo { width: 96px; height: 96px; }
 }
+.crew { padding: 26px 0 8px; border-left: 1px solid var(--hair); padding-left: clamp(24px, 3vw, 44px); }
+.crew-list { list-style: none; margin: 6px 0 0; padding: 0; }
+.crew-list li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--hair); }
+.crew-list li:last-child { border-bottom: 0; }
+.crew-n { font-size: 11px; letter-spacing: 0.1em; color: var(--accent); padding-top: 4px; }
+.crew-name { font-size: 17px; font-weight: var(--w-head); letter-spacing: -0.015em; margin: 0 0 4px; display: flex; align-items: baseline; gap: 10px; }
+.crew-count { font-size: 11px; font-weight: 400; letter-spacing: 0.08em; color: var(--mut); border: 1px solid var(--hair); padding: 1px 7px; }
+.crew-who { font-size: 14px; line-height: 1.5; color: var(--sec); margin: 0 0 4px; }
+.crew-owns { font-size: 13px; line-height: 1.5; color: var(--mut); margin: 0; }
+@media (max-width: 860px) { .crew { border-left: 0; padding-left: 0; border-top: 1px solid var(--hair); } }

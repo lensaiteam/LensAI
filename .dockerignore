@@ -1,6 +1,8 @@
 node_modules
 .next
 .git
+# every dot-directory at the root: VCS, CI, editor and tool state never belong in the image
+.*
 data
 backups
 *.db
@@ -12,11 +14,8 @@ tests
 docs
 brand
 public
-referential
-design-prototypes
 design-reference
 integrations
-Video Frame Extractor*
 *.mp4
 *.jpeg
 *.png

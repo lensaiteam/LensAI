@@ -33,7 +33,7 @@ async function main(): Promise<void> {
   const db = getDb();
   runMigrations(db);
   // Default = the provider pool (config/llm-pool.json). `--anthropic`
-  // keeps the original Claude provider available as an explicit opt-in.
+  // keeps the original Anthropic provider available as an explicit opt-in.
   const provider = useMock
     ? new MockProvider({ headline: "(mock — no claims)", claims: [] })
     : args.includes("--anthropic")

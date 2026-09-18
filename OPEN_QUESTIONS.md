@@ -106,7 +106,7 @@ Consequence taken in the design: no open tool loop (the pool is heterogeneous, a
 the engine, not the model, is the intelligence) — plan → deterministic gather →
 ONE structured generation → the existing fail-closed gates; everything that can be
 arithmetic is (changes, watches, track record); generic reads are one shared brief
-per anchor. Supersedes Q14's "Claude default" for the running system: `narrate` now
+per anchor. Supersedes Q14's "Anthropic default" for the running system: `narrate` now
 defaults to the pool, `--anthropic` remains an opt-in. **Reversal is a config edit**
 (`config/llm-pool.json` takes any OpenAI-compatible endpoint). Known
 ceiling: pooled provider limits cap concurrent ad-hoc questions; per-user daily budget

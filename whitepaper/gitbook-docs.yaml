@@ -1,0 +1,12 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: LensAI
+  structure:
+    - type: space
+      key: lensai-whitepaper
+      title: Whitepaper
+      path: whitepaper
+      default: true
+      content:
+        directory: ./
+        language: en

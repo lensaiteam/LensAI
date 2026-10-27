@@ -12,10 +12,6 @@ LensAI is an automated research desk for crypto. It reads funding, open interest
 
 This paper describes what LensAI is, how the engine underneath it works, why its outputs can be trusted, how it stays free for the people who use it, and how the $LENS token is designed to fit the product once it launches.
 
-{% hint style="info" %}
-**Version 2.0, October 2026.** This edition replaces the earlier whitepaper. The product has changed in three ways since then: every read now ends in a committed call with a public record, deep research is free for users, and the desk captures its own liquidation data.
-{% endhint %}
-
 ## The short version
 
 | | |
